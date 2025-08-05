@@ -1,0 +1,197 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(VOLUNTEER)
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationship to volunteer record (for VOLUNTEER role users)
+  volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
+  volunteerId String?    @unique
+
+  @@map("users")
+}
+
+model Volunteer {
+  id        String          @id @default(cuid())
+  name      String
+  email     String          @unique
+  phone     String
+  address   String
+  birthday  DateTime
+  status    VolunteerStatus @default(ACTIVE)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  // Relationships
+  attendances           Attendance[]
+  user                  User? // Optional user account linked to this volunteer
+  ActivityParticipation ActivityParticipation[]
+  DogCareRecord         DogCareRecord[]
+  Notification          Notification[]
+
+  @@map("volunteers")
+}
+
+model Attendance {
+  id        String           @id @default(cuid())
+  date      DateTime
+  status    AttendanceStatus @default(PRESENT)
+  notes     String? // Optional notes for justified absences
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  // Relationships
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerId String
+
+  // Ensure one attendance record per volunteer per day
+  @@unique([volunteerId, date])
+  @@map("attendances")
+}
+
+model Activity {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  date          DateTime
+  location      String?
+  maxVolunteers Int? // Optional limit on number of volunteers
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relationships
+  participations ActivityParticipation[]
+
+  @@map("activities")
+}
+
+model ActivityParticipation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relationships
+  activity    Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId  String
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerId String
+
+  // Ensure one participation per volunteer per activity
+  @@unique([activityId, volunteerId])
+  @@map("activity_participations")
+}
+
+model Dog {
+  id          String    @id @default(cuid())
+  name        String
+  breed       String?
+  age         Int?
+  description String?
+  imageUrl    String?
+  status      DogStatus @default(AVAILABLE)
+  location    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  careRecords DogCareRecord[]
+
+  @@map("dogs")
+}
+
+model DogCareRecord {
+  id          String      @id @default(cuid())
+  date        DateTime
+  careType    DogCareType
+  description String?
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relationships
+  dog         Dog       @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  dogId       String
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId String
+
+  @@map("dog_care_records")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Relationships
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerId String
+
+  @@map("notifications")
+}
+
+// Enums
+enum UserRole {
+  VOLUNTEER
+  MANAGER
+  ADMIN
+}
+
+enum VolunteerStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  JUSTIFIED
+  LATE
+}
+
+enum DogStatus {
+  AVAILABLE
+  ADOPTED
+  MEDICAL_CARE
+  UNAVAILABLE
+}
+
+enum DogCareType {
+  FEEDING
+  WALKING
+  MEDICAL
+  GROOMING
+  TRAINING
+  CLEANING
+  OTHER
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  SUCCESS
+  ERROR
+  REMINDER
+}
