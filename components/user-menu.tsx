@@ -13,10 +13,13 @@ import { Badge } from "@/components/ui/badge"
 import { useAuthStore } from "@/lib/auth-store"
 import { LogOut, User, Settings, Shield, Crown } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import {useRouter} from "next/navigation";
+import {Separator} from "@/components/ui/separator";
 
 export default function UserMenu() {
   const { user, logout } = useAuthStore()
   const { toast } = useToast()
+  const router = useRouter()
 
   if (!user) return null
 
@@ -26,6 +29,14 @@ export default function UserMenu() {
       title: "Sesión cerrada",
       description: "Has cerrado sesión exitosamente",
     })
+  }
+  
+  const handleProfileClick = () => {
+    router.push("/profile")
+  }
+  
+  const handleSettingsClick = () => {
+    router.push("/settings")
   }
 
   const getRoleIcon = () => {
@@ -82,19 +93,29 @@ export default function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer hover:bg-purple-50">
+        <DropdownMenuItem
+          className="cursor-pointer hover:bg-purple-50"
+          onClick={handleProfileClick}>
           <User className="mr-2 h-4 w-4" />
           <span>Perfil</span>
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer hover:bg-purple-50">
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Configuración</span>
-        </DropdownMenuItem>
+        {/*<DropdownMenuItem*/}
+        {/*  className="cursor-pointer hover:bg-purple-50"*/}
+        {/*  onClick={handleSettingsClick}>*/}
+        {/*  <Settings className="mr-2 h-4 w-4" />*/}
+        {/*  <span>Configuración</span>*/}
+        {/*</DropdownMenuItem>*/}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-red-50 text-red-600">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Cerrar Sesión</span>
         </DropdownMenuItem>
+        
+        <Separator className="my-2" />
+      {/*  Version app */}
+        <div className="px-4 py-2 text-xs text-gray-400 text-center">
+          <span>Versión 1.0.0</span>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   )

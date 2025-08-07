@@ -1,5 +1,7 @@
 import { create } from "zustand"
 
+export type StatusAttendance = "Present" | "Absent" | "Justified" | "Late"
+
 export interface Volunteer {
   id: string
   name: string
@@ -7,15 +9,33 @@ export interface Volunteer {
   phone: string
   address: string
   birthday: string
-  status: "Active" | "Inactive"
+  status: "Active" | "Inactive" | "Suspended"
   attendances: Attendance[]
+}
+
+export interface VolunteerForSelect {
+  id: string
+  name: string
+  email: string
+  status: "Active" | "Inactive" | "Suspended"
 }
 
 export interface Attendance {
   id: string
   volunteerId: string
   date: string
-  status: "Present" | "Absent" | "Justified"
+  status: "Present" | "Absent" | "Justified" | "Late"
+}
+
+export interface AttendanceWithVolunteer {
+  id: string
+  date: string
+  status: "Present" | "Absent" | "Justified" | "Late"
+  volunteer: {
+    id: string
+    name: string
+    email: string
+  }
 }
 
 interface VolunteerStore {

@@ -145,3 +145,35 @@ Git
 ```
 
 ### Steps
+1. **Clone the repository:**
+   ```bash
+   git clone 
+   ```
+2. **Navigate to the project directory:**
+   ```bash
+   cd luchos-unsaac
+   ```
+3. **Install dependencies:**
+    ```bash
+   pnpm install
+   ```
+4. **Run the development server:**
+   ```bash
+    pnpm dev
+    ```
+5. **Open your browser:**
+6. Visit `http://localhost:3000` to see the application in action.
+7. **Create a `.env` file:**
+   - Copy the `.env.example` to `.env` and configure your environment variables.
+8. **Run migrations (if applicable):**
+   ```bash
+    pnpm prisma migrate dev --name init
+    ```
+9. **Generate Prisma Client:**
+   ```bash
+    pnpm prisma generate
+    ```
+10. **Seed the database (optional):**
+    ```bash
+    pnpm prisma db seed
+    ```

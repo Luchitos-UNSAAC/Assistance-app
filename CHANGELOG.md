@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [1.0.0] - 2025-08-04
+## [1.0.0] - 2025-08-07
 
 ### ✨ Added
 - Initial release of **LUCHOS UNSAAC** – Volunteer Management Platform.

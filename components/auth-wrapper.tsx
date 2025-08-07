@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useAuthStore } from "@/lib/auth-store"
-import LoginForm from "@/components/login-form"
+import LoginForm from "@/features/auth/components/login-form"
 import BottomNavigation from "@/components/bottom-navigation"
 import UserMenu from "@/components/user-menu"
 

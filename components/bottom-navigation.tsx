@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Users, Calendar, Home } from "lucide-react"
+import {Users, Calendar, Home, Users2Icon} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/lib/auth-store"
 
@@ -11,6 +11,7 @@ const navigation = [
   { name: "Mi Perfil", href: "/profile", icon: Users, requiredRole: "VOLUNTEER" as const, volunteerOnly: true },
   { name: "Voluntarios", href: "/volunteers", icon: Users, requiredRole: "MANAGER" as const },
   { name: "Asistencias", href: "/attendance", icon: Calendar, requiredRole: "MANAGER" as const },
+  { name: "Encargados", href: "/managers", icon: Users2Icon, requiredRole: "ADMIN" as const },
 ]
 
 export default function BottomNavigation() {

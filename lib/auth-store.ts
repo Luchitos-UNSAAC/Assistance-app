@@ -15,9 +15,10 @@ export interface User {
 interface AuthStore {
   user: User | null
   isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  setUser: (user: User) => void
   logout: () => void
   hasPermission: (requiredRole: UserRole) => boolean
+  updateUser: (data: Partial<User>) => void
 }
 
 // Mock users for demonstration
@@ -60,19 +61,8 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      login: async (email: string, password: string) => {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        const user = mockUsers.find((u) => u.email === email && u.password === password)
-
-        if (user) {
-          const { password: _, ...userWithoutPassword } = user
-          set({ user: userWithoutPassword, isAuthenticated: true })
-          return { success: true }
-        }
-
-        return { success: false, error: "Credenciales inválidas" }
+      setUser: (user: User) => {
+        set({ user, isAuthenticated: true })
       },
       logout: () => {
         set({ user: null, isAuthenticated: false })
@@ -82,6 +72,9 @@ export const useAuthStore = create<AuthStore>()(
         if (!user) return false
         return roleHierarchy[user.role] >= roleHierarchy[requiredRole]
       },
+      updateUser: (data: Partial<User>) => set((state) => ({
+        user: state.user ? { ...state.user, ...data } : null
+      })),
     }),
     {
       name: "auth-storage",
