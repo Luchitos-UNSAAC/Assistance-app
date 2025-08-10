@@ -1,236 +1,303 @@
-// app/api/attendances/export-summary/route.ts
+// app/api/attendances/export-summary/professional/route.ts
 import { prisma } from '@/lib/prisma';
 import ExcelJS from 'exceljs';
+import { DateTime } from 'luxon';
 
 export const runtime = 'nodejs';
 
 type ReqBody = {
-  year?: number;
-  month?: number;
-  day?: number;
+  startDate: string; // ISO date or yyyy-MM-dd
+  endDate: string;   // ISO date or yyyy-MM-dd
   statuses?: Array<'ACTIVE' | 'INACTIVE' | 'SUSPENDED'>;
-  timezone?: string;
+  timezone?: string; // e.g. "America/Lima"
+  includePhone?: boolean;
+  onlyWithAttendance?: boolean;
 };
 
 const ATTENDANCE_STATUSES = ['PRESENT', 'ABSENT', 'JUSTIFIED', 'LATE'] as const;
-type AttendanceStatusType = typeof ATTENDANCE_STATUSES[number];
+const EXPORT_IN_MEMORY_LIMIT = 30000; // umbral de filas para exportar en memoria
+const MAX_RANGE_DAYS = 365;
 
-function buildDateRange(body: ReqBody) {
-  const { year, month, day } = body;
-  if (!year) return null;
+function parseRangeInZone(startIso: string, endIso: string, tz: string) {
+  // Parse start as startOf('day') and end as endOf('day') in given timezone.
+  const start = DateTime.fromISO(startIso, { zone: tz });
+  const end = DateTime.fromISO(endIso, { zone: tz });
   
-  if (year && month && day) {
-    const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
-    const end = new Date(Date.UTC(year, month - 1, day + 1, 0, 0, 0));
-    return { gte: start, lt: end };
-  }
+  if (!start.isValid) throw new Error(`startDate inválida: ${startIso}`);
+  if (!end.isValid) throw new Error(`endDate inválida: ${endIso}`);
   
-  if (year && month) {
-    const start = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
-    const end = new Date(Date.UTC(year, month, 1, 0, 0, 0));
-    return { gte: start, lt: end };
-  }
+  const startOfDay = start.startOf('day');
+  const endOfDay = end.endOf('day');
   
-  if (year) {
-    const start = new Date(Date.UTC(year, 0, 1, 0, 0, 0));
-    const end = new Date(Date.UTC(year + 1, 0, 1, 0, 0, 0));
-    return { gte: start, lt: end };
-  }
+  // convert to UTC JS Date for DB filtering
+  const startZ = startOfDay.toUTC().toJSDate();
+  const endZ = endOfDay.toUTC().toJSDate();
   
-  return null;
+  // diff days inclusive
+  const diffDays = Math.floor(endOfDay.startOf('day').diff(startOfDay.startOf('day'), 'days').days) + 1;
+  
+  return { startZ, endZ, diffDays };
 }
 
 export async function POST(req: Request) {
   try {
     const body: ReqBody = await req.json().catch(() => ({}));
+    const tz = body.timezone ?? 'America/Lima';
+    const generatedBy = (req.headers.get('x-user-name') ?? 'system').toString();
     
-    // validations
-    if (body.month && (body.month < 1 || body.month > 12)) {
-      return new Response(JSON.stringify({ error: 'month must be 1-12' }), { status: 400 });
+    // Validación de campos requeridos
+    if (!body.startDate || !body.endDate) {
+      return new Response(JSON.stringify({ error: 'startDate y endDate son requeridos (formato ISO o YYYY-MM-DD).' }), { status: 400 });
     }
-    if (body.day && (body.day < 1 || body.day > 31)) {
-      return new Response(JSON.stringify({ error: 'day must be 1-31' }), { status: 400 });
+    
+    // Parsear y validar rango
+    let startUTC: Date;
+    let endUTC: Date;
+    let diffDays: number;
+    try {
+      const parsed = parseRangeInZone(body.startDate, body.endDate, tz);
+      startUTC = parsed.startZ;
+      endUTC = parsed.endZ;
+      diffDays = parsed.diffDays;
+    } catch (err: any) {
+      return new Response(JSON.stringify({ error: err.message }), { status: 400 });
     }
     
-    const statuses = body.statuses && body.statuses.length > 0
-      ? body.statuses
-      : ['ACTIVE', 'INACTIVE'] as Array<'ACTIVE' | 'INACTIVE' | 'SUSPENDED'>;
+    if (diffDays <= 0) {
+      return new Response(JSON.stringify({ error: 'endDate debe ser igual o posterior a startDate.' }), { status: 400 });
+    }
+    if (diffDays > MAX_RANGE_DAYS) {
+      return new Response(JSON.stringify({
+        error: `Rango demasiado grande. El rango máximo permitido es de ${MAX_RANGE_DAYS} días.`,
+        sugerencia: 'Reduce el rango de fechas o implementa un export por streaming.'
+      }), { status: 413 });
+    }
     
-    const dateFilter = buildDateRange(body);
+    const statuses = body.statuses && body.statuses.length > 0 ? body.statuses : ['ACTIVE', 'INACTIVE'];
     
-    // Build attendance where clause (we can filter by related volunteer fields)
+    // Construir filtro para groupBy en attendances
     const attendanceWhere: any = {
       deletedAt: null,
       volunteer: { deletedAt: null, status: { in: statuses } },
+      date: { gte: startUTC, lte: endUTC },
     };
-    if (dateFilter) attendanceWhere.date = dateFilter;
     
-    // 1) Group attendances by volunteerId + status (single query, efficient)
+    // 1) Agrupar asistencias por volunteerId + status
     const grouped = await prisma.attendance.groupBy({
       by: ['volunteerId', 'status'],
       where: attendanceWhere,
       _count: { _all: true },
     });
     
-    // 2) Get distinct volunteerIds from grouped results
-    const volunteerIds = Array.from(new Set(grouped.map((g) => g.volunteerId)));
+    // IDs de voluntarios con asistencias en el rango
+    const volunteerIdsWithAttendance = Array.from(new Set(grouped.map(g => g.volunteerId)));
     
-    // 3) Fetch volunteers that match filters (include volunteers with zero attendances)
-    //    We include only volunteers that match statuses and not soft-deleted.
+    // 2) Obtener voluntarios (según onlyWithAttendance)
+    const volunteerFilter: any = { deletedAt: null, status: { in: statuses } };
+    if (body.onlyWithAttendance) {
+      if (volunteerIdsWithAttendance.length === 0) {
+        // devolver un reporte vacío pero bien formado
+        return await buildExcelAndReturn({
+          timezone: tz,
+          generatedBy,
+          filters: { startDate: body.startDate, endDate: body.endDate, statuses },
+          volunteers: [],
+          grouped,
+          includePhone: !!body.includePhone
+        });
+      }
+      volunteerFilter.id = { in: volunteerIdsWithAttendance };
+    }
+    
     const volunteers = await prisma.volunteer.findMany({
-      where: {
-        deletedAt: null,
-        status: { in: statuses },
-        // optionally: if you want only those within the date range that had attendances,
-        // use: id: { in: volunteerIds }
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        status: true,
-      },
+      where: volunteerFilter,
+      select: { id: true, name: true, email: true, phone: true, status: true },
       orderBy: { name: 'asc' },
     });
     
-    // If you want to include only volunteers who have at least one attendance in the range,
-    // uncomment the filter on the findMany above: id: { in: volunteerIds }
-    
-    // 4) Map grouped counts: { [volunteerId]: { PRESENT: n, ... } }
-    const countsByVolunteer: Record<string, Record<string, number>> = {};
-    grouped.forEach((g) => {
-      const vid = g.volunteerId;
-      const s = g.status as string;
-      const cnt = (g._count && (g._count._all ?? 0)) ?? 0;
-      if (!countsByVolunteer[vid]) {
-        countsByVolunteer[vid] = {};
-      }
-      countsByVolunteer[vid][s] = cnt;
-    });
-    
-    // 5) Prepare rows for Excel
-    type Row = {
-      index: number;
-      name: string;
-      email: string;
-      counts: Record<AttendanceStatusType, number>;
-      total: number;
-    };
-    
-    const rows: Row[] = [];
-    
-    // We'll iterate volunteers. If want only volunteers with attendance, filter volunteers by volunteerIds set.
-    // const volunteersToReport = volunteers.filter(v => volunteerIds.includes(v.id));
-    const volunteersToReport = volunteers; // includes zero-count volunteers
-    
-    for (const [i, v] of volunteersToReport.entries()) {
-      const countsRaw = countsByVolunteer[v.id] ?? {};
-      const counts = {} as Record<AttendanceStatusType, number>;
-      let total = 0;
-      ATTENDANCE_STATUSES.forEach((status) => {
-        const c = countsRaw[status] ? Number(countsRaw[status]) : 0;
-        counts[status] = c;
-        total += c;
-      });
-      
-      rows.push({
-        index: i + 1,
-        name: v.name,
-        email: v.email,
-        counts,
-        total,
-      });
+    // Comprobación de seguridad de memoria
+    if (volunteers.length > EXPORT_IN_MEMORY_LIMIT) {
+      return new Response(JSON.stringify({
+        error: 'Conjunto de datos demasiado grande para exportar en memoria. Por favor, reduzca los filtros o use exportación por streaming.',
+        sugerencia: 'Use onlyWithAttendance=true o reduzca el rango de fechas.'
+      }), { status: 413 });
     }
     
-    // 6) Create Excel workbook and sheet
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Summary');
-    
-    // Header row: #, name, email, [statuses...], TOTAL
-    const header = ['#', 'name', 'email', ...ATTENDANCE_STATUSES, 'TOTAL'];
-    sheet.addRow(header);
-    
-    // Style header (bold)
-    const headerRow = sheet.getRow(1);
-    headerRow.font = { bold: true };
-    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
-    headerRow.height = 18;
-    
-    // Add data rows
-    rows.forEach((r) => {
-      const rowValues = [
-        r.index,
-        r.name,
-        r.email,
-        ...ATTENDANCE_STATUSES.map((s) => r.counts[s]),
-        r.total,
-      ];
-      sheet.addRow(rowValues);
+    return await buildExcelAndReturn({
+      timezone: tz,
+      generatedBy,
+      filters: { startDate: body.startDate, endDate: body.endDate, statuses },
+      volunteers,
+      grouped,
+      includePhone: !!body.includePhone
     });
     
-    // Add totals footer (sum column-wise) - optional
-    const footerRowIndex = sheet.rowCount + 1;
-    const footer = [];
-    footer[1] = 'TOTALS'; // leave first col empty (#)
-    footer[2] = ''; // name
-    footer[3] = ''; // email
-    // For each status column, build formula SUM(colRange)
-    // header is row 1, data starts at row 2 and ends at rowCount
-    const dataStart = 2;
-    const dataEnd = sheet.rowCount;
-    // find column indexes (1-based)
-    const colIndexForStatusStart = 4; // because: 1(#),2(name),3(email), 4 -> PRESENT
-    ATTENDANCE_STATUSES.forEach((s, idx) => {
-      const col = colIndexForStatusStart + idx;
-      // Excel formula e.g. =SUM(D2:D{dataEnd})
-      footer[col] = { formula: `SUM(${sheet.getColumn(col).letter}${dataStart}:${sheet.getColumn(col).letter}${dataEnd})` };
-    });
-    // TOTAL column index
-    const totalColIndex = colIndexForStatusStart + ATTENDANCE_STATUSES.length;
-    footer[totalColIndex] = { formula: `SUM(${sheet.getColumn(totalColIndex).letter}${dataStart}:${sheet.getColumn(totalColIndex).letter}${dataEnd})` };
-    
-    // push footer only if there is at least one data row
-    if (dataEnd >= dataStart) {
-      const f = sheet.addRow(footer);
-      f.font = { bold: true };
-    }
-    
-    // Auto width (simple)
-    sheet.columns?.forEach((col) => {
-      let maxLength = 10;
-      
-      //@ts-ignore
-      col.eachCell({ includeEmpty: true }, (cell) => {
-        const v = cell.value;
-        const text = v && typeof v === 'object' && 'richText' in v
-          ? (v as any).richText.map((x: any) => x.text).join('')
-          : String(v ?? '');
-        if (text.length > maxLength) maxLength = text.length;
-      });
-      col.width = Math.min(Math.max(maxLength + 2, 8), 60);
-    });
-    
-    // Generate buffer
-    const buffer = await workbook.xlsx.writeBuffer();
-    
-    // filename
-    const parts = [];
-    if (body.year) parts.push(String(body.year));
-    if (body.month) parts.push(String(body.month).padStart(2, '0'));
-    if (body.day) parts.push(String(body.day).padStart(2, '0'));
-    const filterLabel = parts.length ? parts.join('-') : 'all';
-    const filename = `attendances_summary_${filterLabel}_${statuses.join('_')}.xlsx`;
-    
-    return new Response(buffer, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="${filename}"`,
-      },
-    });
   } catch (err: any) {
-    console.error('Export summary error:', err);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
+    console.error('Error export profesional (rango):', err);
+    return new Response(JSON.stringify({ error: 'Error interno del servidor' }), { status: 500 });
   }
+}
+
+/** Función helper para construir el workbook y devolver Response (Excel) */
+async function buildExcelAndReturn({
+                                     timezone,
+                                     generatedBy,
+                                     filters,
+                                     volunteers,
+                                     grouped,
+                                     includePhone,
+                                   }: {
+  timezone: string;
+  generatedBy: string;
+  filters: any;
+  volunteers: Array<any>;
+  grouped: Array<any>;
+  includePhone: boolean;
+}) {
+  // Mapear counts por voluntario
+  const countsByVolunteer: Record<string, Record<string, number>> = {};
+  grouped.forEach(g => {
+    const vid = g.volunteerId;
+    const s = g.status as string;
+    const cnt = (g._count && (g._count._all ?? 0)) ?? 0;
+    if (!countsByVolunteer[vid]) countsByVolunteer[vid] = {};
+    countsByVolunteer[vid][s] = cnt;
+  });
+  
+  // Construir filas
+  const rows = volunteers.map((v, idx) => {
+    const raw = countsByVolunteer[v.id] ?? {};
+    const counts: Record<string, number> = {};
+    let total = 0;
+    ATTENDANCE_STATUSES.forEach(status => {
+      const c = raw[status] ? Number(raw[status]) : 0;
+      counts[status] = c;
+      total += c;
+    });
+    return {
+      index: idx + 1,
+      id: v.id,
+      name: v.name,
+      email: v.email,
+      phone: v.phone ?? '',
+      counts,
+      total,
+      status: v.status,
+    };
+  });
+  
+  // Crear workbook
+  const workbook = new ExcelJS.Workbook();
+  
+  // Hoja Metadata
+  const meta = workbook.addWorksheet('Metadatos', { views: [{ state: 'frozen', ySplit: 1 }] });
+  meta.properties.defaultRowHeight = 18;
+  const reportTitle = 'Reporte Resumen de Asistencias';
+  meta.mergeCells('A1', 'D1');
+  const titleCell = meta.getCell('A1');
+  titleCell.value = reportTitle;
+  titleCell.font = { size: 16, bold: true };
+  titleCell.alignment = { vertical: 'middle', horizontal: 'left' };
+  
+  const generatedAtStr = DateTime.now().setZone(timezone).toFormat('yyyy-LL-dd HH:mm ZZZZ');
+  const metaRows = [
+    ['Generado por', generatedBy],
+    ['Generado el', generatedAtStr],
+    ['Zona horaria', timezone],
+    ['Filtros', JSON.stringify(filters)],
+    ['Voluntarios en el reporte', String(volunteers.length)],
+    ['Grupos de estado de asistencia agregados', String(grouped.length)],
+  ];
+  meta.addRows(metaRows);
+  meta.addRow([]);
+  meta.addRow(['Notas', 'Este reporte excluye voluntarios y asistencias marcados como eliminados (deletedAt != null).']);
+  
+  // Hoja de datos
+  const sheet = workbook.addWorksheet('Resumen', { views: [{ state: 'frozen', ySplit: 1 }] });
+  const header = ['#', 'Nombre', 'Correo'];
+  if (includePhone) header.push('Teléfono');
+  ATTENDANCE_STATUSES.forEach(s => header.push(s));
+  header.push('TOTAL');
+  sheet.addRow(header);
+  
+  const headerRow = sheet.getRow(1);
+  headerRow.font = { bold: true, size: 11 };
+  headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+  headerRow.height = 20;
+  
+  rows.forEach(r => {
+    const base = [r.index, r.name, r.email];
+    if (includePhone) base.push(r.phone);
+    const counts = ATTENDANCE_STATUSES.map(s => r.counts[s]);
+    const rowData = [...base, ...counts, r.total];
+    sheet.addRow(rowData);
+  });
+  
+  // Pie de totales (fórmulas)
+  const dataStart = 2;
+  const dataEnd = sheet.rowCount;
+  if (dataEnd >= dataStart) {
+    const footer: any[] = [];
+    footer[1] = 'TOTALES';
+    footer[2] = '';
+    footer[3] = '';
+    let colIdx = 4;
+    if (includePhone) colIdx = 5;
+    ATTENDANCE_STATUSES.forEach((s, idx) => {
+      const col = colIdx + idx;
+      const letter = sheet.getColumn(col).letter;
+      footer[col] = { formula: `SUM(${letter}${dataStart}:${letter}${dataEnd})` };
+    });
+    const totalCol = colIdx + ATTENDANCE_STATUSES.length;
+    const totalLetter = sheet.getColumn(totalCol).letter;
+    footer[totalCol] = { formula: `SUM(${totalLetter}${dataStart}:${totalLetter}${dataEnd})` };
+    const f = sheet.addRow(footer);
+    f.font = { bold: true };
+  }
+  
+  // Estilos: anchos, alineación, bordes, filas alternadas
+  sheet.columns.forEach((col, i) => {
+    const headerText = String(header[i] ?? '');
+    col.width = Math.max(12, Math.min(40, headerText.length + 10));
+    col.alignment = { vertical: 'middle', horizontal: i < (includePhone ? 4 : 3) ? 'left' : 'center' };
+    // @ts-ignore
+    col.eachCell({ includeEmpty: true }, (cell) => {
+      cell.border = {
+        top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }
+      };
+    });
+  });
+  
+  // Relleno alternado para filas de datos
+  for (let r = dataStart; r <= dataEnd; r++) {
+    if ((r - dataStart) % 2 === 0) {
+      const row = sheet.getRow(r);
+      row.eachCell(cell => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFF9F9F9' },
+        };
+      });
+    }
+  }
+  
+  // AutoFilter y freeze header
+  sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: sheet.columnCount } };
+  sheet.views = [{ state: 'frozen', ySplit: 1 }];
+  
+  // Nombre del archivo
+  const startLabel = String(filters.startDate).replace(/[: ]/g, '_');
+  const endLabel = String(filters.endDate).replace(/[: ]/g, '_');
+  const filename = `resumen_asistencias_${startLabel}_a_${endLabel}_${DateTime.now().toFormat('yyyyLLdd_HHmm')}.xlsx`;
+  
+  // Buffer (apto para tamaños moderados)
+  const buffer = await workbook.xlsx.writeBuffer();
+  return new Response(buffer, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+    },
+  });
 }

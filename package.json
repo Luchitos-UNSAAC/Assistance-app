@@ -53,6 +53,7 @@
     "immer": "latest",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
+    "luxon": "^3.7.1",
     "next": "14.2.16",
     "next-themes": "^0.4.4",
     "react": "^18",
@@ -70,6 +71,7 @@
     "zustand": "latest"
   },
   "devDependencies": {
+    "@types/luxon": "^3.7.1",
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
