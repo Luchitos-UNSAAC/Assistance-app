@@ -1,0 +1,4 @@
+- Responde en español.
+- Sigue nuestro checklist de seguridad interno.
+- Enfócate en la legibilidad y evita el uso de operadores ternarios anidados.
+- Revisa si existen vulnerabilidades de seguridad en el código.
