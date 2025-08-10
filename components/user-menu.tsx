@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { useAuthStore } from "@/lib/auth-store"
-import { LogOut, User, Settings, Shield, Crown } from "lucide-react"
+import {LogOut, User, Settings, Shield, Crown, UserCircle} from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {useRouter} from "next/navigation";
 import {Separator} from "@/components/ui/separator";
@@ -31,12 +31,15 @@ export default function UserMenu() {
     })
   }
   
+  const hasPermission = useAuthStore((state) => state.hasPermission)
+  const isAdmin = hasPermission("ADMIN")
+  
   const handleProfileClick = () => {
     router.push("/profile")
   }
   
   const handleSettingsClick = () => {
-    router.push("/settings")
+    router.push("/admin")
   }
 
   const getRoleIcon = () => {
@@ -65,8 +68,8 @@ export default function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10 border-2 border-white/20">
-            <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+          <Avatar className="h-10 w-10 border-2 border-white/20 ">
+            <AvatarImage/>
             <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
               {user.name
                 .split(" ")
@@ -99,12 +102,17 @@ export default function UserMenu() {
           <User className="mr-2 h-4 w-4" />
           <span>Perfil</span>
         </DropdownMenuItem>
-        {/*<DropdownMenuItem*/}
-        {/*  className="cursor-pointer hover:bg-purple-50"*/}
-        {/*  onClick={handleSettingsClick}>*/}
-        {/*  <Settings className="mr-2 h-4 w-4" />*/}
-        {/*  <span>Configuración</span>*/}
-        {/*</DropdownMenuItem>*/}
+        {
+          isAdmin && (
+            <DropdownMenuItem
+              className="cursor-pointer bg-purple-50 hover:bg-purple-100 font-medium text-purple-700"
+              onClick={handleSettingsClick}>
+              <UserCircle className="mr-2 h-4 w-4" />
+              <span>Admin</span>
+            </DropdownMenuItem>
+          )
+        }
+       
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-red-50 text-red-600">
           <LogOut className="mr-2 h-4 w-4" />
