@@ -15,6 +15,12 @@ import {useRouter} from "next/navigation";
 import {useDeleteModalStore} from "@/lib/delete-modal-store";
 import {deleteVolunteerById} from "@/features/volunteers/actions/delete-volunteer-by-id";
 import VolunteerModal from "@/features/volunteers/components/volunteer-modal";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion"
 
 interface ManagersListProps {
   volunteers: Volunteer[]
@@ -39,7 +45,7 @@ export default function VolunteerList({volunteers, attendances}: ManagersListPro
   )
   
   const getAttendanceStats = (volunteerId: string) => {
-    const volunteerAttendances = attendances.filter((a) => a.id === volunteerId)
+    const volunteerAttendances = attendances.filter((a) => a.volunteerId === volunteerId)
     const present = volunteerAttendances.filter((a) => a.status === "Present").length
     const absent = volunteerAttendances.filter((a) => a.status === "Absent").length
     const justified = volunteerAttendances.filter((a) => a.status === "Justified").length
@@ -96,8 +102,7 @@ export default function VolunteerList({volunteers, attendances}: ManagersListPro
               }}
               className="gradient-button text-white"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar
+              <Plus className="h-4 w-4" />
             </Button>
           )}
         </div>
@@ -152,26 +157,33 @@ export default function VolunteerList({volunteers, attendances}: ManagersListPro
                   </div>
                   
                   {/* Volunteer Info */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-gray-700">
-                    <InfoRow icon={Mail} text={volunteer.email} />
-                    <InfoRow icon={Phone} text={volunteer.phone} />
-                    <InfoRow icon={MapPin} text={volunteer.address} />
-                  </div>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="personal-info">
+                      <AccordionTrigger className="text-xs text-gray-700">Ver datos personales</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-gray-700 mt-2">
+                          <InfoRow icon={Mail} text={volunteer.email} />
+                          <InfoRow icon={Phone} text={volunteer.phone} />
+                          <InfoRow icon={MapPin} text={volunteer.address} />
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                   
                   {/* Attendance Summary */}
                   <div className="flex justify-between items-center border-t pt-2 border-gray-100 text-xs">
-                    <div className="flex gap-3">
-        <span className="text-green-600 font-medium">
-          {stats.present} Presente{stats.present !== 1 ? "s" : ""}
-        </span>
-                      <span className="text-red-600 font-medium">
-          {stats.absent} Ausente{stats.absent !== 1 ? "s" : ""}
-        </span>
-                      <span className="text-yellow-600 font-medium">
-          {stats.justified} Justificado{stats.justified !== 1 ? "s" : ""}
-        </span>
+                    <div className="flex gap-2">
+                      <div className="text-green-600 font-medium">
+                        {stats.present} Presente{stats.present !== 1 ? "s" : ""}
+                      </div>
+                      <div className="text-red-600 font-medium">
+                        {stats.absent} Ausente{stats.absent !== 1 ? "s" : ""}
+                      </div>
+                      <div className="text-yellow-600 font-medium">
+                        {stats.justified} Justificado{stats.justified !== 1 ? "s" : ""}
+                      </div>
                     </div>
-                    <span className="text-gray-400 mt-1">Total: {stats.total}</span>
+                    <div className="text-gray-400 mt-1">Total: {stats.total}</div>
                   </div>
                 </CardContent>
               </Card>

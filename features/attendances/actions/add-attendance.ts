@@ -46,7 +46,7 @@ export const addAttendance = async (body: AddAttendanceBody) => {
     
     const response = await prisma.attendance.create({
       data: {
-        date: new Date(body.date),
+        date: new Date(),
         status: statusFormatted,
         volunteerId: body.volunteerId,
         createdBy: currentUser.email,

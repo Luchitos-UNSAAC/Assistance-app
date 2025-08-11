@@ -5,7 +5,7 @@ import {Attendance} from "@/lib/store";
 export default async function ManagersPage() {
   const activeManagers = await getActiveManagers();
   const attendancesAll: Attendance[]  = []
-  
+  console.log("Active Managers:", activeManagers)
   // Join all the attendances for stats
   activeManagers.forEach((manager) => {
     manager.attendances.forEach((attendance) => {
