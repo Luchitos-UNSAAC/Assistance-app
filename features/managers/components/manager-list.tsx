@@ -39,7 +39,7 @@ export default function ManagersList({managers: volunteers, attendances}: Manage
   )
   
   const getAttendanceStats = (volunteerId: string) => {
-    const volunteerAttendances = attendances.filter((a) => a.id === volunteerId)
+    const volunteerAttendances = attendances.filter((a) => a.volunteerId === volunteerId)
     const present = volunteerAttendances.filter((a) => a.status === "Present").length
     const absent = volunteerAttendances.filter((a) => a.status === "Absent").length
     const justified = volunteerAttendances.filter((a) => a.status === "Justified").length
@@ -96,8 +96,7 @@ export default function ManagersList({managers: volunteers, attendances}: Manage
               }}
               className="gradient-button text-white"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar
+              <Plus className="h-4 w-4" />
             </Button>
           )}
         </div>

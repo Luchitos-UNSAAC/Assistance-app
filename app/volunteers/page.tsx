@@ -9,6 +9,7 @@ export default async function VolunteersPage() {
   // Join all the attendances for stats
   activeVolunteers.forEach((volunteer) => {
     volunteer.attendances.forEach((attendance) => {
+      console.log(attendance)
       attendancesAll.push(attendance)
     })
   })

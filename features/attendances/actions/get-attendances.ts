@@ -1,45 +1,56 @@
-"use server"
+"use server";
 
-import {getCurrentUser} from "@/lib/get-current-user";
+import { getCurrentUser } from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
-import {AttendanceWithVolunteer, VolunteerForSelect} from "@/lib/store";
-import { AttendanceStatus } from "@prisma/client";
-import { VolunteerStatus } from "@prisma/client";
+import { AttendanceWithVolunteer, VolunteerForSelect } from "@/lib/store";
+import { AttendanceStatus, VolunteerStatus } from "@prisma/client";
 
-export const getAttendancesAndVolunteers = async () => {
+type GetAttendancesParams = {
+  page?: number;
+  pageSize?: number;
+};
+
+export const getAttendancesAndVolunteers = async ({ page = 1, pageSize = 10 }: GetAttendancesParams = {}) => {
   try {
+    // normalizar valores
+    page = Number(page) || 1;
+    pageSize = Number(pageSize) || 10;
+    if (page < 1) page = 1;
+    if (pageSize < 1) pageSize = 10;
+    const maxPageSize = 100;
+    if (pageSize > maxPageSize) pageSize = maxPageSize;
+    
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return {
         attendances: [],
-        volunteers: []
-      }
+        volunteers: [],
+        pagination: { page, pageSize, total: 0, totalPages: 1 },
+      };
     }
-    const [attendances, volunteers] = await Promise.all([
+    
+    const whereAttendance = { deletedAt: null };
+    
+    // Ejecutamos count y findMany en paralelo (y también traemos volunteers)
+    const [total, attendances, volunteers] = await Promise.all([
+      prisma.attendance.count({ where: whereAttendance }),
       prisma.attendance.findMany({
-        where: {
-          deletedAt: null,
-        },
-        include: {
-          volunteer: true
-        }
+        where: whereAttendance,
+        include: { volunteer: true },
+        orderBy: { date: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
       }),
       prisma.volunteer.findMany({
         where: {
           deletedAt: null,
           status: VolunteerStatus.ACTIVE,
-          createdBy: {
-            not: null
-          }
+          createdBy: { not: null },
         },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          status: true,
-        }
-      })
-    ])
+        select: { id: true, name: true, email: true, status: true },
+        orderBy: { name: "asc" },
+      }),
+    ]);
     
     const mapAttendanceStatus = (status: AttendanceStatus) => {
       switch (status) {
@@ -52,7 +63,7 @@ export const getAttendancesAndVolunteers = async () => {
         case AttendanceStatus.LATE:
           return "Late";
       }
-    }
+    };
     
     const mapVolunteerStatus = (status: VolunteerStatus) => {
       switch (status) {
@@ -63,7 +74,7 @@ export const getAttendancesAndVolunteers = async () => {
         case VolunteerStatus.SUSPENDED:
           return "Suspended";
       }
-    }
+    };
     
     const attendancesMapped: AttendanceWithVolunteer[] = attendances.map((attendance) => ({
       id: attendance.id,
@@ -73,24 +84,34 @@ export const getAttendancesAndVolunteers = async () => {
         id: attendance.volunteer.id,
         name: attendance.volunteer.name,
         email: attendance.volunteer.email,
-      }
+      },
     }));
-    const volunteersForSelect: VolunteerForSelect[] = volunteers.map(volunteer => ({
+    
+    const volunteersForSelect: VolunteerForSelect[] = volunteers.map((volunteer) => ({
       id: volunteer.id,
       name: volunteer.name,
       email: volunteer.email,
-      status: mapVolunteerStatus(volunteer.status)
+      status: mapVolunteerStatus(volunteer.status),
     }));
+    
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    
     return {
       attendances: attendancesMapped,
       volunteers: volunteersForSelect,
-    }
-    
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages,
+      },
+    };
   } catch (error) {
     console.error("[ERROR_GET_ATTENDANCES]", error);
     return {
       attendances: [],
-      volunteers: []
-    }
+      volunteers: [],
+      pagination: { page: 1, pageSize: 10, total: 0, totalPages: 1 },
+    };
   }
-}
+};
