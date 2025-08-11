@@ -140,3 +140,9 @@
 .gradient-accent {
   @apply bg-gradient-to-r from-blue-500 to-purple-500;
 }
+
+/* Placeholder of input should be gray-300 */
+input::placeholder,
+textarea::placeholder {
+  @apply text-gray-400 !important;
+}
