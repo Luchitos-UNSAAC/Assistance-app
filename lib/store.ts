@@ -165,3 +165,19 @@ export const useAttendanceStore = create<AttendanceStore>((set, get) => ({
     return get().attendances.filter((a) => a.date === date)
   },
 }))
+
+export interface Attendance {
+  id: string;
+  date: string;
+  status: StatusAttendance;
+  notes?: string;
+}
+
+export interface Manager {
+  id: string;
+  name: string;
+  role: string;
+  avatarUrl?: string;
+  attendances: Attendance[];
+}
+
