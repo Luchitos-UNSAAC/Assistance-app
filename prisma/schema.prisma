@@ -44,9 +44,10 @@ model Volunteer {
   updatedBy String?
   deletedBy String?
 
-  attendances  Attendance[]
-  user         User?
-  notification Notification[]
+  attendances     Attendance[]
+  user            User?
+  notification    Notification[]
+  CallParticipant CallParticipant[]
 
   @@map("volunteers")
 }
@@ -64,10 +65,12 @@ model Attendance {
   updatedBy String?
   deletedBy String?
 
-  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
-  volunteerId String
+  participant   CallParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+  Volunteer     Volunteer?      @relation(fields: [volunteerId], references: [id])
+  volunteerId   String?
 
-  @@unique([volunteerId, date])
+  @@unique([participantId, date]) // Evita duplicar asistencias para la misma convocatoria y fecha
   @@map("attendances")
 }
 
@@ -88,6 +91,139 @@ model Notification {
   volunteerId String
 
   @@map("notifications")
+}
+
+model CallForVolunteers {
+  id           String     @id @default(cuid())
+  title        String
+  description  String
+  location     String?
+  modality     Modality   @default(PRESENTIAL)
+  requirements String?
+  benefits     String?
+  deadline     DateTime
+  status       CallStatus @default(OPEN)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
+
+  participants CallParticipant[] // 🔗 Relación con voluntarios
+  CallQuestion CallQuestion[]
+  CallSchedule CallSchedule[]
+
+  @@map("calls_for_volunteers")
+}
+
+model CallParticipant {
+  id     String              @id @default(cuid())
+  role   String? // Rol del voluntario en la convocatoria (ej: organizador, participante)
+  status ParticipationStatus @default(ENROLLED)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerId String
+
+  call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
+  callId String
+
+  attendances Attendance[] // 🔗 Asistencias dentro de esta convocatoria
+  CallAnswer  CallAnswer[]
+
+  @@unique([volunteerId, callId]) // Un voluntario no puede inscribirse 2 veces a la misma convocatoria
+  @@map("call_participants")
+}
+
+model CallQuestion {
+  id       String       @id @default(cuid())
+  question String // Texto de la pregunta
+  type     QuestionType @default(TEXT) // Tipo de respuesta (texto, opción, número, etc.)
+  required Boolean      @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
+  callId String
+
+  answers CallAnswer[]
+
+  @@map("call_questions")
+}
+
+model CallAnswer {
+  id     String @id @default(cuid())
+  answer String // Respuesta del voluntario (guardada como texto genérico)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  question   CallQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+
+  participant   CallParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+
+  @@map("call_answers")
+}
+
+model CallSchedule {
+  id        String    @id @default(cuid())
+  dayOfWeek WeekDay? // Día de la semana (si es recurrente)
+  startTime DateTime? // Hora de inicio
+  endTime   DateTime? // Hora de fin (opcional)
+  onDate    DateTime? // Fecha puntual (si no es recurrente)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
+  callId String
+
+  @@map("call_schedules")
+}
+
+enum WeekDay {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum QuestionType {
+  TEXT // Respuesta abierta
+  NUMBER // Respuesta numérica
+  BOOLEAN // Sí / No
+  MULTIPLE // Selección múltiple
+}
+
+enum CallStatus {
+  OPEN
+  CLOSED
+  DRAFT
+}
+
+enum ParticipationStatus {
+  ENROLLED
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
+enum Modality {
+  PRESENTIAL
+  REMOTE
+  HYBRID
 }
 
 // Enums
