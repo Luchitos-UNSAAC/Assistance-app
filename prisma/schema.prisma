@@ -187,6 +187,18 @@ model CallSchedule {
   @@map("call_schedules")
 }
 
+model AuditLog {
+  id        String   @id @default(cuid())
+  entity    String
+  entityId  String
+  action    String
+  changes   String
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  @@map("audit_logs")
+}
+
 enum WeekDay {
   MONDAY
   TUESDAY
