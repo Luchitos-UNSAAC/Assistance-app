@@ -44,10 +44,10 @@ model Volunteer {
   updatedBy String?
   deletedBy String?
 
-  attendances     Attendance[]
-  user            User?
-  notification    Notification[]
-  CallParticipant CallParticipant[]
+  attendances      Attendance[]
+  user             User?
+  notifications    Notification[]
+  callParticipants CallParticipant[]
 
   @@map("volunteers")
 }
@@ -65,12 +65,10 @@ model Attendance {
   updatedBy String?
   deletedBy String?
 
-  participant   CallParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  participantId String
-  Volunteer     Volunteer?      @relation(fields: [volunteerId], references: [id])
-  volunteerId   String?
+  Volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerId String
 
-  @@unique([participantId, date]) // Evita duplicar asistencias para la misma convocatoria y fecha
+  @@unique([participantId, date])
   @@map("attendances")
 }
 
@@ -112,16 +110,16 @@ model CallForVolunteers {
   updatedBy String?
   deletedBy String?
 
-  participants CallParticipant[]
-  CallQuestion CallQuestion[]
-  CallSchedule CallSchedule[]
+  participants  CallParticipant[]
+  callQuestions CallQuestion[]
+  callSchedules CallSchedule[]
 
   @@map("calls_for_volunteers")
 }
 
 model CallParticipant {
   id     String              @id @default(cuid())
-  role   String? // Rol del voluntario en la convocatoria (ej: organizador, participante)
+  role   String?
   status ParticipationStatus @default(ENROLLED)
 
   createdAt DateTime  @default(now())
@@ -134,8 +132,7 @@ model CallParticipant {
   call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
   callId String
 
-  attendances Attendance[]
-  CallAnswer  CallAnswer[]
+  callAnswers CallAnswer[]
 
   @@unique([volunteerId, callId])
   @@map("call_participants")
