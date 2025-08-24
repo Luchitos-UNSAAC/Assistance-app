@@ -68,7 +68,7 @@ model Attendance {
   Volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
   volunteerId String
 
-  @@unique([participantId, date])
+  @@unique([volunteerId, date])
   @@map("attendances")
 }
 
