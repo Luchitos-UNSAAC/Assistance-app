@@ -112,7 +112,7 @@ model CallForVolunteers {
   updatedBy String?
   deletedBy String?
 
-  participants CallParticipant[] // 🔗 Relación con voluntarios
+  participants CallParticipant[]
   CallQuestion CallQuestion[]
   CallSchedule CallSchedule[]
 
@@ -134,17 +134,17 @@ model CallParticipant {
   call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
   callId String
 
-  attendances Attendance[] // 🔗 Asistencias dentro de esta convocatoria
+  attendances Attendance[]
   CallAnswer  CallAnswer[]
 
-  @@unique([volunteerId, callId]) // Un voluntario no puede inscribirse 2 veces a la misma convocatoria
+  @@unique([volunteerId, callId])
   @@map("call_participants")
 }
 
 model CallQuestion {
   id       String       @id @default(cuid())
-  question String // Texto de la pregunta
-  type     QuestionType @default(TEXT) // Tipo de respuesta (texto, opción, número, etc.)
+  question String
+  type     QuestionType @default(TEXT)
   required Boolean      @default(true)
 
   createdAt DateTime @default(now())
@@ -160,7 +160,7 @@ model CallQuestion {
 
 model CallAnswer {
   id     String @id @default(cuid())
-  answer String // Respuesta del voluntario (guardada como texto genérico)
+  answer String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -176,10 +176,10 @@ model CallAnswer {
 
 model CallSchedule {
   id        String    @id @default(cuid())
-  dayOfWeek WeekDay? // Día de la semana (si es recurrente)
-  startTime DateTime? // Hora de inicio
-  endTime   DateTime? // Hora de fin (opcional)
-  onDate    DateTime? // Fecha puntual (si no es recurrente)
+  dayOfWeek WeekDay?
+  startTime DateTime?
+  endTime   DateTime?
+  onDate    DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -201,10 +201,10 @@ enum WeekDay {
 }
 
 enum QuestionType {
-  TEXT // Respuesta abierta
-  NUMBER // Respuesta numérica
-  BOOLEAN // Sí / No
-  MULTIPLE // Selección múltiple
+  TEXT
+  NUMBER
+  BOOLEAN
+  MULTIPLE
 }
 
 enum CallStatus {
