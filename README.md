@@ -177,3 +177,4 @@ Git
     ```bash
     pnpm prisma db seed
     ```
+Readme updated
