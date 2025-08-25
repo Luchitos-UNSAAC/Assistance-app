@@ -6,9 +6,8 @@ import {useAttendanceStore, Volunteer} from "@/lib/store"
 import { useAuthStore } from "@/lib/auth-store"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {User, ArrowLeft, Mail, Edit, Trash2, Phone, MapPin, Calendar, BarChart3} from "lucide-react"
+import {User, Mail, Edit, Phone, MapPin, Calendar, BarChart3} from "lucide-react"
 import AuthGuard from "@/components/auth-guard"
-import EditProfileModal from "@/components/edit-profile-modal";
 import {Badge} from "@/components/ui/badge";
 import {format, parseISO} from "date-fns";
 import {es} from "date-fns/locale";

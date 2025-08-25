@@ -1,8 +1,9 @@
 import {prisma} from "@/lib/prisma";
 import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
 import {AttendanceStatus, VolunteerStatus} from "@prisma/client";
+import {Volunteer} from "@/lib/store";
 
-export const getProfileVolunteer = async () => {
+export const getProfileVolunteer = async (): Promise<Volunteer | null> => {
   const currentVolunteer = await getCurrentVolunteer()
   if (!currentVolunteer) {
     return null;
