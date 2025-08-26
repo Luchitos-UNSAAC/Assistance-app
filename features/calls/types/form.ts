@@ -1,4 +1,4 @@
-// types/forms.ts
+// types/form.ts
 export type WeekDay =
   | "LUNES" | "MARTES" | "MIERCOLES"
   | "JUEVES" | "VIERNES" | "SABADO" | "DOMINGO";

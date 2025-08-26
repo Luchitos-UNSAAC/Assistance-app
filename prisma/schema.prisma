@@ -221,6 +221,8 @@ enum QuestionType {
   NUMBER
   BOOLEAN
   MULTIPLE
+  CHECKBOX
+  DATE
 }
 
 enum CallStatus {
