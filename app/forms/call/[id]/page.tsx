@@ -7,7 +7,6 @@ export default async function FormCallPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const questions = await getActiveQuestionByCallId(id);
-  console.log('Fetched questions:', questions);
-  return <QuestionsToFill questions={questions} />;
+  const {schedules, questions} = await getActiveQuestionByCallId(id);
+  return <QuestionsToFill questions={questions} schedules={schedules} />;
 }

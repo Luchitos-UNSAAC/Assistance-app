@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CallQuestion } from "@prisma/client";
+import { CallQuestion, CallSchedule } from "@prisma/client";
+import {callFormSchema, CallFormSchema} from "@/features/calls/validations/call-form-schema";
 
 type QuestionType = "short" | "paragraph" | "multiple" | "checkbox";
 
@@ -19,13 +21,31 @@ interface Question {
   options?: string[];
 }
 
-interface QuestionsPreviewProps {
+interface QuestionsToFillProps {
   questions: CallQuestion[];
+  schedules: CallSchedule[];
 }
 
-export default function QuestionsToFill({ questions: serverQuestions }: QuestionsPreviewProps) {
-  const [localQuestions, setLocalQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+export default function QuestionsToFill({ questions, schedules }: QuestionsToFillProps) {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<CallFormSchema>({
+    resolver: zodResolver(callFormSchema),
+    defaultValues: {
+      email: "",
+      fullName: "",
+      dni: "",
+      answers: {},
+      schedules: [],
+    },
+  });
+  
+  const answers = watch("answers");
+  const selectedSchedules = watch("schedules");
   
   // Prisma -> Form mapping
   const mapFromPrisma = (q: CallQuestion): Question => ({
@@ -33,131 +53,167 @@ export default function QuestionsToFill({ questions: serverQuestions }: Question
     text: q.question,
     type:
       q.type === "TEXT"
-        ? "short"
+        ? "paragraph"
         : q.type === "NUMBER"
-          ? "paragraph"
+          ? "short"
           : q.type === "MULTIPLE"
             ? "multiple"
             : "checkbox",
-    // @ts-ignore
-    options: Array.isArray(q.options)
-      ? (q.options.filter((opt): opt is string => typeof opt === "string") as string[])
-      : [],
+    options: Array.isArray(q.options) ? q.options.filter((opt): opt is string => typeof opt === "string") : [],
   });
   
-  useEffect(() => {
-    setLocalQuestions(serverQuestions.map(mapFromPrisma));
-  }, [serverQuestions]);
+  const localQuestions: Question[] = questions.map(mapFromPrisma);
   
-  // Manejo de respuestas
-  const handleChange = (id: string, value: string | string[]) => {
-    setAnswers((prev) => ({ ...prev, [id]: value }));
+  const onSubmit = (data: CallFormSchema) => {
+    console.log("✅ Datos validados:", data);
+    console.log("Respuestas formateadas:", formattedAnswers);
+    // Aquí puedes enviar 'data' a tu servidor o manejarlo como necesites
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Respuestas enviadas:", answers);
-    // Aquí puedes hacer fetch() o axios.post() para guardar en la API
+  const formattedAnswers = Object.entries(answers).map(([questionId, value]) => {
+    const question = localQuestions.find((q) => q.id === questionId);
+    if (!question) return null;
+    return {
+      questionId,
+      answer: value,
+      type: question.type,
+    };
+  });
+  
+  const formatSchedule = (s: CallSchedule) => {
+    if (s.onDate) {
+      return `${new Date(s.onDate).toLocaleDateString()} - ${new Date(s.startTime!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} a ${new Date(s.endTime!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    }
+    return `${s.dayOfWeek} - ${new Date(s.startTime!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} a ${new Date(s.endTime!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
   };
   
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-8 p-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl mx-auto space-y-8 p-6">
       <h1 className="text-3xl font-bold mb-8 text-center">Formulario</h1>
-      <Card className="shadow-sm">
+      
+      {/* Correo institucional */}
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-start space-x-2 text-lg">
-            <span className="font-bold text-primary">1.</span>
-            <span>Correo institucional</span>
-          </CardTitle>
+          <CardTitle>1. Correo institucional</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Input
-            placeholder="010101@unsaac.edu.pe"
-            value={""}
-            onChange={()=>{}}
-          />
+        <CardContent>
+          <Input placeholder="010101@unsaac.edu.pe" {...register("email")} />
+          {errors.email && <p className="mt-1 text-red-500 text-sm">{errors.email.message}</p>}
         </CardContent>
       </Card>
       
+      {/* Nombre completo */}
+      <Card>
+        <CardHeader>
+          <CardTitle>2. Nombre Completo</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input placeholder="JUANITO QUISPE QUISPE" {...register("fullName")} />
+          {errors.fullName && <p className="mt-1 text-red-500 text-sm">{errors.fullName.message}</p>}
+        </CardContent>
+      </Card>
+      
+      {/* DNI */}
+      <Card>
+        <CardHeader>
+          <CardTitle>3. DNI</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input placeholder="76767676" type="number" {...register("dni")} />
+          {errors.dni && <p className="mt-1 text-red-500 text-sm">{errors.dni.message}</p>}
+        </CardContent>
+      </Card>
+      
+      {/* Preguntas dinámicas */}
       {localQuestions.map((q, index) => (
-        <Card key={q.id} className="shadow-sm">
+        <Card key={q.id}>
           <CardHeader>
-            <CardTitle className="flex items-start space-x-2 text-lg">
-              <span className="font-bold text-primary">{index + 1}.</span>
-              <span>{q.text}</span>
-            </CardTitle>
+            <CardTitle>{index + 5}. {q.text}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {q.type === "short" && (
-              <Input
-                placeholder="Escribe tu respuesta..."
-                value={(answers[q.id] as string) || ""}
-                onChange={(e) => handleChange(q.id, e.target.value)}
-              />
-            )}
-            
+          <CardContent>
             {q.type === "paragraph" && (
               <Textarea
                 placeholder="Escribe un párrafo..."
                 value={(answers[q.id] as string) || ""}
-                onChange={(e) => handleChange(q.id, e.target.value)}
+                onChange={(e) => setValue(`answers.${q.id}`, e.target.value)}
               />
             )}
             
             {q.type === "multiple" && (
               <RadioGroup
-                onValueChange={(val) => handleChange(q.id, val)}
+                onValueChange={(val) => setValue(`answers.${q.id}`, val)}
                 value={(answers[q.id] as string) || ""}
               >
-                {q.options?.length ? (
-                  q.options.map((opt, i) => (
-                    <div key={i} className="flex items-center space-x-2">
-                      <RadioGroupItem value={opt} id={`${q.id}-radio-${i}`} />
-                      <Label htmlFor={`${q.id}-radio-${i}`}>{opt}</Label>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-sm">No hay opciones disponibles</p>
-                )}
+                {q.options?.map((opt, i) => (
+                  <div key={i} className="flex items-center space-x-2">
+                    <RadioGroupItem value={opt} id={`${q.id}-radio-${i}`} />
+                    <Label htmlFor={`${q.id}-radio-${i}`}>{opt}</Label>
+                  </div>
+                ))}
               </RadioGroup>
             )}
             
-            {q.type === "checkbox" && (
-              <>
-                {q.options?.length ? (
-                  q.options.map((opt, i) => {
-                    const current = (answers[q.id] as string[]) || [];
-                    const checked = current.includes(opt);
-                    return (
-                      <div key={i} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`${q.id}-checkbox-${i}`}
-                          checked={checked}
-                          onCheckedChange={(val) => {
-                            if (val) {
-                              handleChange(q.id, [...current, opt]);
-                            } else {
-                              handleChange(
-                                q.id,
-                                current.filter((o) => o !== opt)
-                              );
-                            }
-                          }}
-                        />
-                        <Label htmlFor={`${q.id}-checkbox-${i}`}>{opt}</Label>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-muted-foreground text-sm">No hay opciones disponibles</p>
-                )}
-              </>
-            )}
+            {q.type === "checkbox" &&
+              q.options?.map((opt, i) => {
+                const current = (answers[q.id] as string[]) || [];
+                const checked = current.includes(opt);
+                return (
+                  <div key={i} className="flex items-center space-x-2 py-1">
+                    <Checkbox
+                      id={`${q.id}-checkbox-${i}`}
+                      checked={checked}
+                      onCheckedChange={(val) => {
+                        if (val) {
+                          setValue(`answers.${q.id}`, [...current, opt]);
+                        } else {
+                          setValue(`answers.${q.id}`, current.filter((o) => o !== opt));
+                        }
+                      }}
+                    />
+                    <Label htmlFor={`${q.id}-checkbox-${i}`}>{opt}</Label>
+                  </div>
+                );
+              })}
+            
+            {errors.answers?.[q.id] && <p className="mt-1 text-red-500 text-sm">{errors.answers[q.id]?.toString()}</p>}
           </CardContent>
         </Card>
       ))}
       
-      <Button type="submit" className="w-full" size="lg">
+      {/* Horarios */}
+      {(schedules?.length ?? 0) > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Elige tus horarios disponibles</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {schedules.map((s) => {
+              const checked = (selectedSchedules || []).includes(s.id);
+              return (
+                <div key={s.id} className="flex items-center space-x-2 py-1">
+                  <Checkbox
+                    id={`schedule-${s.id}`}
+                    checked={checked}
+                    onCheckedChange={(val) => {
+                      if (val) {
+                        setValue("schedules", [...selectedSchedules, s.id]);
+                      } else {
+                        setValue("schedules", selectedSchedules.filter((id) => id !== s.id));
+                      }
+                    }}
+                  />
+                  <Label htmlFor={`schedule-${s.id}`}>{formatSchedule(s)}</Label>
+                </div>
+              );
+            })}
+            {errors.schedules && <p className="mt-1 text-red-500 text-sm">{errors.schedules.message}</p>}
+          </CardContent>
+        </Card>
+      )}
+      
+      <Button type="submit"
+              className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded"
+              size="lg">
         Guardar respuestas
       </Button>
     </form>
