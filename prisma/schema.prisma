@@ -132,10 +132,26 @@ model CallParticipant {
   call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
   callId String
 
-  callAnswers CallAnswer[]
+  callAnswers              CallAnswer[]
+  callParticipantSchedules CallParticipantSchedule[]
 
   @@unique([volunteerId, callId])
   @@map("call_participants")
+}
+
+model CallParticipantSchedule {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participant   CallParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+
+  schedule   CallSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  scheduleId String
+
+  @@unique([participantId, scheduleId]) // evita duplicados
+  @@map("call_participant_schedules")
 }
 
 model CallQuestion {
@@ -190,6 +206,8 @@ model CallSchedule {
 
   call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
   callId String
+
+  callParticipantSchedules CallParticipantSchedule[]
 
   @@map("call_schedules")
 }
