@@ -9,7 +9,7 @@ export const getCallById = async (id: string): Promise<CallWithSchedules | null>
   try {
     const call = await prisma.callForVolunteers.findUnique({
       where: {
-        id: id
+        id: id,
       },
       include: {
         callSchedules: true

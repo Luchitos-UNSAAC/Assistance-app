@@ -4,8 +4,9 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Pencil, Copy, XCircle, MessageCircle, MessageSquare } from "lucide-react"
+import {Pencil, Copy, XCircle, MessageCircle, MessageSquare, Link2Icon} from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 
 type CallForVolunteers = {
   id: string
@@ -23,11 +24,12 @@ interface CallForVolunteersListProps {
 export default function CallForVolunteersList({ calls }: CallForVolunteersListProps) {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  
+  const {toast} = useToast()
   const router = useRouter()
   
   const handleClose = async (id: string) => {
     if (!confirm("¿Seguro que deseas cerrar esta convocatoria?")) return
+    
     
     await fetch(`/api/calls/${id}/close`, {
       method: "PUT",
@@ -47,13 +49,28 @@ export default function CallForVolunteersList({ calls }: CallForVolunteersListPr
     }
   }
   
+  const copyLink = (callId: string) => {
+    let url = "";
+    const isLocal = window.location.hostname === "localhost";
+    if (!isLocal) {
+      url = "https://assistance-app-two.vercel.app/" + `forms/call/${callId}`
+    } else {
+      url = "http://localhost:3001/" + `forms/call/${callId}`
+    }
+    navigator.clipboard.writeText(url)
+    toast({
+      title: "Link copiado al portapapeles",
+      description: "Envía este link a los voluntarios para que puedan aplicar.",
+    })
+  }
+  
   return (
     <div className="max-w-5xl mx-auto space-y-6 px-3 sm:px-4">
       <h2 className="text-2xl font-semibold mb-4 flex items-center">
         Convocatorias
         <Button
           onClick={() => router.push("/calls/new")}
-          className="ml-4 px-3 py-1 rounded-full font-medium bg-blue-500 hover:bg-blue-400 text-white transition"
+          className="ml-4 px-3 py-1 rounded-full font-medium bg-violet-400 hover:bg-violet-300 text-white transition"
           size="sm"
         >
           +
@@ -95,6 +112,14 @@ export default function CallForVolunteersList({ calls }: CallForVolunteersListPr
                 </p>
                 
                 <div className="pt-3 flex flex-wrap justify-end gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyLink(call.id)}
+                  >
+                    <Link2Icon className="w-4 h-4 mr-1" />
+                    Copiar link
+                  </Button>
                   <Button
                     size="sm"
                     variant="outline"

@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CallQuestion, CallSchedule } from "@prisma/client";
 import {callFormSchema, CallFormSchema} from "@/features/calls/validations/call-form-schema";
+import {useRouter} from "next/navigation";
+import {useToast} from "@/hooks/use-toast";
 
 type QuestionType = "short" | "paragraph" | "multiple" | "checkbox";
 
@@ -24,9 +26,10 @@ interface Question {
 interface QuestionsToFillProps {
   questions: CallQuestion[];
   schedules: CallSchedule[];
+  callId: string,
 }
 
-export default function QuestionsToFill({ questions, schedules }: QuestionsToFillProps) {
+export default function QuestionsToFill({ questions, schedules, callId }: QuestionsToFillProps) {
   const {
     register,
     handleSubmit,
@@ -43,6 +46,8 @@ export default function QuestionsToFill({ questions, schedules }: QuestionsToFil
       schedules: [],
     },
   });
+  const router = useRouter();
+  const { toast } = useToast()
   
   const answers = watch("answers");
   const selectedSchedules = watch("schedules");
@@ -64,21 +69,31 @@ export default function QuestionsToFill({ questions, schedules }: QuestionsToFil
   
   const localQuestions: Question[] = questions.map(mapFromPrisma);
   
-  const onSubmit = (data: CallFormSchema) => {
-    console.log("✅ Datos validados:", data);
-    console.log("Respuestas formateadas:", formattedAnswers);
-    // Aquí puedes enviar 'data' a tu servidor o manejarlo como necesites
+  const onSubmit = async (data: CallFormSchema) => {
+    try {
+      const res = await fetch(`/api/calls/${callId}/participants`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      
+      if (!res.ok) {
+        toast({
+          title: "Error",
+          description: "Ocurrio un error al enviar tus respuestas. Intenta nuevamente.",
+          variant: "destructive",
+        })
+        return
+      }
+      toast({
+        title: "Exito",
+        description: "Se enviaron tus respuestas correctamente.",
+      })
+      router.push('/')
+    } catch (err) {
+      console.error("❌ Error al enviar:", err);
+    }
   };
-  
-  const formattedAnswers = Object.entries(answers).map(([questionId, value]) => {
-    const question = localQuestions.find((q) => q.id === questionId);
-    if (!question) return null;
-    return {
-      questionId,
-      answer: value,
-      type: question.type,
-    };
-  });
   
   const formatSchedule = (s: CallSchedule) => {
     if (s.onDate) {

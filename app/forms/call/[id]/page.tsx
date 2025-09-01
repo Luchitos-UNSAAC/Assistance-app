@@ -8,5 +8,5 @@ export default async function FormCallPage({
 }) {
   const { id } = await params;
   const {schedules, questions} = await getActiveQuestionByCallId(id);
-  return <QuestionsToFill questions={questions} schedules={schedules} />;
+  return <QuestionsToFill questions={questions} schedules={schedules} callId={id} />;
 }
