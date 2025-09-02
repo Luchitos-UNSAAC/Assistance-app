@@ -139,7 +139,8 @@ Web/Mobile Client
 
 ### Prerequisites
 ```bash
-Node.js >= 18
+Docker (for database)
+Node.js >= 22.17.8
 pnpm >= 9
 Git
 ```
@@ -147,24 +148,31 @@ Git
 ### Steps
 1. **Clone the repository:**
    ```bash
-   git clone 
+   git clone https://github.com/Luchitos-UNSAAC/Assistance-app.git
    ```
 2. **Navigate to the project directory:**
    ```bash
    cd luchos-unsaac
    ```
-3. **Install dependencies:**
+3. **Install pnpm:**
+    ```bash
+    npm install -g pnpm
+    ```
+4. **Verify:**
+    ```bash
+   pnpm -v
+   ```
+5. **Install dependencies:**
     ```bash
    pnpm install
    ```
-4. **Run the development server:**
+
+6. **Create db from docker:**
    ```bash
-    pnpm dev
-    ```
-5. **Open your browser:**
-6. Visit `http://localhost:3000` to see the application in action.
+   cd ./dev-tools/docker-compose && docker compose up -d
+   ```
 7. **Create a `.env` file:**
-   - Copy the `.env.example` to `.env` and configure your environment variables.
+   - Copy the `.env.example` to `.env`
 8. **Run migrations (if applicable):**
    ```bash
     pnpm prisma migrate dev --name init
@@ -173,8 +181,13 @@ Git
    ```bash
     pnpm prisma generate
     ```
-10. **Seed the database (optional):**
+10. **Seed the database:**
     ```bash
-    pnpm prisma db seed
+    node ./prisma/seed.js
+    ```
+
+5. **Run the development server:**
+   ```bash
+    pnpm dev
     ```
 Readme updated

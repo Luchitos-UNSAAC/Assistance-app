@@ -1,5 +1,14 @@
-// features/calls/actions/get-schedules-by-call-id.ts
 import { prisma } from "@/lib/prisma";
+
+const weekOrder = {
+  LUNES: 1,
+  MARTES: 2,
+  MIERCOLES: 3,
+  JUEVES: 4,
+  VIERNES: 5,
+  SABADO: 6,
+  DOMINGO: 7,
+};
 
 export type ScheduleWithParticipants = {
   id: string;
@@ -28,7 +37,7 @@ export const getSchedulesByCallId = async (callId: string): Promise<ScheduleWith
   // traer schedules + relaciones a CallParticipantSchedule -> participant -> volunteer -> answers
   const schedules = await prisma.callSchedule.findMany({
     where: { callId },
-    orderBy: { startTime: "asc" },
+    orderBy: { startTime: "asc",  },
     include: {
       callParticipantSchedules: {
         include: {
@@ -45,6 +54,23 @@ export const getSchedulesByCallId = async (callId: string): Promise<ScheduleWith
         },
       },
     },
+  });
+  
+  schedules.sort((a, b) => {
+    // si ambos tienen fecha, comparar por fecha
+    if (a.onDate && b.onDate) return new Date(a.onDate).getTime() - new Date(b.onDate).getTime();
+    
+    // si uno tiene fecha y otro no, darle prioridad a los que tienen fecha
+    if (a.onDate && !b.onDate) return -1;
+    if (!a.onDate && b.onDate) return 1;
+    
+    // si ninguno tiene fecha, ordenar por día de semana
+    if (a.dayOfWeek && b.dayOfWeek) {
+      return weekOrder[a.dayOfWeek as keyof typeof weekOrder] -
+        weekOrder[b.dayOfWeek as keyof typeof weekOrder];
+    }
+    
+    return 0;
   });
   
   // mapear y serializar
