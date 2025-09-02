@@ -11,6 +11,7 @@ model User {
   id        String    @id @default(cuid())
   email     String    @unique
   password  String
+  dni       String?   @unique
   name      String
   role      UserRole  @default(VOLUNTEER)
   avatar    String?
@@ -44,9 +45,10 @@ model Volunteer {
   updatedBy String?
   deletedBy String?
 
-  attendances  Attendance[]
-  user         User?
-  notification Notification[]
+  attendances      Attendance[]
+  user             User?
+  notifications    Notification[]
+  callParticipants CallParticipant[]
 
   @@map("volunteers")
 }
@@ -64,7 +66,7 @@ model Attendance {
   updatedBy String?
   deletedBy String?
 
-  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  Volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
   volunteerId String
 
   @@unique([volunteerId, date])
@@ -88,6 +90,177 @@ model Notification {
   volunteerId String
 
   @@map("notifications")
+}
+
+model CallForVolunteers {
+  id           String     @id @default(cuid())
+  title        String
+  description  String
+  location     String?
+  modality     Modality   @default(PRESENTIAL)
+  requirements String?
+  benefits     String?
+  deadline     DateTime
+  status       CallStatus @default(OPEN)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
+
+  participants  CallParticipant[]
+  callQuestions CallQuestion[]
+  callSchedules CallSchedule[]
+
+  @@map("calls_for_volunteers")
+}
+
+model CallParticipant {
+  id     String              @id @default(cuid())
+  role   String?
+  status ParticipationStatus @default(ENROLLED)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerId String
+
+  call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
+  callId String
+
+  callAnswers              CallAnswer[]
+  callParticipantSchedules CallParticipantSchedule[]
+
+  @@unique([volunteerId, callId])
+  @@map("call_participants")
+}
+
+model CallParticipantSchedule {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participant   CallParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+
+  schedule   CallSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  scheduleId String
+
+  @@unique([participantId, scheduleId]) // evita duplicados
+  @@map("call_participant_schedules")
+}
+
+model CallQuestion {
+  id       String       @id @default(cuid())
+  question String
+  type     QuestionType @default(TEXT)
+  required Boolean      @default(true)
+  options  Json?
+  order    Int          @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
+  callId String
+
+  answers CallAnswer[]
+
+  @@map("call_questions")
+}
+
+model CallAnswer {
+  id String @id @default(cuid())
+
+  answer          String?
+  selectedOptions String?
+
+  dateAnswer   DateTime?
+  numberAnswer Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  question   CallQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+
+  participant   CallParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  participantId String
+
+  @@map("call_answers")
+}
+
+model CallSchedule {
+  id        String    @id @default(cuid())
+  dayOfWeek WeekDay?
+  startTime DateTime?
+  endTime   DateTime?
+  onDate    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  call   CallForVolunteers @relation(fields: [callId], references: [id], onDelete: Cascade)
+  callId String
+
+  callParticipantSchedules CallParticipantSchedule[]
+
+  @@map("call_schedules")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  entity    String
+  entityId  String
+  action    String
+  changes   String
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  @@map("audit_logs")
+}
+
+enum WeekDay {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
+}
+
+enum QuestionType {
+  TEXT
+  NUMBER
+  BOOLEAN
+  MULTIPLE
+  CHECKBOX
+  DATE
+}
+
+enum CallStatus {
+  OPEN
+  CLOSED
+  DRAFT
+}
+
+enum ParticipationStatus {
+  ENROLLED
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
+enum Modality {
+  PRESENTIAL
+  REMOTE
+  HYBRID
 }
 
 // Enums
