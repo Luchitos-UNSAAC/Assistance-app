@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useAuthStore } from "@/lib/auth-store"
-import { Calendar, TrendingUp, Gift, User, Users } from "lucide-react"
+import { TrendingUp, Gift, User, Users } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
 import AuthGuard from "@/components/auth-guard"
@@ -24,24 +24,24 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            LUCHOS UNSAAC
+            Bienvenido!
           </h1>
           <p className="text-gray-600">
-            {isVolunteerView ? "Mi Panel de Voluntario" : "Plataforma de Voluntarios Caninos"}
+            {isVolunteerView ? "Mi Panel de Voluntario" : "Plataforma de Voluntarios"}
           </p>
         </div>
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex gap-4 w-full">
           {!isVolunteerView && (
             <Card className="gradient-card">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center space-x-2">
                   <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
-                    <Users className="h-4 w-4 text-white" />
+                    <Users className="h-4 w-4 text-gray-500"/>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Voluntarios Activos</p>
+                    <p className="text-xs text-gray-600">Voluntarios Activos</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {reviewDashboard.activeVolunteers}
                     </p>
@@ -55,10 +55,10 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
             <CardContent className="p-4">
               <div className="flex items-center space-x-2">
                 <div className="p-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg">
-                  <TrendingUp className="h-4 w-4 text-white" />
+                  <TrendingUp className="h-4 w-4 text-gray-500"/>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-600">
                     {isVolunteerView ? "Mi Asistencia Hoy" : "Presentes Hoy"}
                   </p>
                   <p className="text-2xl font-bold text-gray-900">
@@ -76,10 +76,10 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
                   <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
-                    <User className="h-4 w-4 text-white" />
+                    <User className="h-4 w-4 text-white"/>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Total Asistencias</p>
+                    <p className="text-xs text-gray-500">Total Asistencias</p>
                     <p className="text-2xl font-bold text-gray-900">
                       {reviewDashboard.myAttendances}
                     </p>
@@ -96,7 +96,7 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
             <CardContent className="p-4 space-y-4">
               
               {/* Ver Perfil */}
-              <Link href={`/volunteers/${user.volunteerId}`}>
+              <Link href={`/app/(root)/volunteers/${user.volunteerId}`}>
                 <div className="flex items-center justify-between p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200 cursor-pointer">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">

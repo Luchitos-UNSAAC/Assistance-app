@@ -1,28 +1,42 @@
 "use client"
 
-import {useState, useTransition} from "react"
+import { useEffect, useState, useTransition } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {useAttendanceStore, AttendanceWithVolunteer, VolunteerForSelect} from "@/lib/store"
-import { Plus, Calendar, Edit, Trash2 } from "lucide-react"
+import { AttendanceWithVolunteer, VolunteerForSelect } from "@/lib/store"
+import { Plus, Calendar, Edit, Trash2, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
 import AttendanceModal from "@/components/attendance-modal"
 import { useToast } from "@/hooks/use-toast"
 import AuthGuard from "@/components/auth-guard"
-import {useDeleteModalStore} from "@/lib/delete-modal-store";
-import {useRouter} from "next/navigation";
-import {deleteAttendanceById} from "@/features/attendances/actions/delete-attendance-by-id";
+import { useDeleteModalStore } from "@/lib/delete-modal-store"
+import { useRouter, useSearchParams } from "next/navigation"
+import { deleteAttendanceById } from "@/features/attendances/actions/delete-attendance-by-id"
+
+interface Pagination {
+  page: number
+  pageSize: number
+  total: number
+  totalPages: number
+}
 
 interface AttendanceListProps {
   attendances: AttendanceWithVolunteer[]
   volunteers: VolunteerForSelect[]
   serverTime: string
+  pagination?: Pagination
 }
 
-export default function AttendanceList({attendances, volunteers, serverTime}: AttendanceListProps) {
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100]
+
+export default function AttendanceList({
+                                         attendances,
+                                         volunteers,
+                                         serverTime,
+                                         pagination,
+                                       }: AttendanceListProps) {
   const { toast } = useToast()
   const [selectedDate, setSelectedDate] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -30,7 +44,17 @@ export default function AttendanceList({attendances, volunteers, serverTime}: At
   const [editingAttendance, setEditingAttendance] = useState<AttendanceWithVolunteer | null>(null)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { openModal: openModalToDelete } = useDeleteModalStore()
   
+  // Page / pageSize: priorizamos `pagination` (server) si está presente,
+  // si no, leemos query params (fallback).
+  const page = pagination?.page ?? Number(searchParams?.get("page") ?? 1)
+  const pageSize = pagination?.pageSize ?? Number(searchParams?.get("pageSize") ?? 10)
+  const total = pagination?.total ?? attendances.length
+  const totalPages = pagination?.totalPages ?? 1
+  
+  // Filtros (cliente) — siguen actuando sobre los attendances que llegan del server (offset already applied).
   const filteredAttendances = attendances
     .filter((attendance) => {
       const dateMatch = !selectedDate || attendance.date === selectedDate
@@ -38,6 +62,38 @@ export default function AttendanceList({attendances, volunteers, serverTime}: At
       return dateMatch && statusMatch
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  
+  // Rangos para mostrar "Mostrando X–Y de TOTAL"
+  const startIndex = Math.max(1, (page - 1) * pageSize + 1)
+  const endIndex = startIndex + attendances.length - 1 // attendances es lo que trae el servidor en esa página
+  
+  // Navegación entre páginas
+  const goTo = (p: number) => {
+    if (p < 1 || (pagination && p > totalPages)) return
+    const params = new URLSearchParams(searchParams?.toString() ?? "")
+    params.set("page", String(p))
+    startTransition(() => {
+      router.push(`${window.location.pathname}?${params.toString()}`)
+    })
+  }
+  
+  // Cambiar pageSize (reset a página 1)
+  const changePageSize = (size: number) => {
+    const params = new URLSearchParams(searchParams?.toString() ?? "")
+    params.set("pageSize", String(size))
+    params.set("page", "1")
+    startTransition(() => {
+      router.push(`${window.location.pathname}?${params.toString()}`)
+    })
+  }
+  
+  // Refresh manual (botón)
+  const handleRefresh = () => {
+    if (isPending) return
+    startTransition(() => {
+      router.refresh()
+    })
+  }
   
   const handleEdit = (attendance: AttendanceWithVolunteer) => {
     setEditingAttendance(attendance)
@@ -47,7 +103,7 @@ export default function AttendanceList({attendances, volunteers, serverTime}: At
   const handleDelete = (attendanceId: string) => {
     const onDeleteAttendance = async (id: string) => {
       if (isPending) return
-      startTransition(async ()=>{
+      startTransition(async () => {
         const response = await deleteAttendanceById(id)
         if (!response.success) {
           toast({
@@ -73,65 +129,96 @@ export default function AttendanceList({attendances, volunteers, serverTime}: At
     )
   }
   
-  const { openModal: openModalToDelete } = useDeleteModalStore()
-  
   const handleModalClose = () => {
     setIsModalOpen(false)
     setEditingAttendance(null)
   }
   
-  // Get unique dates for filter
-  const uniqueDates = [...new Set(attendances.map((a) => a.date))].sort().reverse()
-  
   return (
     <AuthGuard requiredRole="MANAGER">
-      <div className="p-4 space-y-6">
+      <div className="p-3 space-y-2">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Asistencias</h1>
-          <Button onClick={() => setIsModalOpen(true)} className="gradient-button text-white">
-            <Plus className="h-4 w-4 mr-2" />
-            Registrar
-          </Button>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-gray-900">Asistencias</h1>
+            
+            {/* Refresh button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isPending}
+              aria-label="Refrescar"
+              className="h-8 w-8"
+            >
+              <RotateCcw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {/* PageSize selector */}
+            <div className="flex items-center gap-2 mr-2">
+              <span className="text-sm text-gray-600">Mostrar</span>
+              <select
+                value={pageSize}
+                onChange={(e) => changePageSize(Number(e.target.value))}
+                className="border rounded px-2 py-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Seleccionar cantidad de registros por página"
+              >
+                {PAGE_SIZE_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <Button onClick={() => setIsModalOpen(true)}
+                    size='sm'
+                    className="gradient-button text-white">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
-        {/* Filters */}
-        {/*<Card className="gradient-card">*/}
-        {/*  <CardContent className="p-4">*/}
-        {/*    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">*/}
-        {/*      <div>*/}
-        {/*        <label className="block text-sm font-medium text-gray-700 mb-2">Filtrar por fecha</label>*/}
-        {/*        <Select value={selectedDate} onValueChange={setSelectedDate}>*/}
-        {/*          <SelectTrigger className="bg-white/80">*/}
-        {/*            <SelectValue placeholder="Todas las fechas" />*/}
-        {/*          </SelectTrigger>*/}
-        {/*          <SelectContent>*/}
-        {/*            <SelectItem value="all">Todas las fechas</SelectItem>*/}
-        {/*            {uniqueDates.map((date) => (*/}
-        {/*              <SelectItem key={date} value={date}>*/}
-        {/*                {format(parseISO(date), "dd 'de' MMMM 'de' yyyy", { locale: es })}*/}
-        {/*              </SelectItem>*/}
-        {/*            ))}*/}
-        {/*          </SelectContent>*/}
-        {/*        </Select>*/}
-        {/*      </div>*/}
-        {/*      <div>*/}
-        {/*        <label className="block text-sm font-medium text-gray-700 mb-2">Filtrar por estado</label>*/}
-        {/*        <Select value={statusFilter} onValueChange={setStatusFilter}>*/}
-        {/*          <SelectTrigger className="bg-white/80">*/}
-        {/*            <SelectValue />*/}
-        {/*          </SelectTrigger>*/}
-        {/*          <SelectContent>*/}
-        {/*            <SelectItem value="all">Todos los estados</SelectItem>*/}
-        {/*            <SelectItem value="Present">Presente</SelectItem>*/}
-        {/*            <SelectItem value="Absent">Ausente</SelectItem>*/}
-        {/*            <SelectItem value="Justified">Justificado</SelectItem>*/}
-        {/*          </SelectContent>*/}
-        {/*        </Select>*/}
-        {/*      </div>*/}
-        {/*    </div>*/}
-        {/*  </CardContent>*/}
-        {/*</Card>*/}
+        {/* (Opcional) espacio para filtros: si quieres los reactivos, los dejamos aquí. */}
+        {/* ... puedes re-habilitar tu bloque de filtros comentado si lo deseas ... */}
+        
+        {/* Info de rango / resumen */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            Mostrando <span className="font-medium">{startIndex}</span>–<span className="font-medium">{endIndex}</span> de{" "}
+            <span className="font-medium">{total}</span>
+            {filteredAttendances.length !== attendances.length && (
+              <span className="ml-2 text-xs text-gray-500">({filteredAttendances.length} en esta página después de filtros)</span>
+            )}
+          </div>
+          
+          {/* Controles de paginación */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => goTo(page - 1)}
+              disabled={page <= 1 || isPending}
+              aria-label="Página anterior"
+            >
+              <ChevronLeft className="h-3 w-3" />
+            </Button>
+            <div className="text-sm">
+              Página <span className="font-medium">{page}</span> de <span className="font-medium">{totalPages}</span>
+            </div>
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => goTo(page + 1)}
+              disabled={page >= totalPages || isPending}
+              aria-label="Página siguiente"
+            >
+              <ChevronRight className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
         
         {/* Attendance Records */}
         <div className="space-y-4">
@@ -140,7 +227,6 @@ export default function AttendanceList({attendances, volunteers, serverTime}: At
               <Card key={attendance.id} className="gradient-card">
                 <CardContent className="p-3">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6">
-                    
                     {/* Left: Volunteer + Date */}
                     <div className="flex items-start gap-3">
                       <div className="p-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-md shrink-0">
@@ -172,11 +258,7 @@ export default function AttendanceList({attendances, volunteers, serverTime}: At
                               : "bg-red-500 text-white hover:bg-red-600"
                         }`}
                       >
-                        {attendance.status === "Present"
-                          ? "Presente"
-                          : attendance.status === "Absent"
-                            ? "Ausente"
-                            : "Justificado"}
+                        {attendance.status === "Present" ? "Presente" : attendance.status === "Absent" ? "Ausente" : "Justificado"}
                       </Badge>
                       
                       <div className="flex gap-1">
@@ -203,7 +285,6 @@ export default function AttendanceList({attendances, volunteers, serverTime}: At
                   </div>
                 </CardContent>
               </Card>
-            
             )
           })}
         </div>

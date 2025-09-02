@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useAuthStore } from "@/lib/auth-store"
-import { Eye, EyeOff, LogIn, User, Shield, Crown } from "lucide-react"
+import { Eye, EyeOff, User, Shield, Crown } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {loginUser} from "@/features/auth/actions/login-user";
 import {useRouter} from "next/navigation";
@@ -30,7 +30,7 @@ export default function LoginForm() {
 
   const demoUsers = [
     {
-      email: "voluntario@unsaac.edu",
+      email: "voluntario5@unsaac.edu",
       password: "123456",
       role: "VOLUNTEER",
       name: "María López",
@@ -39,7 +39,7 @@ export default function LoginForm() {
       description: "Solo ve su perfil y asistencias",
     },
     {
-      email: "manager@unsaac.edu",
+      email: "manager2@unsaac.edu",
       password: "123456",
       role: "MANAGER",
       name: "Carlos Mendoza",

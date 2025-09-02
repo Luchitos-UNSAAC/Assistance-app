@@ -43,7 +43,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
         email: volunteer.email,
         phone: volunteer.phone,
         address: volunteer.address,
-        birthday: volunteer.birthday,
+        birthday: new Date(volunteer.birthday).toISOString().split("T")[0],
         status: volunteer.status,
       })
     } else {
@@ -183,10 +183,10 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
               id="email"
               type="email"
               value={formData.email}
-              disabled={pending}
               onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="ejemplo@unsaac.edu"
               className={errors.email ? "border-red-500" : ""}
+              disabled
             />
             {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
           </div>
@@ -228,22 +228,6 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
               className={errors.birthday ? "border-red-500" : ""}
             />
             {errors.birthday && <p className="text-sm text-red-500 mt-1">{errors.birthday}</p>}
-          </div>
-
-          <div>
-            <Label htmlFor="status">Estado</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value: "Active" | "Inactive") => handleInputChange("status", value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Activo</SelectItem>
-                <SelectItem value="Inactive">Inactivo</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
