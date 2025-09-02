@@ -151,7 +151,7 @@ model CallParticipantSchedule {
   schedule   CallSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
   scheduleId String
 
-  @@unique([participantId, scheduleId]) // evita duplicados
+  @@unique([participantId, scheduleId])
   @@map("call_participant_schedules")
 }
 

@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     const statuses = body.statuses && body.statuses.length > 0 ? body.statuses : ['ACTIVE', 'INACTIVE'];
     
     // Construir filtro para groupBy en attendances
-    const attendanceWhere: any = {
+    const attendanceWhere = {
       deletedAt: null,
       volunteer: { deletedAt: null, status: { in: statuses } },
       date: { gte: startUTC, lte: endUTC },

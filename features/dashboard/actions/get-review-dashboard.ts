@@ -117,7 +117,7 @@ export async function getReviewDashboard(): Promise<DashboardReview | null> {
     const myAttendance = await prisma.attendance.findMany({
       where: {
         deletedAt: null,
-        volunteer: {
+        Volunteer: {
           user: {
             email: user.email
           }
