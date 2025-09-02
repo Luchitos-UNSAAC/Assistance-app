@@ -5,6 +5,7 @@ import type { CallForVolunteersForm, ScheduleInput, WeekDay } from "@/features/c
 import { Button } from "@/components/ui/button";
 import { CallWithSchedules } from "@/features/calls/actions/get-call-by-id";
 import {useRouter} from "next/navigation";
+import {ArrowLeft} from "lucide-react";
 
 const WEEK_DAYS: WeekDay[] = [
   "LUNES","MARTES","MIERCOLES","JUEVES","VIERNES","SABADO","DOMINGO"
@@ -148,7 +149,17 @@ export default function CallForVolunteersEditPage({ call }: Props) {
   
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-md rounded-2xl p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Editar Convocatoria</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          Editar Convocatoria
+        </h2>
+        <Button onClick={()=> router.push("/calls")}
+                variant='outline'
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver a Convocatorias
+        </Button>
+      </div>
       
       {errors && (
         <div className="mb-4 p-3 rounded-lg border border-red-300 bg-red-50 text-red-700">
@@ -254,7 +265,10 @@ export default function CallForVolunteersEditPage({ call }: Props) {
           </select>
         </label>
         
-        <Button type="submit" disabled={submitting} className="w-full bg-blue-600 text-white font-semibold p-2 rounded-lg hover:bg-blue-700 disabled:opacity-60">
+        <Button type="submit" disabled={submitting}
+                className='w-full'
+                variant='outline'
+        >
           {submitting ? "Guardando..." : "Actualizar Convocatoria"}
         </Button>
       </form>

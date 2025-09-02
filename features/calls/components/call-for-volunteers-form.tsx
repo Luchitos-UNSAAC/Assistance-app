@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { CallForVolunteersForm, ScheduleInput, WeekDay } from "@/features/calls/types/form";
 import {Button} from "@/components/ui/button"
+import {ArrowLeft} from "lucide-react";
+import {useRouter} from "next/navigation";
 
 const WEEK_DAYS: WeekDay[] = [
   "LUNES","MARTES","MIERCOLES","JUEVES","VIERNES","SABADO","DOMINGO"
@@ -21,6 +23,7 @@ function timeIsValid(start: string, end: string) {
 }
 
 export default function CallForVolunteersFormPage() {
+  const router =  useRouter()
   const [form, setForm] = useState<CallForVolunteersForm>({
     title: "",
     description: "",
@@ -136,8 +139,17 @@ export default function CallForVolunteersFormPage() {
   
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-md rounded-2xl p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Crear Convocatoria</h2>
-      
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          Crear convocatoria
+        </h2>
+        <Button onClick={()=> router.push("/calls")}
+                variant='outline'
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver a Convocatorias
+        </Button>
+      </div>
       {errors && (
         <div className="mb-4 p-3 rounded-lg border border-red-300 bg-red-50 text-red-700">
           {errors}

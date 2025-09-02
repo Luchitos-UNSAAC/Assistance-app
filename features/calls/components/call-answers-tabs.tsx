@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Download, FileText } from "lucide-react";
+import {ArrowLeft, Download, FileText} from "lucide-react";
 import {CallSchedule} from "@prisma/client";
 import {CallWithSchedules} from "@/features/calls/actions/get-call-by-id";
+import {useRouter} from "next/navigation";
 
 type ScheduleShape = {
   id: string;
@@ -80,11 +81,17 @@ const formatSchedule = (s: ScheduleShape) => {
 /* ---------- Main component ---------- */
 export default function CallAnswersTabs({ callId, questions, participantsCount, schedules, call }: Props) {
   const [activeTab, setActiveTab] = useState<"questions" | "schedules">("questions");
-  
+  const router = useRouter();
   return (
     <div className="space-y-6">
       {/* Header + tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <Button onClick={()=> router.push("/calls")}
+                variant='outline'
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver a Convocatorias
+        </Button>
         <div>
           <h1 className="text-2xl font-semibold">Respuestas - Convocatoria</h1>
           <p className="text-sm text-muted-foreground mt-1">Convocatoria: <span className="font-medium">{call.title}</span> • Participantes: <span className="font-medium">{participantsCount}</span></p>

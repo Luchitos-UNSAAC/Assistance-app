@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { CallQuestion } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import {ArrowLeft} from "lucide-react";
 
 type QuestionTypeForm = "short" | "paragraph" | "multiple" | "checkbox";
 
@@ -137,7 +138,13 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <div className="flex justify-end gap-2">
-        <Link href={`/calls/${callId}/questions/preview`} target="_blank">
+        <Button onClick={()=> router.push("/calls")}
+                variant='outline'
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver a Convocatorias
+        </Button>
+        <Link href={`/app/(root)/calls/${callId}/questions/preview`} target="_blank">
           <Button variant="outline">Ver previsualización</Button>
         </Link>
         <Button variant="outline" onClick={handleAddQuestion}>

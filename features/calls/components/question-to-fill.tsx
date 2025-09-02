@@ -89,7 +89,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
         title: "Exito",
         description: "Se enviaron tus respuestas correctamente.",
       })
-      router.push('/')
+      router.push('/forms/thank-you');
     } catch (err) {
       console.error("❌ Error al enviar:", err);
     }
