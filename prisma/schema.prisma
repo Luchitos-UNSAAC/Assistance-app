@@ -225,6 +225,45 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+model Group {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
+
+  // Relación con miembros
+  members GroupMember[]
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id        String    @id @default(cuid())
+  role      GroupRole @default(MEMBER) // Encargado o miembro
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId String
+
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerId String
+
+  @@unique([groupId, volunteerId]) // un voluntario no se repite en el mismo grupo
+  @@map("group_members")
+}
+
+enum GroupRole {
+  LEADER
+  MEMBER
+}
+
 enum WeekDay {
   LUNES
   MARTES
