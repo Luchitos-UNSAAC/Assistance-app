@@ -49,6 +49,7 @@ model Volunteer {
   user             User?
   notifications    Notification[]
   callParticipants CallParticipant[]
+  groupMembers     GroupMember[]
 
   @@map("volunteers")
 }
@@ -237,7 +238,6 @@ model Group {
   updatedBy String?
   deletedBy String?
 
-  // Relación con miembros
   members GroupMember[]
 
   @@map("groups")
@@ -245,9 +245,11 @@ model Group {
 
 model GroupMember {
   id        String    @id @default(cuid())
-  role      GroupRole @default(MEMBER) // Encargado o miembro
+  role      GroupRole @default(MEMBER)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  deletedBy String?
 
   group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId String
@@ -255,7 +257,7 @@ model GroupMember {
   volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
   volunteerId String
 
-  @@unique([groupId, volunteerId]) // un voluntario no se repite en el mismo grupo
+  @@unique([groupId, volunteerId])
   @@map("group_members")
 }
 

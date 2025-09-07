@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
-import { UserRole, VolunteerStatus } from "@prisma/client";
+import { UserRole, VolunteerStatus, GroupRole } from "@prisma/client";
 import {getCurrentUser} from "@/lib/get-current-user";
 
 interface AddManagerBody {
@@ -45,7 +45,7 @@ export const addManager = async (body: AddManagerBody) => {
     
     const statusFormatted = body.status === "Active" ? VolunteerStatus.ACTIVE : VolunteerStatus.INACTIVE;
     
-    const response = await prisma.volunteer.create({
+    const newVolunteer = await prisma.volunteer.create({
       data: {
         name: body.name,
         email: body.email,
@@ -65,10 +65,30 @@ export const addManager = async (body: AddManagerBody) => {
         }
       },
     })
-    if (!response) {
+    if (!newVolunteer) {
       return {
         success: false,
         message: `Error al agregar el encargado`,
+      }
+    }
+    
+    // Create new group
+    const group = await prisma.group.create({
+      data: {
+        name: `Grupo de ${newVolunteer.name}`,
+        createdBy: currentUser.email,
+        members: {
+          create: {
+            volunteerId: newVolunteer.id,
+            role: GroupRole.LEADER
+          }
+        }
+      }
+    })
+    if (!group) {
+      return {
+        success: false,
+        message: `Error al crear el grupo del encargado`,
       }
     }
     
