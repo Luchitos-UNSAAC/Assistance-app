@@ -22,7 +22,7 @@ export default async function VolunteersPage({ searchParams }: Props) {
         attendances={attendances}
         volunteers={volunteers}
         serverTime={serverTime}
-        pagination={pagination} // pasamos info de paginación
+        pagination={pagination}
       />
     </div>
   );

@@ -2,20 +2,20 @@
 
 import { prisma } from "@/lib/prisma";
 import {Volunteer} from "@/lib/store";
-import { AttendanceStatus, VolunteerStatus, GroupRole } from "@prisma/client";
+import { AttendanceStatus, VolunteerStatus } from "@prisma/client";
 import {getCurrentCall} from "@/lib/get-current-call";
 import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
 import {getGroupOfCurrentVolunteer} from "@/lib/get-group-of-current-volunteer";
 
 export const getVolunteerGroupedToday = async () => {
   try {
-    const currentCall = await getCurrentCall()
-    if (!currentCall) {
+    const currentVolunteer = await getCurrentVolunteer()
+    if (!currentVolunteer) {
       return [];
     }
     
-    const currentVolunteer = await getCurrentVolunteer()
-    if (!currentVolunteer) {
+    const currentCall = await getCurrentCall()
+    if (!currentCall) {
       return [];
     }
     

@@ -44,6 +44,23 @@ export const addAttendance = async (body: AddAttendanceBody) => {
     
     const statusFormatted = mapAttendanceStatus(body.status);
     
+    const existingAttendanceToday = await prisma.attendance.findFirst({
+      where: {
+        volunteerId: body.volunteerId,
+        date: {
+          gte: new Date(new Date().setHours(0, 0, 0, 0)),
+          lt: new Date(new Date().setHours(23, 59, 59, 999)),
+        },
+        deletedAt: null
+      }
+    })
+    if (existingAttendanceToday) {
+      return {
+        success: false,
+        message: `El voluntario ya tiene una asistencia registrada para hoy`,
+      }
+    }
+    
     const response = await prisma.attendance.create({
       data: {
         date: new Date(),

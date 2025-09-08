@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
 import { AttendanceWithVolunteer, VolunteerForSelect } from "@/lib/store";
 import { AttendanceStatus, VolunteerStatus } from "@prisma/client";
+import {getGroupOfCurrentVolunteer} from "@/lib/get-group-of-current-volunteer";
+import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
 
 type GetAttendancesParams = {
   page?: number;
@@ -12,7 +14,6 @@ type GetAttendancesParams = {
 
 export const getAttendancesAndVolunteers = async ({ page = 1, pageSize = 10 }: GetAttendancesParams = {}) => {
   try {
-    // normalizar valores
     page = Number(page) || 1;
     pageSize = Number(pageSize) || 10;
     if (page < 1) page = 1;
@@ -20,8 +21,17 @@ export const getAttendancesAndVolunteers = async ({ page = 1, pageSize = 10 }: G
     const maxPageSize = 100;
     if (pageSize > maxPageSize) pageSize = maxPageSize;
     
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
+    const currentVolunteer = await getCurrentVolunteer()
+    if (!currentVolunteer) {
+      return {
+        attendances: [],
+        volunteers: [],
+        pagination: { page, pageSize, total: 0, totalPages: 1 },
+      };
+    }
+    
+    const currentGroup = await getGroupOfCurrentVolunteer(currentVolunteer.id);
+    if (!currentGroup) {
       return {
         attendances: [],
         volunteers: [],
@@ -31,12 +41,13 @@ export const getAttendancesAndVolunteers = async ({ page = 1, pageSize = 10 }: G
     
     const whereAttendance = { deletedAt: null };
     
-    // Ejecutamos count y findMany en paralelo (y también traemos volunteers)
     const [total, attendances, volunteers] = await Promise.all([
       prisma.attendance.count({ where: whereAttendance }),
       prisma.attendance.findMany({
         where: whereAttendance,
-        include: { volunteer: true },
+        include: {
+          Volunteer: true
+        },
         orderBy: { date: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
@@ -45,7 +56,12 @@ export const getAttendancesAndVolunteers = async ({ page = 1, pageSize = 10 }: G
         where: {
           deletedAt: null,
           status: VolunteerStatus.ACTIVE,
-          createdBy: { not: null },
+          groupMembers: {
+            some: {
+              groupId: currentGroup.id,
+              deletedAt: null
+            }
+          },
         },
         select: { id: true, name: true, email: true, status: true },
         orderBy: { name: "asc" },
@@ -81,9 +97,9 @@ export const getAttendancesAndVolunteers = async ({ page = 1, pageSize = 10 }: G
       date: attendance.date.toISOString(),
       status: mapAttendanceStatus(attendance.status),
       volunteer: {
-        id: attendance.volunteer.id,
-        name: attendance.volunteer.name,
-        email: attendance.volunteer.email,
+        id: attendance.Volunteer.id,
+        name: attendance.Volunteer.name,
+        email: attendance.Volunteer.email,
       },
     }));
     
