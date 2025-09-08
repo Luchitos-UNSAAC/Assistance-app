@@ -7,8 +7,6 @@ export default async function VolunteersPage() {
   const activeVolunteers = await getVolunteerGroupedToday();
   const volunteersByScheduleToday = await getVolunteerByScheduleToday()
   const attendancesAll: Attendance[]  = []
-  console.log("volunteersByScheduleToday:", volunteersByScheduleToday)
-  console.log("activeVolunteers:", activeVolunteers)
   
   activeVolunteers.forEach((volunteer) => {
     volunteer.attendances.forEach((attendance) => {
@@ -20,6 +18,7 @@ export default async function VolunteersPage() {
     <VolunteersList
       attendances={attendancesAll}
       volunteers={activeVolunteers}
+      newVolunteers={volunteersByScheduleToday}
     />
   )
 }

@@ -4,8 +4,6 @@ import { prisma } from "@/lib/prisma";
 import {Volunteer} from "@/lib/store";
 import { AttendanceStatus, VolunteerStatus, WeekDay } from "@prisma/client";
 import {getCurrentCall} from "@/lib/get-current-call";
-import {getGroupOfCurrentVolunteer} from "@/lib/get-group-of-current-volunteer";
-import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
 
 export const getVolunteerByScheduleToday = async () => {
   try {
@@ -52,6 +50,9 @@ export const getVolunteerByScheduleToday = async () => {
               }
             }
           }
+        },
+        groupMembers: {
+          none: {}
         },
       },
       include: {

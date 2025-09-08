@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {Volunteer, Attendance} from "@/lib/store"
 import { useAuthStore } from "@/lib/auth-store"
-import { Plus, User, Mail, Phone, MapPin, Pencil, Trash } from "lucide-react"
+import {Plus, User, Mail, Phone, MapPin, Pencil, Trash, AlertCircle} from "lucide-react"
 import AuthGuard from "@/components/auth-guard"
 import { useToast } from "@/hooks/use-toast"
 import {SearchBar} from "@/components/search-bar";
@@ -21,18 +21,21 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion"
+import VolunteerNewModal from "@/features/volunteers/components/volunteer-new-modal";
 
 interface ManagersListProps {
+  newVolunteers: Volunteer[]
   volunteers: Volunteer[]
   attendances: Attendance[]
 }
 
-export default function VolunteerList({volunteers, attendances}: ManagersListProps) {
+export default function VolunteerList({volunteers, attendances, newVolunteers}: ManagersListProps) {
   const { hasPermission } = useAuthStore()
   const { toast } = useToast()
   
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isNewModalOpen, setIsNewModalOpen] = useState(false)
   const [selectedVolunteer, setSelectedVolunteer] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const router = useRouter()
@@ -95,15 +98,25 @@ export default function VolunteerList({volunteers, attendances}: ManagersListPro
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Voluntarios</h1>
           {canManageVolunteers && (
-            <Button
-              onClick={() => {
-                setSelectedVolunteer(null)
-                setIsModalOpen(true)
-              }}
-              className="gradient-button text-white"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {
+                newVolunteers.length > 0 && (
+                  <Button  onClick={() => setIsNewModalOpen(true)}>
+                    <AlertCircle className="h-4 w-4 md:mr-2" />
+                    <span className='hidden md:block'> Nuevos: {newVolunteers.length}</span>
+                  </Button>
+                )
+              }
+              <Button
+                onClick={() => {
+                  setSelectedVolunteer(null)
+                  setIsModalOpen(true)
+                }}
+                className="gradient-button text-white"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           )}
         </div>
         
@@ -207,6 +220,15 @@ export default function VolunteerList({volunteers, attendances}: ManagersListPro
             volunteer={selectedVolunteer ? volunteers.find((v) => v.id === selectedVolunteer) : undefined}
           />
         )}
+        
+        <VolunteerNewModal
+          isOpen={isNewModalOpen}
+          onClose={() => {
+            setIsNewModalOpen(false)
+            router.refresh()
+          }}
+          newVolunteers={newVolunteers}
+        />
       </div>
     </AuthGuard>
   )
