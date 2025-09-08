@@ -15,6 +15,7 @@ export default async function VolunteersPage({ searchParams }: Props) {
   
   const { volunteers, attendances, pagination } = await getAttendancesAndVolunteers({ page, pageSize });
   const serverTime = getServerTime();
+  console.log(volunteers)
   
   return (
     <div className="space-y-4">

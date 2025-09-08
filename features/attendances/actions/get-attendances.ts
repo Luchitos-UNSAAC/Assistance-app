@@ -1,6 +1,5 @@
 "use server";
 
-import { getCurrentUser } from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
 import { AttendanceWithVolunteer, VolunteerForSelect } from "@/lib/store";
 import { AttendanceStatus, VolunteerStatus } from "@prisma/client";
@@ -108,6 +107,17 @@ export const getAttendancesAndVolunteers = async ({ page = 1, pageSize = 10 }: G
       name: volunteer.name,
       email: volunteer.email,
       status: mapVolunteerStatus(volunteer.status),
+      countAttendances: attendancesMapped.filter((a) => a.volunteer.id === volunteer.id).length,
+      attendanceToday: attendancesMapped.find((a) => {
+        const today = new Date();
+        const attendanceDate = new Date(a.date);
+        return (
+          a.volunteer.id === volunteer.id &&
+          attendanceDate.getDate() === today.getDate() &&
+          attendanceDate.getMonth() === today.getMonth() &&
+          attendanceDate.getFullYear() === today.getFullYear()
+        );
+      }),
     }));
     
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
