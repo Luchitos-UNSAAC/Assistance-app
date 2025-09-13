@@ -101,10 +101,10 @@ export default function VolunteerDetail({volunteer}: VolunteerDetailProps) {
                 <Edit className="h-4 w-4 mr-2" />
                 Editar
               </Button>
-              <Button onClick={handleDelete} variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Eliminar
-              </Button>
+              {/*<Button onClick={handleDelete} variant="destructive" size="sm">*/}
+              {/*  <Trash2 className="h-4 w-4 mr-2" />*/}
+              {/*  Eliminar*/}
+              {/*</Button>*/}
             </div>
           )}
         </div>

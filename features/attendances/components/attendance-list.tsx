@@ -196,15 +196,18 @@ export default function AttendanceList({ volunteers, serverTime }: AttendanceLis
                                 size="sm"
                                 aria-label={`Marcar asistencia de ${vol.name}`}
                                 className="h-7"
+                                disabled={attendance.status === "Present" || isPending || loadingId === vol.id}
                               >
                                 <Check className="h-4 w-4 text-green-600" />
                               </Button>
+                              
                               <Button
                                 onClick={() => openEditModalFor(vol, "Justified")}
                                 variant="outline"
                                 size="sm"
                                 aria-label={`Registrar permiso de ${vol.name}`}
                                 className="h-7"
+                                disabled={attendance.status === "Justified" || isPending || loadingId === vol.id}
                               >
                                 <FileText className="h-4 w-4 text-yellow-600" />
                               </Button>
@@ -214,6 +217,7 @@ export default function AttendanceList({ volunteers, serverTime }: AttendanceLis
                                 size="icon"
                                 aria-label={`Marcar ausencia de ${vol.name}`}
                                 className="h-7 w-7"
+                                disabled={attendance.status === "Absent" || isPending || loadingId === vol.id}
                               >
                                 <X className="h-4 w-4 text-red-600" />
                               </Button>
