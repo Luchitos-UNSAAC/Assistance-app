@@ -19,7 +19,6 @@ export interface VolunteerForSelect {
   email: string
   status: "Active" | "Inactive" | "Suspended"
   attendanceToday?: Attendance
-  countAttendances?: number
 }
 
 export interface Attendance {
