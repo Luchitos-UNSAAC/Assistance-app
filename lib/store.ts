@@ -7,6 +7,7 @@ export interface Volunteer {
   name: string
   email: string
   phone: string
+  dni?: string
   address: string
   birthday: string
   status: "Active" | "Inactive" | "Suspended"

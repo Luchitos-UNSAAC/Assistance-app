@@ -10,6 +10,7 @@ interface AddManagerBody {
   email: string
   phone: string
   address: string
+  dni?: string
   birthday: string
   status?: "Active" | "Inactive" | "Suspended"
   newVolunteerId?: string
@@ -116,7 +117,7 @@ export const addVolunteer = async (body: AddManagerBody) => {
             create: {
               email: body.email,
               name: body.name,
-              password: "123123",
+              password: body?.dni || "123123",
               role: UserRole.VOLUNTEER,
               createdBy: currentUser.email,
             }

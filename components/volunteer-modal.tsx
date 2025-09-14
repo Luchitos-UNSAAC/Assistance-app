@@ -28,7 +28,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
     phone: "",
     address: "",
     birthday: "",
-    status: "Active" as "Active" | "Inactive",
+    status: "Active" as "Active" | "Inactive" | "Suspended",
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})

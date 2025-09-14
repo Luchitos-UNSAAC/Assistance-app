@@ -51,12 +51,14 @@ export default function TableOfAttendances({ data }: { data: Row[] }) {
           <tr>
             <th className="px-4 py-3 text-left text-sm font-medium">#</th>
             <th className="px-4 py-3 text-left text-sm font-medium">Nombre</th>
-            <th className="px-4 py-3 text-left text-sm font-medium">Correo</th>
-            {showPhone && <th className="px-4 py-3 text-left text-sm font-medium">Teléfono</th>}
-            {ATTENDANCE_STATUSES.map((s) => (
-              <th key={s} className="px-4 py-3 text-center text-sm font-medium">{STATUS_LABELS[s]}</th>
-            ))}
-            <th className="px-4 py-3 text-center text-sm font-medium">TOTAL</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Asistencia</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Deuda</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Tombola</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Objetos</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Convocatoria</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Numero</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Horario</th>
+            <th className="px-4 py-3 text-left text-sm font-medium">Cumpleaños</th>
           </tr>
           </thead>
           <tbody className="bg-white divide-y">
@@ -69,12 +71,28 @@ export default function TableOfAttendances({ data }: { data: Row[] }) {
               <tr key={row.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-sm whitespace-nowrap">{row.index}</td>
                 <td className="px-4 py-3 text-sm">{row.name}</td>
-                <td className="px-4 py-3 text-sm">{row.email}</td>
-                {showPhone && <td className="px-4 py-3 text-sm">{row.phone}</td>}
-                {ATTENDANCE_STATUSES.map((s) => (
-                  <td key={s} className="px-4 py-3 text-center text-sm">{row.counts[s] ?? 0}</td>
-                ))}
-                <td className="px-4 py-3 text-center text-sm font-medium">{row.total}</td>
+                <td className="px-4 py-3 text-center text-sm">{row.counts["PRESENT"] ?? 0}</td>
+                
+                {/*Deuda*/}
+                <td className="px-4 py-3 text-center text-sm">0</td>
+                
+                {/*Tombola*/}
+                <td className="px-4 py-3 text-center text-sm">0</td>
+                
+                {/*Objetos*/}
+                <td className="px-4 py-3 text-center text-sm">0</td>
+                
+                {/*Convocatoria*/}
+                <td className="px-4 py-3 text-center text-sm">2024-3</td>
+                
+                {/*Numero*/}
+                <td className="px-4 py-3 text-sm">{row?.phone}</td>
+                
+                {/*Horario*/}
+                <td className="px-4 py-3 text-sm">LUNES, MARTES</td>
+                
+                {/*Cumpleaños*/}
+                <td className="px-4 py-3 text-sm">01/01/2000</td>
               </tr>
             ))
           )}

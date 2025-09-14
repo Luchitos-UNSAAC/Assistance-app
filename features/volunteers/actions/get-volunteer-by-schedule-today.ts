@@ -63,6 +63,11 @@ export const getVolunteerByScheduleToday = async () => {
           where: {
             deletedAt: null
           }
+        },
+        user: {
+          select: {
+            dni: true,
+          }
         }
       }
     })
@@ -85,6 +90,7 @@ export const getVolunteerByScheduleToday = async () => {
       name: volunteer.name,
       email: volunteer.email,
       phone: volunteer.phone || "",
+      dni: volunteer.user?.dni || "",
       address: volunteer.address || "",
       birthday: volunteer.birthday ? new Date(volunteer.birthday).toISOString().split('T')[0] : "",
       status: volunteer.status === "ACTIVE" ? "Active" : "Inactive",

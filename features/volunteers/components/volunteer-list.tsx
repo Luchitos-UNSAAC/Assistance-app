@@ -15,12 +15,7 @@ import {useRouter} from "next/navigation";
 import {useDeleteModalStore} from "@/lib/delete-modal-store";
 import {deleteVolunteerById} from "@/features/volunteers/actions/delete-volunteer-by-id";
 import VolunteerModal from "@/features/volunteers/components/volunteer-modal";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion"
+
 import VolunteerNewModal from "@/features/volunteers/components/volunteer-new-modal";
 
 interface ManagersListProps {
@@ -172,7 +167,6 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
                     </div>
                     
                     {/* Actions */}
-                    
                   </div>
                   
                   {/*/!* Volunteer Info *!/*/}
