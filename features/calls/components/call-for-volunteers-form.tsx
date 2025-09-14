@@ -34,7 +34,13 @@ export default function CallForVolunteersFormPage() {
     deadline: "",
     status: "OPEN",
     schedules: [
-      { mode: "WEEKLY", dayOfWeek: "LUNES", startTime: "09:00", endTime: "12:00" },
+      { mode: "WEEKLY", dayOfWeek: "LUNES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "MARTES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "MIERCOLES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "JUEVES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "VIERNES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "SABADO", startTime: "16:00", endTime: "17:00" },
+      { mode: "WEEKLY", dayOfWeek: "DOMINGO", startTime: "15:30", endTime: "16:00" },
     ],
   });
   
