@@ -136,15 +136,15 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
   };
   
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
-      <div className="flex justify-end gap-2">
+    <div className="max-w-3xl mx-auto space-y-4 px-3 md:px-1">
+      <div className="flex flex-col md:flex-row justify-end gap-2">
         <Button onClick={()=> router.push("/calls")}
                 variant='outline'
         >
           <ArrowLeft className="w-4 h-4" />
           Volver a Convocatorias
         </Button>
-        <Link href={`/app/(root)/calls/${callId}/questions/preview`} target="_blank">
+        <Link href={`/calls/${callId}/questions/preview`} target="_blank" className="w-full md:w-auto">
           <Button variant="outline">Ver previsualización</Button>
         </Link>
         <Button variant="outline" onClick={handleAddQuestion}>

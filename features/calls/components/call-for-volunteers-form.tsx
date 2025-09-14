@@ -139,7 +139,7 @@ export default function CallForVolunteersFormPage() {
   
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-md rounded-2xl p-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Crear convocatoria
         </h2>
