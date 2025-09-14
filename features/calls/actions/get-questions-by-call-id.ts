@@ -7,16 +7,19 @@ export const getQuestionsByCallId = async (callId: string) => {
     })
     if (!call) {
       console.error('Call not found');
-      return [];
+      return {questions: [], call: null};
     }
     
     const questions = await prisma.callQuestion.findMany({
       where: {callId},
       orderBy: { createdAt: 'asc'},
     });
-    return questions;
+    return {
+      questions,
+      call
+    };
   } catch (error) {
-    console.error('Error fetching questions:', error);
-    return [];
+    console.error('[ERROR_GET_QUESTIONS_BY_CALL_ID]', error);
+    return {questions: [], call: null};
   }
 }

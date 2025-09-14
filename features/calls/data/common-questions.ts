@@ -1,0 +1,50 @@
+export const commonQuestionsList = [
+  {
+    id: "1",
+    text: "Nombre completo",
+    type: "short",
+    options: [],
+    isEditing: false,
+    isNew: false,
+  },
+  {
+    id: "2",
+    text: "Correo institucional",
+    type: "short",
+    options: [],
+    isEditing: false,
+    isNew: false,
+  },
+  {
+    id: "3",
+    text: "DNI",
+    type: "short",
+    options: [],
+    isEditing: false,
+    isNew: false,
+  },
+  {
+    id: "4",
+    text: "Número celular",
+    type: "short",
+    options: [],
+    isEditing: false,
+    isNew: false,
+  },
+  {
+    id: "5",
+    text: "Dirección en caso de emergencias",
+    type: "short",
+    options: [],
+    isEditing: false,
+    isNew: false,
+  },
+  {
+    id: "6",
+    text: "Fecha de nacimiento",
+    type: "short",
+    options: [],
+    isEditing: false,
+    isNew: false,
+  }
+]

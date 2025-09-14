@@ -104,6 +104,13 @@ model CallForVolunteers {
   deadline     DateTime
   status       CallStatus @default(OPEN)
 
+  defaultQuestionName     Boolean @default(true)
+  defaultQuestionEmail    Boolean @default(true)
+  defaultQuestionPhone    Boolean @default(true)
+  defaultQuestionAddress  Boolean @default(true)
+  defaultQuestionBirthday Boolean @default(true)
+  defaultQuestionDni      Boolean @default(true)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
