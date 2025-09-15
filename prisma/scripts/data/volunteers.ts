@@ -2,8 +2,7 @@ import {UserRole, Volunteer, VolunteerStatus, User} from '@prisma/client';
 
 export type NewVolunteerWithUser = Volunteer & { user: User };
 
-export let volunteers: NewVolunteerWithUser[];
-volunteers = [
+export let volunteers: NewVolunteerWithUser[] = [
   {
     id: "cme0a14ef000307if8zy60hp9",
     name: "Administrador",
