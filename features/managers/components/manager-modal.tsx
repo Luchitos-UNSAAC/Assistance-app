@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useVolunteerStore, type Volunteer } from "@/lib/store"
+import { type Volunteer } from "@/lib/store"
 import { useToast } from "@/hooks/use-toast"
 import {useRouter} from "next/navigation";
 import {editManagerById} from "@/features/managers/actions/edit-manager-by-id";
@@ -29,6 +29,8 @@ export default function ManagerModal({ isOpen, onClose, volunteer }: VolunteerMo
     name: "",
     email: "",
     phone: "",
+    dni: "",
+    dayOfWeek: "",
     address: "",
     birthday: "",
     status: "Active" as "Active" | "Inactive" | "Suspended",
@@ -42,18 +44,22 @@ export default function ManagerModal({ isOpen, onClose, volunteer }: VolunteerMo
         name: volunteer.name,
         email: volunteer.email,
         phone: volunteer.phone,
+        dni: volunteer.dni || "",
         address: volunteer.address,
         birthday: volunteer.birthday,
         status: volunteer.status,
+        dayOfWeek: "",
       })
     } else {
       setFormData({
         name: "",
         email: "",
         phone: "",
+        dni: "",
         address: "",
         birthday: "",
         status: "Active",
+        dayOfWeek: "",
       })
     }
     setErrors({})
@@ -74,6 +80,10 @@ export default function ManagerModal({ isOpen, onClose, volunteer }: VolunteerMo
 
     if (!formData.phone.trim()) {
       newErrors.phone = "El teléfono es requerido"
+    }
+    
+    if (!formData.dni.trim()) {
+      newErrors.dni = "El DNI es requerido"
     }
 
     if (!formData.address.trim()) {
@@ -101,6 +111,7 @@ export default function ManagerModal({ isOpen, onClose, volunteer }: VolunteerMo
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
+          dni: formData.dni,
           address: formData.address,
           birthday: formData.birthday,
           status: formData.status,
@@ -126,10 +137,12 @@ export default function ManagerModal({ isOpen, onClose, volunteer }: VolunteerMo
         const body = {
           name: formData.name,
           email: formData.email,
+          dni: formData.dni,
           phone: formData.phone,
           address: formData.address,
           birthday: formData.birthday,
           status: formData.status,
+          dayOfWeek: formData.dayOfWeek,
         }
         const response = await addManager(body)
         if (!response.success) {
@@ -190,6 +203,19 @@ export default function ManagerModal({ isOpen, onClose, volunteer }: VolunteerMo
             />
             {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
           </div>
+          
+          <div>
+            <Label htmlFor="phone">DNI</Label>
+            <Input
+              id="dni"
+              value={formData.dni}
+              disabled={pending}
+              onChange={(e) => handleInputChange("dni", e.target.value)}
+              placeholder="787878787"
+              className={errors.dni ? "border-red-500" : ""}
+            />
+            {errors.dni && <p className="text-sm text-red-500 mt-1">{errors.dni}</p>}
+          </div>
 
           <div>
             <Label htmlFor="phone">Teléfono</Label>
@@ -229,23 +255,28 @@ export default function ManagerModal({ isOpen, onClose, volunteer }: VolunteerMo
             />
             {errors.birthday && <p className="text-sm text-red-500 mt-1">{errors.birthday}</p>}
           </div>
-
+          
           <div>
-            <Label htmlFor="status">Estado</Label>
+            <Label htmlFor="dayOfWeek">Dia de la semana</Label>
             <Select
-              value={formData.status}
-              onValueChange={(value: "Active" | "Inactive") => handleInputChange("status", value)}
+              value={formData.dayOfWeek}
+              onValueChange={(value: any) => handleInputChange("dayOfWeek", value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Active">Activo</SelectItem>
-                <SelectItem value="Inactive">Inactivo</SelectItem>
+                <SelectItem value="LUNES">LUNES</SelectItem>
+                <SelectItem value="MARTES">MARTES</SelectItem>
+                <SelectItem value="MIERCOLES">MIERCOLES</SelectItem>
+                <SelectItem value="JUEVES">JUEVES</SelectItem>
+                <SelectItem value="VIERNES">VIERNES</SelectItem>
+                <SelectItem value="SABADO">SABADO</SelectItem>
+                <SelectItem value="DOMINGO">DOMINGO</SelectItem>
               </SelectContent>
             </Select>
           </div>
-
+          
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}
             disabled={pending}>

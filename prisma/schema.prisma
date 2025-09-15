@@ -237,6 +237,7 @@ model Group {
   id          String    @id @default(cuid())
   name        String
   description String?
+  dayOfWeek   WeekDay   @default(LUNES)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?

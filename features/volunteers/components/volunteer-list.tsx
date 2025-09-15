@@ -3,14 +3,12 @@
 import {useState, useTransition} from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {Volunteer, Attendance} from "@/lib/store"
 import { useAuthStore } from "@/lib/auth-store"
-import {Plus, User, Mail, Phone, MapPin, Pencil, Trash, AlertCircle} from "lucide-react"
+import {Plus, User, Pencil, Trash, AlertCircle} from "lucide-react"
 import AuthGuard from "@/components/auth-guard"
 import { useToast } from "@/hooks/use-toast"
 import {SearchBar} from "@/components/search-bar";
-import {InfoRow} from "@/components/info-row";
 import {useRouter} from "next/navigation";
 import {useDeleteModalStore} from "@/lib/delete-modal-store";
 import {deleteVolunteerById} from "@/features/volunteers/actions/delete-volunteer-by-id";

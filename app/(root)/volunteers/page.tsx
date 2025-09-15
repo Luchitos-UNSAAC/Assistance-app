@@ -13,7 +13,6 @@ export default async function VolunteersPage() {
       attendancesAll.push(attendance)
     })
   })
-  
   return (
     <VolunteersList
       attendances={attendancesAll}

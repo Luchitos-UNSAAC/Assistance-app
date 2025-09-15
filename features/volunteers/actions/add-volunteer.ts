@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
 import { UserRole, VolunteerStatus, GroupRole } from "@prisma/client";
-import {getCurrentUser} from "@/lib/get-current-user";
+import {getCurrentUserWithRole} from "@/lib/get-current-user-with-role";
 
 interface AddManagerBody {
   name: string
@@ -18,7 +18,7 @@ interface AddManagerBody {
 
 export const addVolunteer = async (body: AddManagerBody) => {
   try {
-    const currentUser = await getCurrentUser();
+    const currentUser = await getCurrentUserWithRole();
     if (!currentUser) {
       return {
         success: false,
@@ -31,6 +31,27 @@ export const addVolunteer = async (body: AddManagerBody) => {
         success: false,
         message: `No existe el voluntario`
       };
+    }
+    
+    const isAdmin = currentUser.role === UserRole.ADMIN;
+    if(isAdmin) {
+      const verifyIfAdminBelongsToGroup = await prisma.groupMember.findFirst({
+        where: {
+          volunteerId: currentVolunteer.id,
+          role: GroupRole.LEADER,
+        }
+      });
+      if (!verifyIfAdminBelongsToGroup) {
+        // Added, first search which group the admin belongs to as leader
+        const adminGroup = await prisma.groupMember.findFirst({
+          where: {
+            role: GroupRole.LEADER,
+            volunteer: {
+            
+            }
+          }
+        });
+      }
     }
     
     const currentGroupMemberVolunteer = await prisma.groupMember.findFirst({
@@ -48,7 +69,6 @@ export const addVolunteer = async (body: AddManagerBody) => {
     
     const newVolunteerId = body.newVolunteerId;
     
-    // Si se pasa un ID, se agrega el voluntario existente al grupo
     if (newVolunteerId) {
       const existingVolunteer = await prisma.volunteer.findUnique({
         where: {
@@ -87,7 +107,6 @@ export const addVolunteer = async (body: AddManagerBody) => {
         success: true,
       }
       
-      // Si no se pasa un ID, se crea un nuevo voluntario
     } else {
       const existingNewVolunteer = await prisma.volunteer.findUnique({
         where: {

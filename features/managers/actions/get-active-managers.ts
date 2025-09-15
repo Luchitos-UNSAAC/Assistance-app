@@ -3,7 +3,7 @@
 import {getCurrentUser} from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
 import {Volunteer} from "@/lib/store";
-import { AttendanceStatus, VolunteerStatus, UserRole } from "@prisma/client";
+import { AttendanceStatus, VolunteerStatus, UserRole, GroupRole } from "@prisma/client";
 
 export const getActiveManagers = async () => {
   try {
@@ -29,8 +29,16 @@ export const getActiveManagers = async () => {
               where: {
                 deletedAt: null
               }
+            },
+            groupMembers: {
+              where: {
+                role: GroupRole.LEADER,
+              },
+              include: {
+                group: true
+              }
             }
-          }
+          },
         }
       }
     })
@@ -53,6 +61,7 @@ export const getActiveManagers = async () => {
       name: manager.name,
       email: manager.email,
       phone: manager?.volunteer?.phone || "",
+      dni: manager?.dni || "",
       address: manager?.volunteer?.address || "",
       birthday: manager?.volunteer?.birthday ? new Date(manager?.volunteer?.birthday).toISOString().split('T')[0] : "",
       status: manager?.volunteer?.status === "ACTIVE" ? "Active" : "Inactive",
