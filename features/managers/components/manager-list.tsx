@@ -17,6 +17,7 @@ import {useDeleteModalStore} from "@/lib/delete-modal-store";
 import ManagerModal from "@/features/managers/components/manager-modal";
 
 interface ManagersListProps {
+  volunteers: Volunteer[]
   managers: Volunteer[]
   attendances: Attendance[]
 }
@@ -194,6 +195,7 @@ export default function ManagersList({managers: volunteers, attendances}: Manage
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             volunteer={selectedVolunteer ? volunteers.find((v) => v.id === selectedVolunteer) : undefined}
+            volunteers={volunteers}
           />
         )}
       </div>

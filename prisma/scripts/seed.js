@@ -1,6 +1,7 @@
 import {PrismaClient} from "@prisma/client";
 import {volunteers} from "./data/volunteers.js";
 import {groups} from "./data/groups.js";
+import {members} from "./data/members.js";
 
 const prisma = new PrismaClient();
 
@@ -29,6 +30,15 @@ async function main() {
             where: {id: group.id},
             update: {},
             create: group,
+        });
+    }
+
+    // Add members
+    for (const member of members) {
+        await prisma.groupMember.upsert({
+            where: {id: member.id},
+            update: {},
+            create: member,
         });
     }
 
