@@ -9,6 +9,7 @@ interface EditManagerBody {
   name: string
   email: string
   phone: string
+  dni?: string
   address: string
   birthday: string
   status?: "Active" | "Inactive" | "Suspended"
@@ -46,6 +47,7 @@ export const editVolunteerById = async (volunteerId: string, body: EditManagerBo
         user: {
           update: {
             name: body.name,
+            dni: body.dni || null,
             updatedBy: currentUser.email,
           },
         }

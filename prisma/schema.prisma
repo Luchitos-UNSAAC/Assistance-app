@@ -49,6 +49,7 @@ model Volunteer {
   user             User?
   notifications    Notification[]
   callParticipants CallParticipant[]
+  groupMembers     GroupMember[]
 
   @@map("volunteers")
 }
@@ -102,6 +103,13 @@ model CallForVolunteers {
   benefits     String?
   deadline     DateTime
   status       CallStatus @default(OPEN)
+
+  defaultQuestionName     Boolean @default(true)
+  defaultQuestionEmail    Boolean @default(true)
+  defaultQuestionPhone    Boolean @default(true)
+  defaultQuestionAddress  Boolean @default(true)
+  defaultQuestionBirthday Boolean @default(true)
+  defaultQuestionDni      Boolean @default(true)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -223,6 +231,47 @@ model AuditLog {
   createdBy String?
 
   @@map("audit_logs")
+}
+
+model Group {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  dayOfWeek   WeekDay   @default(LUNES)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
+
+  members GroupMember[]
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id        String    @id @default(cuid())
+  role      GroupRole @default(MEMBER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  deletedBy String?
+
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId String
+
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerId String
+
+  @@unique([groupId, volunteerId])
+  @@map("group_members")
+}
+
+enum GroupRole {
+  LEADER
+  MEMBER
 }
 
 enum WeekDay {

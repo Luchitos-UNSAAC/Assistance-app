@@ -96,7 +96,7 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
             <CardContent className="p-4 space-y-4">
               
               {/* Ver Perfil */}
-              <Link href={`/app/(root)/volunteers/${user.volunteerId}`}>
+              <Link href={`/volunteers/${user.volunteerId}`}>
                 <div className="flex items-center justify-between p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200 cursor-pointer">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">

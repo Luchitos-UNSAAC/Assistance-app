@@ -1,3 +1,4 @@
+// File: components/attendance-modal.tsx
 "use client"
 
 import React, { useState, useEffect, useTransition } from "react"
@@ -19,6 +20,11 @@ interface AttendanceModalProps {
   attendance?: AttendanceWithVolunteer | null
   volunteers: VolunteerForSelect[]
   serverTime: string // ISO string
+  /**
+   * Optional: when opening the modal to CREATE a new attendance we can preselect
+   * a volunteer (useful when the + button is shown per item in a list).
+   */
+  initialVolunteerId?: string | null
 }
 
 export default function AttendanceModal({
@@ -27,6 +33,7 @@ export default function AttendanceModal({
                                           attendance,
                                           volunteers,
                                           serverTime,
+                                          initialVolunteerId = null,
                                         }: AttendanceModalProps) {
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
@@ -56,7 +63,7 @@ export default function AttendanceModal({
         })
       } else {
         setFormData({
-          volunteerId: "",
+          volunteerId: initialVolunteerId ?? "",
           date: formatDate(serverTime),
           time: formatTime(serverTime),
           status: "Present",
@@ -66,7 +73,7 @@ export default function AttendanceModal({
     }
     
     if (isOpen) initializeForm()
-  }, [attendance, isOpen, serverTime])
+  }, [attendance, isOpen, serverTime, initialVolunteerId])
   
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -93,8 +100,9 @@ export default function AttendanceModal({
     const combinedDate = new Date(`${formData.date}T${formData.time}:00`)
     
     const payload = {
-      ...formData,
+      volunteerId: formData.volunteerId,
       date: combinedDate.toISOString(),
+      status: formData.status,
     }
     
     startTransition(async () => {
@@ -219,3 +227,4 @@ export default function AttendanceModal({
     </Dialog>
   )
 }
+

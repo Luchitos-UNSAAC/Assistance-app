@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { type Volunteer } from "@/lib/store"
 import { useToast } from "@/hooks/use-toast"
 import {useRouter} from "next/navigation";
@@ -28,6 +27,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    dni: "",
     phone: "",
     address: "",
     birthday: "",
@@ -41,6 +41,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
       setFormData({
         name: volunteer.name,
         email: volunteer.email,
+        dni: volunteer.dni || "",
         phone: volunteer.phone,
         address: volunteer.address,
         birthday: new Date(volunteer.birthday).toISOString().split("T")[0],
@@ -51,6 +52,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
         name: "",
         email: "",
         phone: "",
+        dni: "",
         address: "",
         birthday: "",
         status: "Active",
@@ -78,6 +80,10 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
 
     if (!formData.address.trim()) {
       newErrors.address = "La dirección es requerida"
+    }
+    
+    if (!formData.dni.trim()) {
+      newErrors.dni = "El dni es requerido"
     }
 
     if (!formData.birthday) {
@@ -186,9 +192,22 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
               onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="ejemplo@unsaac.edu"
               className={errors.email ? "border-red-500" : ""}
-              disabled
+              disabled={!!volunteer}
             />
             {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+          </div>
+          
+          <div>
+            <Label htmlFor="email">Dni</Label>
+            <Input
+              id="dni"
+              type="text"
+              value={formData.dni}
+              onChange={(e) => handleInputChange("dni", e.target.value)}
+              placeholder="909090"
+              className={errors.dni ? "border-red-500" : ""}
+            />
+            {errors.dni && <p className="text-sm text-red-500 mt-1">{errors.dni}</p>}
           </div>
 
           <div>

@@ -31,9 +31,20 @@ export const deleteVolunteerById = async (volunteerId: string) => {
         },
         data: {
           status: VolunteerStatus.INACTIVE,
-          deletedAt: new Date().toISOString(),
+          deletedAt: new Date(),
           deletedBy: currentUser.email,
-        }
+          groupMembers: {
+            updateMany: {
+              where: {
+                volunteerId: volunteerId,
+              },
+              data: {
+                deletedAt: new Date(),
+                deletedBy: currentUser.email,
+              },
+            },
+          },
+        },
       })
       
       // Update the user associated with the volunteer to mark it as deleted

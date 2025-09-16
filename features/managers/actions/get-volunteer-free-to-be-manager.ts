@@ -3,15 +3,15 @@
 import {getCurrentUser} from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
 import {Volunteer} from "@/lib/store";
-import { AttendanceStatus, VolunteerStatus, UserRole } from "@prisma/client";
+import { AttendanceStatus, VolunteerStatus, UserRole, GroupRole } from "@prisma/client";
 
-export const getActiveVolunteers = async () => {
+export const getVolunteerFreeToBeManager = async () => {
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return [];
     }
-    const activeVolunteers = await prisma.user.findMany({
+    const activeManagers = await prisma.user.findMany({
       where: {
         role: UserRole.VOLUNTEER,
         volunteer: {
@@ -29,8 +29,16 @@ export const getActiveVolunteers = async () => {
               where: {
                 deletedAt: null
               }
+            },
+            groupMembers: {
+              where: {
+                role: GroupRole.LEADER,
+              },
+              include: {
+                group: true
+              }
             }
-          }
+          },
         }
       }
     })
@@ -48,11 +56,12 @@ export const getActiveVolunteers = async () => {
       }
     }
     
-    const volunteersMapped: Volunteer[] =  activeVolunteers.map((manager) => ({
+    const managersMapped: Volunteer[] =  activeManagers.map((manager) => ({
       id: manager?.volunteer?.id || '',
       name: manager.name,
       email: manager.email,
       phone: manager?.volunteer?.phone || "",
+      dni: manager?.dni || "",
       address: manager?.volunteer?.address || "",
       birthday: manager?.volunteer?.birthday ? new Date(manager?.volunteer?.birthday).toISOString().split('T')[0] : "",
       status: manager?.volunteer?.status === "ACTIVE" ? "Active" : "Inactive",
@@ -63,10 +72,10 @@ export const getActiveVolunteers = async () => {
         status: mapAttendanceStatus(attendance.status),
       })) || [],
     }));
-    return volunteersMapped;
+    return managersMapped;
     
   } catch (error) {
-    console.error("[ERROR_GET_ACTIVE_VOLUNTEERS]", error);
+    console.error("[ERROR_GET_ACTIVE_MANAGERS]", error);
     return [];
   }
 }

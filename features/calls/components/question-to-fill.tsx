@@ -39,9 +39,12 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
   } = useForm<CallFormSchema>({
     resolver: zodResolver(callFormSchema),
     defaultValues: {
-      email: "",
       fullName: "",
+      email: "",
       dni: "",
+      phoneNumber: "",
+      address: "",
+      birthDate: "",
       answers: {},
       schedules: [],
     },
@@ -105,6 +108,16 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl mx-auto space-y-8 p-6">
       <h1 className="text-3xl font-bold mb-8 text-center">Formulario</h1>
+      {/* Nombre completo */}
+      <Card>
+        <CardHeader>
+          <CardTitle>1. Nombre Completo</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input placeholder="JUANITO QUISPE QUISPE" {...register("fullName")} />
+          {errors.fullName && <p className="mt-1 text-red-500 text-sm">{errors.fullName.message}</p>}
+        </CardContent>
+      </Card>
       
       {/* Correo institucional */}
       <Card>
@@ -117,17 +130,6 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
         </CardContent>
       </Card>
       
-      {/* Nombre completo */}
-      <Card>
-        <CardHeader>
-          <CardTitle>2. Nombre Completo</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Input placeholder="JUANITO QUISPE QUISPE" {...register("fullName")} />
-          {errors.fullName && <p className="mt-1 text-red-500 text-sm">{errors.fullName.message}</p>}
-        </CardContent>
-      </Card>
-      
       {/* DNI */}
       <Card>
         <CardHeader>
@@ -136,6 +138,38 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
         <CardContent>
           <Input placeholder="76767676" type="number" {...register("dni")} />
           {errors.dni && <p className="mt-1 text-red-500 text-sm">{errors.dni.message}</p>}
+        </CardContent>
+      </Card>
+      
+      {/* Celular */}
+      <Card>
+        <CardHeader>
+          <CardTitle>4. Celular</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input placeholder="99999999" type="number" {...register("phoneNumber")} />
+          {errors.phoneNumber && <p className="mt-1 text-red-500 text-sm">{errors.phoneNumber.message}</p>}
+        </CardContent>
+      </Card>
+      
+      {/* DNI */}
+      <Card>
+        <CardHeader>
+          <CardTitle>5. Direccion de emergencia</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input placeholder="AV. Ramon Castilla" type="text" {...register("address")} />
+          {errors.address && <p className="mt-1 text-red-500 text-sm">{errors.address.message}</p>}
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>5. Nacimiento</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Input type="date" {...register("birthDate")} />
+          {errors.birthDate && <p className="mt-1 text-red-500 text-sm">{errors.birthDate.message}</p>}
         </CardContent>
       </Card>
       

@@ -3,36 +3,32 @@
 import {useState, useTransition} from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {Volunteer, Attendance} from "@/lib/store"
 import { useAuthStore } from "@/lib/auth-store"
-import { Plus, User, Mail, Phone, MapPin, Pencil, Trash } from "lucide-react"
+import {Plus, User, Pencil, Trash, AlertCircle} from "lucide-react"
 import AuthGuard from "@/components/auth-guard"
 import { useToast } from "@/hooks/use-toast"
 import {SearchBar} from "@/components/search-bar";
-import {InfoRow} from "@/components/info-row";
 import {useRouter} from "next/navigation";
 import {useDeleteModalStore} from "@/lib/delete-modal-store";
 import {deleteVolunteerById} from "@/features/volunteers/actions/delete-volunteer-by-id";
 import VolunteerModal from "@/features/volunteers/components/volunteer-modal";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion"
+
+import VolunteerNewModal from "@/features/volunteers/components/volunteer-new-modal";
 
 interface ManagersListProps {
+  newVolunteers: Volunteer[]
   volunteers: Volunteer[]
   attendances: Attendance[]
 }
 
-export default function VolunteerList({volunteers, attendances}: ManagersListProps) {
+export default function VolunteerList({volunteers, attendances, newVolunteers}: ManagersListProps) {
   const { hasPermission } = useAuthStore()
   const { toast } = useToast()
   
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isNewModalOpen, setIsNewModalOpen] = useState(false)
   const [selectedVolunteer, setSelectedVolunteer] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const router = useRouter()
@@ -95,15 +91,25 @@ export default function VolunteerList({volunteers, attendances}: ManagersListPro
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Voluntarios</h1>
           {canManageVolunteers && (
-            <Button
-              onClick={() => {
-                setSelectedVolunteer(null)
-                setIsModalOpen(true)
-              }}
-              className="gradient-button text-white"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {
+                newVolunteers.length > 0 && (
+                  <Button  onClick={() => setIsNewModalOpen(true)}>
+                    <AlertCircle className="h-4 w-4 md:mr-2" />
+                    <span className='hidden md:block'> Nuevos: {newVolunteers.length}</span>
+                  </Button>
+                )
+              }
+              <Button
+                onClick={() => {
+                  setSelectedVolunteer(null)
+                  setIsModalOpen(true)
+                }}
+                className="gradient-button text-white"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           )}
         </div>
         
@@ -127,64 +133,69 @@ export default function VolunteerList({volunteers, attendances}: ManagersListPro
                   {/* Header */}
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                      <div className="p-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
+                      <div className="hidden md:block p-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
                         <User className="h-4 w-4 text-white" />
                       </div>
                       <div className="text-sm">
                         <h3 className="font-semibold text-gray-900 leading-tight">{volunteer.name}</h3>
-                        <Badge
-                          variant={volunteer.status === "Active" ? "default" : "secondary"}
-                          className={`text-xs px-2 py-0.5 ${
-                            volunteer.status === "Active" ? "bg-green-500 hover:bg-green-600" : ""
-                          }`}
-                        >
-                          {volunteer.status === "Active" ? "Activo" : "Inactivo"}
-                        </Badge>
+                        {canManageVolunteers && (
+                          <div className="flex gap-1">
+                            <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => handleEdit(volunteer.id)}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleDelete(volunteer.id)}>
+                              <Trash className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Stats about the attendances and not attendances */}
+                    <div className="flex gap-1">
+                      <div className="text-xs px-2 py-1">
+                        <span className="text-green-600 font-medium">{stats.present} Presente{stats.present !== 1 ? "s" : ""}</span>
+                      </div>
+                      <div className="text-xs px-2 py-1">
+                        <span className="text-red-600 font-medium">{stats.absent} Deuda{stats.absent !== 1 ? "s" : ""}</span>
+                      </div>
+                      <div className="text-xs px-2 py-1">
+                        <span className="text-yellow-600 font-medium">{stats.justified} Tombola{stats.justified !== 1 ? "s" : ""}</span>
                       </div>
                     </div>
                     
                     {/* Actions */}
-                    {canManageVolunteers && (
-                      <div className="flex gap-1">
-                        <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => handleEdit(volunteer.id)}>
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleDelete(volunteer.id)}>
-                          <Trash className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    )}
                   </div>
                   
-                  {/* Volunteer Info */}
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="personal-info">
-                      <AccordionTrigger className="text-xs text-gray-700">Ver datos personales</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-gray-700 mt-2">
-                          <InfoRow icon={Mail} text={volunteer.email} />
-                          <InfoRow icon={Phone} text={volunteer.phone} />
-                          <InfoRow icon={MapPin} text={volunteer.address} />
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                  {/*/!* Volunteer Info *!/*/}
+                  {/*<Accordion type="single" collapsible>*/}
+                  {/*  <AccordionItem value="personal-info">*/}
+                  {/*    <AccordionTrigger className="text-xs text-gray-700">Ver datos personales</AccordionTrigger>*/}
+                  {/*    <AccordionContent>*/}
+                  {/*      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-gray-700 mt-2">*/}
+                  {/*        <InfoRow icon={Mail} text={volunteer.email} />*/}
+                  {/*        <InfoRow icon={Phone} text={volunteer.phone} />*/}
+                  {/*        <InfoRow icon={MapPin} text={volunteer.address} />*/}
+                  {/*      </div>*/}
+                  {/*    </AccordionContent>*/}
+                  {/*  </AccordionItem>*/}
+                  {/*</Accordion>*/}
                   
-                  {/* Attendance Summary */}
-                  <div className="flex justify-between items-center border-t pt-2 border-gray-100 text-xs">
-                    <div className="flex gap-2">
-                      <div className="text-green-600 font-medium">
-                        {stats.present} Presente{stats.present !== 1 ? "s" : ""}
-                      </div>
-                      <div className="text-red-600 font-medium">
-                        {stats.absent} Ausente{stats.absent !== 1 ? "s" : ""}
-                      </div>
-                      <div className="text-yellow-600 font-medium">
-                        {stats.justified} Justificado{stats.justified !== 1 ? "s" : ""}
-                      </div>
-                    </div>
-                    <div className="text-gray-400 mt-1">Total: {stats.total}</div>
-                  </div>
+                  {/*/!* Attendance Summary *!/*/}
+                  {/*<div className="flex justify-between items-center border-t pt-2 border-gray-100 text-xs">*/}
+                  {/*  <div className="flex gap-2">*/}
+                  {/*    <div className="text-green-600 font-medium">*/}
+                  {/*      {stats.present} Presente{stats.present !== 1 ? "s" : ""}*/}
+                  {/*    </div>*/}
+                  {/*    <div className="text-red-600 font-medium">*/}
+                  {/*      {stats.absent} Ausente{stats.absent !== 1 ? "s" : ""}*/}
+                  {/*    </div>*/}
+                  {/*    <div className="text-yellow-600 font-medium">*/}
+                  {/*      {stats.justified} Justificado{stats.justified !== 1 ? "s" : ""}*/}
+                  {/*    </div>*/}
+                  {/*  </div>*/}
+                  {/*  <div className="text-gray-400 mt-1">Total: {stats.total}</div>*/}
+                  {/*</div>*/}
                 </CardContent>
               </Card>
             
@@ -207,6 +218,15 @@ export default function VolunteerList({volunteers, attendances}: ManagersListPro
             volunteer={selectedVolunteer ? volunteers.find((v) => v.id === selectedVolunteer) : undefined}
           />
         )}
+        
+        <VolunteerNewModal
+          isOpen={isNewModalOpen}
+          onClose={() => {
+            setIsNewModalOpen(false)
+            router.refresh()
+          }}
+          newVolunteers={newVolunteers}
+        />
       </div>
     </AuthGuard>
   )

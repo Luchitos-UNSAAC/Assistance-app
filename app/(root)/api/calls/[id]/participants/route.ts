@@ -7,12 +7,10 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   try {
     const body = await req.json();
     
-    // ✅ Validación con Zod
     const data = callFormSchema.parse(body);
-    const { email, fullName, dni, answers, schedules } = data;
+    const { email, fullName, dni, phoneNumber, address, birthDate, answers, schedules } = data;
     const { id: callId } = params;
     
-    // 1. Buscar o crear Volunteer
     let volunteer = await prisma.volunteer.findUnique({ where: { email } });
     
     if (!volunteer) {
@@ -20,9 +18,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         data: {
           email,
           name: fullName,
-          phone: "", // puedes pedirlo en el form si lo necesitas
-          address: "",
-          birthday: new Date(), // placeholder, ajusta según tu lógica
+          phone: phoneNumber,
+          address,
+          birthday: new Date(birthDate),
         },
       });
     }

@@ -34,7 +34,13 @@ export default function CallForVolunteersFormPage() {
     deadline: "",
     status: "OPEN",
     schedules: [
-      { mode: "WEEKLY", dayOfWeek: "LUNES", startTime: "09:00", endTime: "12:00" },
+      { mode: "WEEKLY", dayOfWeek: "LUNES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "MARTES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "MIERCOLES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "JUEVES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "VIERNES", startTime: "15:30", endTime: "16:00" },
+      { mode: "WEEKLY", dayOfWeek: "SABADO", startTime: "16:00", endTime: "17:00" },
+      { mode: "WEEKLY", dayOfWeek: "DOMINGO", startTime: "15:30", endTime: "16:00" },
     ],
   });
   
@@ -139,7 +145,7 @@ export default function CallForVolunteersFormPage() {
   
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-md rounded-2xl p-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Crear convocatoria
         </h2>

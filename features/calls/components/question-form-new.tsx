@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {useState, useEffect} from "react";
+import {Card, CardContent} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -12,9 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
-import { CallQuestion } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import {ArrowLeft} from "lucide-react";
+import {CallForVolunteers, CallQuestion} from "@prisma/client";
+import {useRouter} from "next/navigation";
+import {ArrowLeft, Trash} from "lucide-react";
+import {commonQuestionsList} from "@/features/calls/data/common-questions";
+import {useDeleteModalStore} from "@/lib/delete-modal-store";
 
 type QuestionTypeForm = "short" | "paragraph" | "multiple" | "checkbox";
 
@@ -29,14 +31,14 @@ interface Question {
 
 interface QuestionsFormProps {
   questions: CallQuestion[];
-  callId: string;
+  call: CallForVolunteers;
 }
 
-export default function QuestionsForm({ questions, callId }: QuestionsFormProps) {
+export default function QuestionsForm({questions, call}: QuestionsFormProps) {
   const [localQuestions, setLocalQuestions] = useState<Question[]>([]);
   const router = useRouter();
+  const { openModal: openModalToDelete } = useDeleteModalStore()
   
-  // 🔄 Map Prisma -> Form
   const mapFromPrisma = (q: CallQuestion): Question => ({
     id: q.id,
     text: q.question,
@@ -54,8 +56,8 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
     isNew: false,
   });
   
-  // 🔄 Map Form -> Prisma
   const mapToPrisma = (q: Question) => ({
+    id: q.id || undefined,
     question: q.text,
     type:
       q.type === "short"
@@ -84,9 +86,9 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
         ...updated,
       });
       
-      const res = await fetch(`/api/calls/${callId}/questions`, {
+      const res = await fetch(`/api/calls/${call.id}/questions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(payload),
       });
       
@@ -101,16 +103,29 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
     }
   };
   
+  const handleDelete = async (id?: string) => {
+    openModalToDelete(
+      "Eliminar pregunta",
+      "¿Estás seguro de que deseas eliminar esta pregunta? Esta acción no se puede deshacer.",
+      async () => {
+        await fetch(`/api/calls/${call.id}/questions?questionId=${id}`, {
+          method: "DELETE",
+        });
+        setLocalQuestions((prev) => prev.filter((q) => q.id !== id));
+        // router.refresh();
+      })
+  }
+  
   const handleEdit = (id?: string) => {
     setLocalQuestions((prev) =>
-      prev.map((q) => ({ ...q, isEditing: q.id === id }))
+      prev.map((q) => ({...q, isEditing: q.id === id}))
     );
   };
   
   const handleAddOption = (id?: string) => {
     setLocalQuestions((prev) =>
       prev.map((q) =>
-        q.id === id ? { ...q, options: [...(q.options || []), ""] } : q
+        q.id === id ? {...q, options: [...(q.options || []), ""]} : q
       )
     );
   };
@@ -131,20 +146,20 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
   const handleAddQuestion = () => {
     setLocalQuestions((prev) => [
       ...prev,
-      { text: "", type: "short", options: [], isEditing: true, isNew: true },
+      {text: "", type: "short", options: [], isEditing: true, isNew: true},
     ]);
   };
   
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
-      <div className="flex justify-end gap-2">
-        <Button onClick={()=> router.push("/calls")}
+    <div className="max-w-3xl mx-auto space-y-4 px-3 md:px-1">
+      <div className="flex flex-col md:flex-row justify-end gap-2">
+        <Button onClick={() => router.push("/calls")}
                 variant='outline'
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4"/>
           Volver a Convocatorias
         </Button>
-        <Link href={`/app/(root)/calls/${callId}/questions/preview`} target="_blank">
+        <Link href={`/calls/${call.id}/questions/preview`} target="_blank" className="w-full md:w-auto">
           <Button variant="outline">Ver previsualización</Button>
         </Link>
         <Button variant="outline" onClick={handleAddQuestion}>
@@ -152,6 +167,26 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
         </Button>
       </div>
       
+      <h1 className="text-2xl font-bold">
+        Preguntas Comunes ( {commonQuestionsList.length} )
+      </h1>
+      
+      <div className="flex flex-col gap-2 w-full overflow-x-auto pb-2">
+        {commonQuestionsList.map((q, index) => (
+          <Card key={q.id ?? index} className="pt-1">
+            <CardContent>
+              <div key={index} className="flex items-center space-x-2">
+                {/*<input type="checkbox" id={"checkbox-common"+index}/>*/}
+                
+                <label htmlFor={"checkbox-common"+index}>{index + 1}. {q.text}</label>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <h1 className="text-2xl font-bold">
+        Preguntas Personalizadas ( {localQuestions.length} )
+      </h1>
       {localQuestions.map((q, index) => (
         <Card key={q.id ?? index} className="p-4">
           <CardContent>
@@ -163,7 +198,7 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
                   onChange={(e) =>
                     setLocalQuestions((prev) =>
                       prev.map((item) =>
-                        item.id === q.id ? { ...item, text: e.target.value } : item
+                        item.id === q.id ? {...item, text: e.target.value} : item
                       )
                     )
                   }
@@ -174,19 +209,22 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
                   onValueChange={(val: QuestionTypeForm) =>
                     setLocalQuestions((prev) =>
                       prev.map((item) =>
-                        item.id === q.id ? { ...item, type: val } : item
+                        item.id === q.id ? {...item, type: val} : item
                       )
                     )
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Tipo de respuesta" />
+                    <SelectValue placeholder="Tipo de respuesta"/>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="short">Respuesta corta</SelectItem>
-                    <SelectItem value="paragraph">Párrafo</SelectItem>
-                    <SelectItem value="multiple">Opción múltiple</SelectItem>
-                    <SelectItem value="checkbox">Casillas</SelectItem>
+                    <SelectItem value="short">Texto</SelectItem>
+                    <SelectItem value="multiple">
+                      Opción múltiple
+                    </SelectItem>
+                    <SelectItem value="checkbox">
+                      Casillas
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 
@@ -214,7 +252,7 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
                 
                 <Button
                   variant="outline"
-                  onClick={() => handleSave(q.id, { text: q.text })}
+                  onClick={() => handleSave(q.id, {text: q.text})}
                 >
                   Guardar
                 </Button>
@@ -223,7 +261,7 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
               <div>
                 <p className="font-medium">{q.text}</p>
                 {q.type === "short" && (
-                  <Input placeholder="Respuesta corta" disabled />
+                  <Input placeholder="Texto" disabled/>
                 )}
                 {q.type === "paragraph" && (
                   <textarea
@@ -235,26 +273,36 @@ export default function QuestionsForm({ questions, callId }: QuestionsFormProps)
                 {q.type === "multiple" &&
                   q.options?.map((opt, i) => (
                     <div key={i} className="flex items-center space-x-2">
-                      <input type="radio" disabled />
+                      <input type="radio" disabled/>
                       <span>{opt}</span>
                     </div>
                   ))}
                 {q.type === "checkbox" &&
                   q.options?.map((opt, i) => (
                     <div key={i} className="flex items-center space-x-2">
-                      <input type="checkbox" disabled />
+                      <input type="checkbox" disabled/>
                       <span>{opt}</span>
                     </div>
                   ))}
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => handleEdit(q.id)}
-                >
-                  Editar
-                </Button>
+                <div className="flex space-x-2 items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => handleEdit(q.id)}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 ml-2 text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
+                    onClick={() => handleDelete(q.id)}
+                  >
+                    <Trash className="w-3 h-3"/>
+                  </Button>
+                </div>
               </div>
             )}
           </CardContent>

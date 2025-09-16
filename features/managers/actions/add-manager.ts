@@ -2,16 +2,39 @@
 
 import { prisma } from "@/lib/prisma";
 import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
-import { UserRole, VolunteerStatus } from "@prisma/client";
+import { UserRole, VolunteerStatus, GroupRole, WeekDay } from "@prisma/client";
 import {getCurrentUser} from "@/lib/get-current-user";
 
 interface AddManagerBody {
   name: string
   email: string
   phone: string
+  dni: string
   address: string
   birthday: string
   status?: "Active" | "Inactive" | "Suspended"
+  dayOfWeek?: any
+}
+
+const dayOfWeekMapper = (day: string) => {
+  switch (day) {
+    case "LUNES":
+      return WeekDay.LUNES;
+    case "MARTES":
+      return WeekDay.MARTES;
+    case "MIERCOLES":
+      return WeekDay.MIERCOLES;
+    case "JUEVES":
+      return WeekDay.JUEVES;
+    case "VIERNES":
+      return WeekDay.VIERNES;
+    case "SABADO":
+      return WeekDay.SABADO;
+    case "DOMINGO":
+      return WeekDay.DOMINGO;
+    default:
+      return WeekDay.LUNES;
+  }
 }
 
 export const addManager = async (body: AddManagerBody) => {
@@ -45,7 +68,7 @@ export const addManager = async (body: AddManagerBody) => {
     
     const statusFormatted = body.status === "Active" ? VolunteerStatus.ACTIVE : VolunteerStatus.INACTIVE;
     
-    const response = await prisma.volunteer.create({
+    const newVolunteer = await prisma.volunteer.create({
       data: {
         name: body.name,
         email: body.email,
@@ -59,16 +82,66 @@ export const addManager = async (body: AddManagerBody) => {
             email: body.email,
             name: body.name,
             password: "123123",
+            dni: body.dni,
             role: UserRole.MANAGER,
             createdBy: currentUser.email,
           }
         }
       },
     })
-    if (!response) {
+    if (!newVolunteer) {
       return {
         success: false,
         message: `Error al agregar el encargado`,
+      }
+    }
+    
+    const dayOfWeekMapped = dayOfWeekMapper(body.dayOfWeek);
+    // Verify existing group for the day
+    const existingGroup = await prisma.group.findFirst({
+      where: {
+        dayOfWeek: dayOfWeekMapped,
+      }
+    })
+    if (existingGroup) {
+      const newMemberGroup = await prisma.groupMember.create({
+        data: {
+          volunteerId: newVolunteer.id,
+          role: GroupRole.LEADER,
+          groupId: existingGroup.id,
+        }
+      })
+      
+      if (!newMemberGroup) {
+        return {
+          success: false,
+          message: `Error al agregar el encargado al grupo existente`,
+        }
+      }
+      
+      return {
+        success: true,
+      }
+    }
+    
+    const group = await prisma.group.create({
+      data: {
+        name: `Grupo de ` + dayOfWeekMapped,
+        createdBy: currentUser.email,
+        dayOfWeek: dayOfWeekMapped,
+        members: {
+          create: {
+            volunteerId: newVolunteer.id,
+            role: GroupRole.LEADER
+          }
+        }
+      }
+    })
+    
+    if (!group) {
+      return {
+        success: false,
+        message: `Error al crear el grupo del encargado`,
       }
     }
     
