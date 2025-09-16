@@ -1,8 +1,7 @@
-import {UserRole, Volunteer, VolunteerStatus, User} from '@prisma/client';
+import {UserRole, VolunteerStatus} from '@prisma/client';
 
-export type NewVolunteerWithUser = Volunteer & { user: User };
 
-export let volunteers: NewVolunteerWithUser[] = [
+export let volunteers = [
   {
     id: "cme0a14ef000307if8zy60hp9",
     name: "Administrador",
@@ -20,7 +19,7 @@ export let volunteers: NewVolunteerWithUser[] = [
     user: {
       id: "cme09w21z000007if6wg7fxfk",
       email: "admin@unsaac.edu.pe",
-      password: "123456",
+      password: "123123",
       name: "Administrador",
       role: UserRole.ADMIN,
       createdAt: new Date(),
@@ -30,7 +29,7 @@ export let volunteers: NewVolunteerWithUser[] = [
       createdBy: "initial_data",
       updatedBy: null,
       deletedBy: null,
-      dni: null,
+      dni: "00000000",
       avatar: null
     }
   },
@@ -51,7 +50,7 @@ export let volunteers: NewVolunteerWithUser[] = [
     user: {
       id: "cme0user0000307if8zy60hp4",
       email: "manager2@unsaac.edu.pe",
-      password: "123456", // ⚠️ Hash in production
+      password: "123123", // ⚠️ Hash in production
       name: "Carlos Mendoza",
       role: UserRole.MANAGER,
       createdAt: new Date(),
@@ -60,7 +59,7 @@ export let volunteers: NewVolunteerWithUser[] = [
       createdBy: "initial_data",
       updatedBy: null,
       deletedBy: null,
-      dni: null,
+      dni: "22222222",
       avatar: null,
       deletedAt: null
     }
@@ -82,7 +81,7 @@ export let volunteers: NewVolunteerWithUser[] = [
     user: {
       id: "cme0user0000307if8zy60hp2",
       email: "voluntario5@unsaac.edu.pe",
-      password: "123456", // ⚠️ Hash in production
+      password: "123123", // ⚠️ Hash in production
       name: "María López",
       role: UserRole.VOLUNTEER,
       createdAt: new Date(),
@@ -91,7 +90,7 @@ export let volunteers: NewVolunteerWithUser[] = [
       createdBy: "initial_data",
       updatedBy: null,
       deletedBy: null,
-      dni: null,
+      dni: "11111111",
       avatar: null,
       deletedAt: null
     }

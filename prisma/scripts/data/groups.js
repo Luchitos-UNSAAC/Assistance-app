@@ -1,8 +1,4 @@
-import {Group} from '@prisma/client';
-
-export type GroupFull = Group;
-
-export let groups: GroupFull[] = [
+export let groups = [
   {
     id: "cmfahdfo300022w5x5i5bjzid",
     name: "Grupo LUNES",
