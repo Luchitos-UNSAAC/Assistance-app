@@ -217,10 +217,13 @@ export default function ManagerModal({ isOpen, onClose, volunteer, volunteers }:
         <DialogHeader>
           <DialogTitle>Gestión de Encargados</DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue="convert" className="w-full">
+        <Tabs defaultValue={volunteer ? "add" : "convert"}
+              className="w-full">
           <TabsList className="grid grid-cols-3 w-full bg-purple-50">
             <TabsTrigger value="convert">Voluntario</TabsTrigger>
-            <TabsTrigger value="add">Nuevo</TabsTrigger>
+            <TabsTrigger value="add">
+              {volunteer ? "Editar" : "Nuevo"}
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="add">

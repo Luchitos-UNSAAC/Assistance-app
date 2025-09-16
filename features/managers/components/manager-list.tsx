@@ -22,7 +22,7 @@ interface ManagersListProps {
   attendances: Attendance[]
 }
 
-export default function ManagersList({managers: volunteers, attendances}: ManagersListProps) {
+export default function ManagersList({managers, attendances, volunteers}: ManagersListProps) {
   const { hasPermission } = useAuthStore()
   const { toast } = useToast()
   
@@ -33,7 +33,7 @@ export default function ManagersList({managers: volunteers, attendances}: Manage
   const router = useRouter()
   const { openModal: openModalToDelete } = useDeleteModalStore()
   
-  const filteredVolunteers = volunteers.filter(
+  const filteredVolunteers = managers.filter(
     (v) =>
       v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       v.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -194,7 +194,7 @@ export default function ManagersList({managers: volunteers, attendances}: Manage
           <ManagerModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            volunteer={selectedVolunteer ? volunteers.find((v) => v.id === selectedVolunteer) : undefined}
+            volunteer={selectedVolunteer ? managers.find((v) => v.id === selectedVolunteer) : undefined}
             volunteers={volunteers}
           />
         )}
