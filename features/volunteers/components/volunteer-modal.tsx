@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useTransition} from "react"
+import React, { useTransition } from "react"
 
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { type Volunteer } from "@/lib/store"
 import { useToast } from "@/hooks/use-toast"
-import {useRouter} from "next/navigation";
-import {editVolunteerById} from "@/features/volunteers/actions/edit-volunteer-by-id";
-import {addVolunteer} from "@/features/volunteers/actions/add-volunteer";
+import { useRouter } from "next/navigation";
+import { editVolunteerById } from "@/features/volunteers/actions/edit-volunteer-by-id";
+import { addVolunteer } from "@/features/volunteers/actions/add-volunteer";
 
 interface VolunteerModalProps {
   isOpen: boolean
@@ -81,7 +81,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
     if (!formData.address.trim()) {
       newErrors.address = "La dirección es requerida"
     }
-    
+
     if (!formData.dni.trim()) {
       newErrors.dni = "El dni es requerido"
     }
@@ -102,7 +102,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
     }
 
     if (volunteer) {
-      startTransition(async ()=>{
+      startTransition(async () => {
         const body = {
           name: formData.name,
           email: formData.email,
@@ -128,7 +128,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
         })
       })
     } else {
-      startTransition(async ()=>{
+      startTransition(async () => {
         const body = {
           name: formData.name,
           email: formData.email,
@@ -136,6 +136,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
           address: formData.address,
           birthday: formData.birthday,
           status: formData.status,
+          dni: formData.dni,
         }
         const response = await addVolunteer(body)
         if (!response.success) {
@@ -196,7 +197,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
             />
             {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
           </div>
-          
+
           <div>
             <Label htmlFor="email">Dni</Label>
             <Input
@@ -251,11 +252,11 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}
-            disabled={pending}>
+              disabled={pending}>
               Cancelar
             </Button>
             <Button type="submit" className="gradient-button text-white"
-                    disabled={pending}>
+              disabled={pending}>
               {volunteer ? "Actualizar" : "Guardar"}
             </Button>
           </div>

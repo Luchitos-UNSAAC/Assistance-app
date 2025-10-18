@@ -183,7 +183,7 @@ Git
     ```
 10. **Seed the database:**
     ```bash
-    node ./prisma/seed.js
+    node ./prisma/scripts/seed.js
     ```
 
 5. **Run the development server:**
