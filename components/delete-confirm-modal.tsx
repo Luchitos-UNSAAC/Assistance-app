@@ -6,7 +6,7 @@ import { useDeleteModalStore } from "@/lib/delete-modal-store"
 
 export default function DeleteConfirmationModal() {
   const { isOpen, title, description, onConfirm, closeModal } = useDeleteModalStore()
-  
+
   const handleDelete = async () => {
     if (!onConfirm) {
       return
@@ -14,7 +14,7 @@ export default function DeleteConfirmationModal() {
     await onConfirm()
     closeModal()
   }
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
       <DialogContent className='bg-white border-2 border-purple-200 '>
@@ -27,7 +27,7 @@ export default function DeleteConfirmationModal() {
             Cancelar
           </Button>
           <Button onClick={handleDelete}
-                  className='bg-red-500 hover:bg-red-600 text-white border-red-500 hover:border-red-600'
+            className='bg-red-500 hover:bg-red-600 text-white border-red-500 hover:border-red-600'
           >
             Eliminar
           </Button>

@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useTransition} from "react"
+import React, { useTransition } from "react"
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,8 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { useAuthStore } from "@/lib/auth-store"
 import { Eye, EyeOff, User, Shield, Crown } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import {loginUser} from "@/features/auth/actions/login-user";
-import {useRouter} from "next/navigation";
+import { loginUser } from "@/features/auth/actions/login-user";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const setUser = useAuthStore((state) => state.setUser)
@@ -87,13 +87,13 @@ export default function LoginForm() {
     if (pending) {
       return
     }
-      
+
     const email = formData.email.trim().toLowerCase()
     const password = formData.password.trim()
     starTransition(async () => {
       const result = await loginUser(email, password)
       if (result.success) {
-        if(!result.data) {
+        if (!result.data) {
           toast({
             title: "Error de autenticación",
             description: "No se pudo obtener la información del usuario",
@@ -114,7 +114,7 @@ export default function LoginForm() {
           title: "Inicio de sesión exitoso",
           description: "Bienvenido a LUCHOS UNSAAC",
         })
-        router.refresh()
+        router.push('/')
       } else {
         const errorMessage = result.error || "Ocurrió un error al iniciar sesión"
         toast({
@@ -223,7 +223,7 @@ export default function LoginForm() {
               Usuarios de Demostración
             </CardTitle>
           </CardHeader>
-          
+
           <CardContent className="space-y-3">
             {demoUsers.map((user) => (
               <div
@@ -241,18 +241,17 @@ export default function LoginForm() {
                     <p className="text-xs text-gray-500">{user.description}</p>
                   </div>
                 </div>
-                
+
                 {/* Right: Actions */}
                 <div className="flex flex-col items-end justify-between gap-1 min-w-[80px]">
                   <Badge
                     variant="secondary"
-                    className={`text-[10px] px-2 py-0.5 rounded-md ${
-                      user.role === "ADMIN"
-                        ? "bg-pink-100 text-pink-800"
-                        : user.role === "MANAGER"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-blue-100 text-blue-800"
-                    }`}
+                    className={`text-[10px] px-2 py-0.5 rounded-md ${user.role === "ADMIN"
+                      ? "bg-pink-100 text-pink-800"
+                      : user.role === "MANAGER"
+                        ? "bg-purple-100 text-purple-800"
+                        : "bg-blue-100 text-blue-800"
+                      }`}
                   >
                     {user.role}
                   </Badge>
@@ -267,7 +266,7 @@ export default function LoginForm() {
                 </div>
               </div>
             ))}
-            
+
             {/* Password Hint */}
             <div className="text-center pt-3 border-t border-gray-100">
               <p className="text-xs text-gray-500">

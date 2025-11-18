@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import AuthWrapper from "@/components/auth-wrapper"
 import BottomNavigation from "@/components/bottom-navigation"
-import {ClientRenderSecure} from "@/components/client-render-secure";
+import { ClientRenderSecure } from "@/components/client-render-secure";
 import DeleteConfirmationModal from "@/components/delete-confirm-modal";
 
 const inter = Inter({ subsets: ["latin"] })
@@ -26,7 +26,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
             <ClientRenderSecure>
-              <AuthWrapper>{children}</AuthWrapper>
+              {children}
               <BottomNavigation />
               <DeleteConfirmationModal />
             </ClientRenderSecure>
