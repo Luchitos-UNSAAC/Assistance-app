@@ -8,7 +8,7 @@ export const getProfileVolunteer = async (): Promise<Volunteer | null> => {
   if (!currentVolunteer) {
     return null;
   }
-  
+
   const volunteerFull = await prisma.volunteer.findUnique({
     where: {
       id: currentVolunteer.id,
@@ -24,13 +24,14 @@ export const getProfileVolunteer = async (): Promise<Volunteer | null> => {
           volunteerId: true,
         },
       },
+      user: true,
     },
   });
-  
+
   if (!volunteerFull) {
     return null;
   }
-  
+
   const mapAttendanceStatus = (status: AttendanceStatus) => {
     switch (status) {
       case AttendanceStatus.PRESENT:
@@ -43,7 +44,7 @@ export const getProfileVolunteer = async (): Promise<Volunteer | null> => {
         return "Late";
     }
   }
-  
+
   const mapVolunteerStatus = (status: VolunteerStatus) => {
     switch (status) {
       case VolunteerStatus.ACTIVE:
@@ -54,14 +55,15 @@ export const getProfileVolunteer = async (): Promise<Volunteer | null> => {
         return "Suspended";
     }
   }
-  
+
   return {
     id: volunteerFull.id,
     name: volunteerFull.name,
     email: volunteerFull.email,
     phone: volunteerFull.phone,
     address: volunteerFull.address,
-    birthday: volunteerFull.birthday.toISOString(),
+    dni: volunteerFull?.user?.dni || undefined,
+    birthday: volunteerFull?.birthday?.toISOString(),
     status: mapVolunteerStatus(volunteerFull.status),
     attendances: volunteerFull.attendances.map(a => ({
       id: a.id,

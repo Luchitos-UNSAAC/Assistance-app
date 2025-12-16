@@ -12,16 +12,16 @@ export const getAttendancesAndVolunteers = async () => {
     if (!currentVolunteer) {
       return [];
     }
-    
+
     const currentGroup = await getGroupOfCurrentVolunteer(currentVolunteer.id);
     if (!currentGroup) {
       return [];
     }
-    
+
     const today = new Date();
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
     const endOfDay = new Date(today.setHours(23, 59, 59, 999));
-    
+
     const volunteers = await prisma.volunteer.findMany({
       where: {
         deletedAt: null,
@@ -32,6 +32,11 @@ export const getAttendancesAndVolunteers = async () => {
             deletedAt: null,
           },
         },
+        user: {
+          role: {
+            not: 'ADMIN'
+          }
+        }
       },
       select: {
         id: true,
@@ -51,7 +56,7 @@ export const getAttendancesAndVolunteers = async () => {
       },
       orderBy: { name: "asc" },
     });
-    
+
     const mapAttendanceStatus = (status: AttendanceStatus) => {
       switch (status) {
         case AttendanceStatus.PRESENT:
@@ -64,7 +69,7 @@ export const getAttendancesAndVolunteers = async () => {
           return "Late";
       }
     };
-    
+
     const mapVolunteerStatus = (status: VolunteerStatus) => {
       switch (status) {
         case VolunteerStatus.ACTIVE:
@@ -75,7 +80,7 @@ export const getAttendancesAndVolunteers = async () => {
           return "Suspended";
       }
     };
-    
+
     const volunteersForSelect: VolunteerForSelect[] = volunteers.map(
       (volunteer) => ({
         id: volunteer.id,
@@ -93,7 +98,7 @@ export const getAttendancesAndVolunteers = async () => {
             : undefined,
       })
     );
-    
+
     return volunteersForSelect;
   } catch (error) {
     console.error("[ERROR_GET_ATTENDANCES]", error);

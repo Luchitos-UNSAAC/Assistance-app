@@ -1,6 +1,6 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {Button} from "@/components/ui/button"
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,16 +9,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { useAuthStore } from "@/lib/auth-store"
+import {Badge} from "@/components/ui/badge"
+import {useAuthStore, UserRole} from "@/lib/auth-store"
 import {LogOut, User, Settings, Shield, Crown, UserCircle} from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import {useToast} from "@/hooks/use-toast"
 import {useRouter} from "next/navigation";
 import {Separator} from "@/components/ui/separator";
 
-export default function UserMenu() {
-  const { user, logout } = useAuthStore()
-  const { toast } = useToast()
+interface UserMenuProps {
+  justImage: boolean;
+}
+
+export default function UserMenu({justImage = false}: UserMenuProps) {
+  const {user, logout} = useAuthStore()
+  const {toast} = useToast()
   const router = useRouter()
 
   if (!user) return null
@@ -30,14 +34,14 @@ export default function UserMenu() {
       description: "Has cerrado sesión exitosamente",
     })
   }
-  
+
   const hasPermission = useAuthStore((state) => state.hasPermission)
   const isAdmin = hasPermission("ADMIN")
-  
+
   const handleProfileClick = () => {
     router.push("/profile")
   }
-  
+
   const handleSettingsClick = () => {
     router.push("/admin/assistances")
   }
@@ -45,11 +49,11 @@ export default function UserMenu() {
   const getRoleIcon = () => {
     switch (user.role) {
       case "ADMIN":
-        return <Crown className="h-3 w-3" />
+        return <Crown className="h-3 w-3"/>
       case "MANAGER":
-        return <Shield className="h-3 w-3" />
+        return <Shield className="h-3 w-3"/>
       default:
-        return <User className="h-3 w-3" />
+        return <User className="h-3 w-3"/>
     }
   }
 
@@ -64,13 +68,27 @@ export default function UserMenu() {
     }
   }
 
+  const mapRole = () => {
+    switch (user.role) {
+      case "ADMIN":
+        return 'Admin'
+      case "MANAGER":
+        return 'Encargado'
+      default:
+        return 'Voluntario'
+    }
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10 border-2 border-white/20 ">
-            <AvatarImage/>
-            <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+    <>
+      {
+        justImage
+          ? <Avatar className="h-10 w-10 border-2 border-white/20">
+            <AvatarImage
+              src={user.avatar || `https://robohash.org/1?set=set4`}
+              alt={user.name}
+            />
+            <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold">
               {user.name
                 .split(" ")
                 .map((n) => n[0])
@@ -78,53 +96,72 @@ export default function UserMenu() {
                 .toUpperCase()}
             </AvatarFallback>
           </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white border-2 border-purple-200 shadow-2xl" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-2">
-            <div className="flex items-center space-x-2">
-              <p className="text-sm font-medium leading-none">{user.name}</p>
-              <Badge variant="secondary" className={`text-xs ${getRoleColor()}`}>
+          : <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Avatar className="h-10 w-10 border-2 border-white/20">
+                  <AvatarImage
+                    src={user.avatar || `https://robohash.org/1?set=set4`}
+                    alt={user.name}
+                  />
+                  <AvatarFallback
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold">
+                    {user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border-2 border-purple-200 shadow-2xl" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <p className="text-sm font-medium leading-none">{user.name}</p>
+                    <Badge variant="secondary" className={`text-xs ${getRoleColor()}`}>
                 <span className="flex items-center space-x-1">
                   {getRoleIcon()}
-                  <span>{user.role}</span>
+                  <span>{mapRole()}</span>
                 </span>
-              </Badge>
-            </div>
-            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="cursor-pointer hover:bg-purple-50"
-          onClick={handleProfileClick}>
-          <User className="mr-2 h-4 w-4" />
-          <span>Perfil</span>
-        </DropdownMenuItem>
-        {
-          isAdmin && (
-            <DropdownMenuItem
-              className="cursor-pointer bg-purple-50 hover:bg-purple-100 font-medium text-purple-700"
-              onClick={handleSettingsClick}>
-              <UserCircle className="mr-2 h-4 w-4" />
-              <span>Admin</span>
-            </DropdownMenuItem>
-          )
-        }
-       
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-red-50 text-red-600">
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Cerrar Sesión</span>
-        </DropdownMenuItem>
-        
-        <Separator className="my-2" />
-      {/*  Version app */}
-        <div className="px-4 py-2 text-xs text-gray-400 text-center">
-          <span>Versión 1.0.0</span>
-        </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+                    </Badge>
+                  </div>
+                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator/>
+              <DropdownMenuItem
+                className="cursor-pointer hover:bg-purple-50"
+                onClick={handleProfileClick}>
+                <User className="mr-2 h-4 w-4"/>
+                <span>Perfil</span>
+              </DropdownMenuItem>
+              {
+                isAdmin && (
+                  <DropdownMenuItem
+                    className="cursor-pointer bg-purple-50 hover:bg-purple-100 font-medium text-purple-700"
+                    onClick={handleSettingsClick}>
+                    <UserCircle className="mr-2 h-4 w-4"/>
+                    <span>Admin</span>
+                  </DropdownMenuItem>
+                )
+              }
+
+              <DropdownMenuSeparator/>
+              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-red-50 text-red-600">
+                <LogOut className="mr-2 h-4 w-4"/>
+                <span>Cerrar Sesión</span>
+              </DropdownMenuItem>
+
+              <Separator className="my-2"/>
+              {/*  Version app */}
+              <div className="px-4 py-2 text-xs text-gray-400 text-center">
+                <span>Versión 1.0.0</span>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+      }
+    </>
   )
 }

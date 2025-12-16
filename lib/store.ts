@@ -9,7 +9,7 @@ export interface Volunteer {
   phone: string
   dni?: string
   address: string
-  birthday: string
+  birthday?: string
   status: "Active" | "Inactive" | "Suspended"
   attendances: Attendance[]
 }

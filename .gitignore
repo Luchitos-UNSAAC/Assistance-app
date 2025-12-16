@@ -26,3 +26,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /lib/generated/prisma
+
+# idea
+/.idea
+
+# migrations dependencies
+prisma/scripts/migrate/volunteers/node_modules

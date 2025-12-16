@@ -9,8 +9,8 @@ import { useAuthStore } from "@/lib/auth-store"
 const navigation = [
   { name: "Inicio", href: "/", icon: Home, requiredRole: "VOLUNTEER" as const },
   { name: "Mi Perfil", href: "/profile", icon: Users, requiredRole: "VOLUNTEER" as const, volunteerOnly: true },
-  { name: "Voluntarios", href: "/volunteers", icon: Users, requiredRole: "MANAGER" as const },
   { name: "Asistencias", href: "/attendance", icon: Calendar, requiredRole: "MANAGER" as const },
+  { name: "Voluntarios", href: "/volunteers", icon: Users, requiredRole: "MANAGER" as const },
   { name: "Encargados", href: "/managers", icon: Users2Icon, requiredRole: "ADMIN" as const },
 ]
 

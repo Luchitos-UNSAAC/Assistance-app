@@ -32,7 +32,7 @@ export const editVolunteerById = async (volunteerId: string, body: EditManagerBo
       };
     }
     const statusFormatted = body.status === "Active" ? VolunteerStatus.ACTIVE : VolunteerStatus.INACTIVE;
-    
+
     const response = await prisma.volunteer.update({
       where: {
         id: volunteer.id,
@@ -59,7 +59,7 @@ export const editVolunteerById = async (volunteerId: string, body: EditManagerBo
         message: `Error al actualizar el voluntario`,
       }
     }
-    
+
     return {
       success: true,
     }
@@ -67,7 +67,7 @@ export const editVolunteerById = async (volunteerId: string, body: EditManagerBo
     console.error("[ERROR_DELETE_VOLUNTEER_BY_ID]", error)
     return {
       success: false,
-      message: `Error al eliminar el voluntario`,
+      message: `Error al editar el voluntario`,
     }
   }
 }
