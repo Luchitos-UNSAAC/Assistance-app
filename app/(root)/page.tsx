@@ -5,7 +5,7 @@ import {redirect} from "next/navigation";
 export default async function DashboardPage() {
   const reviewDashboard = await getReviewDashboard();
   if (!reviewDashboard) {
-    return redirect('/auth/logout')
+    return redirect('/auth/login')
   }
   return (
    <Dashboard reviewDashboard={reviewDashboard} />

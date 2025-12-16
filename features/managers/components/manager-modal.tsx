@@ -51,7 +51,7 @@ export default function ManagerModal({ isOpen, onClose, volunteer, volunteers }:
         phone: volunteer.phone,
         dni: volunteer.dni || "",
         address: volunteer.address,
-        birthday: volunteer.birthday,
+        birthday: volunteer.birthday || "",
         status: volunteer.status,
         dayOfWeek: "",
       })
@@ -118,7 +118,7 @@ export default function ManagerModal({ isOpen, onClose, volunteer, volunteers }:
     startTransition(async () => {
       const body = {
         volunteerId: managerId,
-        day: formData.dayOfWeek as "LUNES" | "MARTES" | "MIERCOLES" | "JUEVES" | "VIERNES" | "SABADO" | "DOMINGO"
+        day: formData.dayOfWeek as "LUNES" | "MARTES" | "MIERCOLES" | "JUEVES" | "VIERNES" | "SABADO_MANIANA" | "SABADO_TARDE" | "DOMINGO"
       }
       const response = await updateVolunteerToManagerByIdAndDay(body)
       if (!response.success) {
@@ -196,7 +196,8 @@ export default function ManagerModal({ isOpen, onClose, volunteer, volunteers }:
             <SelectItem value="MIERCOLES">MIERCOLES</SelectItem>
             <SelectItem value="JUEVES">JUEVES</SelectItem>
             <SelectItem value="VIERNES">VIERNES</SelectItem>
-            <SelectItem value="SABADO">SABADO</SelectItem>
+            <SelectItem value="SABADO_MANIANA">SABADO MAÑANA</SelectItem>
+            <SelectItem value="SABADO_TARDE">SABADO TARDE</SelectItem>
             <SelectItem value="DOMINGO">DOMINGO</SelectItem>
           </SelectContent>
         </Select>

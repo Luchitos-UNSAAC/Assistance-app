@@ -32,7 +32,7 @@ function isStartBeforeEnd(start: string, end: string) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    
+
     // Validaciones básicas del payload
     if (!body?.title || !body?.description) {
       return bad("Faltan campos obligatorios (title, description).");
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     if (!Array.isArray(body?.schedules) || body.schedules.length === 0) {
       return bad("Debes enviar al menos un horario.");
     }
-    
+
     const schedulesMapped = (body.schedules as ScheduleInput[]).map((s, idx) => {
       if (!s.startTime || !s.endTime) {
         throw new Error(`Horario #${idx + 1}: falta startTime/endTime`);
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       if (!isStartBeforeEnd(s.startTime, s.endTime)) {
         throw new Error(`Horario #${idx + 1}: la hora de inicio debe ser menor que la de fin`);
       }
-      
+
       if (s.mode === "WEEKLY") {
         if (!s.dayOfWeek) throw new Error(`Horario #${idx + 1}: dayOfWeek es obligatorio en modo WEEKLY`);
         return {
@@ -70,8 +70,7 @@ export async function POST(req: Request) {
         };
       }
     });
-    console.log("schedulesMapped", schedulesMapped);
-    
+
     const call = await prisma.callForVolunteers.create({
       data: {
         title: body.title,
@@ -83,7 +82,7 @@ export async function POST(req: Request) {
         deadline: new Date(body.deadline),
         status: body.status,
         createdBy: "system", // TODO: tomar del usuario autenticado
-        
+
         callSchedules: {
           create: schedulesMapped,
         },
@@ -92,7 +91,7 @@ export async function POST(req: Request) {
         callSchedules: true,
       },
     });
-    
+
     return NextResponse.json(call, { status: 201 });
   } catch (error: any) {
     console.error(error);

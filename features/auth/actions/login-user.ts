@@ -45,7 +45,7 @@ export async function loginUser(email: string, password: string) {
       }
     }
   } catch (error) {
-    console.log("[ERROR_LOGIN_USER]", error);
+    console.error("[ERROR_LOGIN_USER]", error);
     return {
       success: false,
       error: "Error al iniciar sesión"

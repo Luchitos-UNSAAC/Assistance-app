@@ -48,7 +48,7 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
             </h1>
             <p className="text-xs text-gray-600">Bienvenido, {user?.name}</p>
           </div>
-          <UserMenu />
+          <UserMenu justImage={false} />
         </div>
       </div>
 

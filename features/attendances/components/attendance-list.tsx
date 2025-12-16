@@ -116,157 +116,159 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
 
   return (
     <AuthGuard requiredRole="MANAGER">
-      <div className="p-3 space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">Asistencias de hoy</h1>
+      <div className="pt-20 pb-20">
+        <div className="p-3 space-y-4">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold text-gray-900">Asistencias de hoy</h1>
 
-          <div className="flex items-center gap-2">
-            {!attendancesForTodayIsAlreadyCreated &&
+            <div className="flex items-center gap-2">
+              {!attendancesForTodayIsAlreadyCreated &&
+                <Button
+                  onClick={handleCreateAttendances}
+                  disabled={isPending}
+                  className="bg-purple-600 text-white hover:bg-purple-700"
+                >
+                  Hoy
+                </Button>
+              }
+
               <Button
-                onClick={handleCreateAttendances}
-                disabled={isPending}
-                className="bg-purple-600 text-white hover:bg-purple-700"
+                variant="ghost"
+                size="icon"
+                onClick={() => router.refresh()}
+                aria-label="Refrescar"
               >
-                Hoy
+                <RotateCcw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`}/>
               </Button>
-            }
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.refresh()}
-              aria-label="Refrescar"
-            >
-              <RotateCcw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`}/>
-            </Button>
+            </div>
           </div>
-        </div>
 
 
-        {/* Lista de voluntarios */}
-        <div className="space-y-4">
-          {volunteers.map((vol) => {
-            const attendance = vol.attendanceToday
-            const attendanceStatus = attendance?.status ?? "No record"
+          {/* Lista de voluntarios */}
+          <div className="space-y-4">
+            {volunteers.map((vol) => {
+              const attendance = vol.attendanceToday
+              const attendanceStatus = attendance?.status ?? "No record"
 
-            const badgeText =
-              attendanceStatus === "Present"
-                ? "Presente"
-                : attendanceStatus === "Justified"
-                  ? "Justificado"
-                  : attendanceStatus === "Late"
-                    ? "Tarde"
-                    : "Ausente"
+              const badgeText =
+                attendanceStatus === "Present"
+                  ? "Presente"
+                  : attendanceStatus === "Justified"
+                    ? "Justificado"
+                    : attendanceStatus === "Late"
+                      ? "Tarde"
+                      : "Ausente"
 
-            const badgeClass =
-              attendanceStatus === "Present"
-                ? "bg-green-500 text-white"
-                : attendanceStatus === "Justified"
-                  ? "bg-yellow-500 text-white"
-                  : attendanceStatus === "Late"
-                    ? "bg-orange-500 text-white"
-                    : "bg-red-500 text-white"
+              const badgeClass =
+                attendanceStatus === "Present"
+                  ? "bg-green-500 text-white"
+                  : attendanceStatus === "Justified"
+                    ? "bg-yellow-500 text-white"
+                    : attendanceStatus === "Late"
+                      ? "bg-orange-500 text-white"
+                      : "bg-red-500 text-white"
 
-            return (
-              <Card key={vol.id} className="gradient-card">
-                <CardContent className="p-3">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6">
-                    {/* Left: Volunteer info */}
-                    <div className="flex items-start gap-3">
-                      <div className="p-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-md shrink-0">
-                        <Calendar className="h-4 w-4 text-white"/>
+              return (
+                <Card key={vol.id} className="gradient-card">
+                  <CardContent className="p-3">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6">
+                      {/* Left: Volunteer info */}
+                      <div className="flex items-start gap-3">
+                        <div className="p-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-md shrink-0">
+                          <Calendar className="h-4 w-4 text-white"/>
+                        </div>
+                        <div className="text-sm leading-snug">
+                          <h3 className="font-semibold text-gray-900 truncate max-w-[160px]">{vol.name}</h3>
+                          <p className="text-xs text-gray-600">{vol.email}</p>
+                          {attendance?.date && (
+                            <p className="text-xs text-gray-500">
+                              {format(parseISO(attendance.date), "hh:mm a — EEEE", {locale: es})}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-sm leading-snug">
-                        <h3 className="font-semibold text-gray-900 truncate max-w-[160px]">{vol.name}</h3>
-                        <p className="text-xs text-gray-600">{vol.email}</p>
-                        {attendance?.date && (
-                          <p className="text-xs text-gray-500">
-                            {format(parseISO(attendance.date), "hh:mm a — EEEE", {locale: es})}
-                          </p>
-                        )}
-                      </div>
-                    </div>
 
-                    {/* Right: Status + Actions */}
-                    {
-                      attendancesForTodayIsAlreadyCreated
-                      &&
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className={`text-xs font-medium px-2 py-0.5 border ${badgeClass}`}>
-                          {badgeText}
-                        </Badge>
+                      {/* Right: Status + Actions */}
+                      {
+                        attendancesForTodayIsAlreadyCreated
+                        &&
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={`text-xs font-medium px-2 py-0.5 border ${badgeClass}`}>
+                            {badgeText}
+                          </Badge>
 
-                        {!attendance ? (
-                          <Button
-                            onClick={() => openCreateModalFor(vol.id)}
-                            size="icon"
-                            aria-label={`Registrar asistencia de ${vol.name}`}
-                            disabled={isPending || loadingId === vol.id}
-                            className="h-7 w-7"
-                          >
-                            <Plus className="h-4 w-4"/>
-                          </Button>
-                        ) : (
-                          <>
+                          {!attendance ? (
                             <Button
-                              onClick={() => markAssistance(attendance?.id, vol.id, "Present")}
-                              variant="outline"
-                              size="sm"
-                              aria-label={`Marcar asistencia de ${vol.name}`}
-                              className="h-7"
-                              disabled={attendance.status === "Present" || isPending || loadingId === vol.id}
-                            >
-                              <Check className="h-4 w-4 text-green-600"/>
-                            </Button>
-
-                            <Button
-                              onClick={() => markAssistance(attendance?.id, vol.id, "Justified")}
-                              variant="outline"
-                              size="sm"
-                              aria-label={`Registrar permiso de ${vol.name}`}
-                              className="h-7"
-                              disabled={attendance.status === "Justified" || isPending || loadingId === vol.id}
-                            >
-                              <FileText className="h-4 w-4 text-yellow-600"/>
-                            </Button>
-                            <Button
-                              onClick={() => markAssistance(attendance?.id, vol.id, "Absent")}
-                              variant="outline"
+                              onClick={() => openCreateModalFor(vol.id)}
                               size="icon"
-                              aria-label={`Marcar ausencia de ${vol.name}`}
+                              aria-label={`Registrar asistencia de ${vol.name}`}
+                              disabled={isPending || loadingId === vol.id}
                               className="h-7 w-7"
-                              disabled={attendance.status === "Absent" || isPending || loadingId === vol.id}
                             >
-                              <X className="h-4 w-4 text-red-600"/>
+                              <Plus className="h-4 w-4"/>
                             </Button>
-                          </>
-                        )}
-                      </div>
-                    }
+                          ) : (
+                            <>
+                              <Button
+                                onClick={() => markAssistance(attendance?.id, vol.id, "Present")}
+                                variant="outline"
+                                size="sm"
+                                aria-label={`Marcar asistencia de ${vol.name}`}
+                                className="h-7"
+                                disabled={attendance.status === "Present" || isPending || loadingId === vol.id}
+                              >
+                                <Check className="h-4 w-4 text-green-600"/>
+                              </Button>
 
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+                              <Button
+                                onClick={() => markAssistance(attendance?.id, vol.id, "Justified")}
+                                variant="outline"
+                                size="sm"
+                                aria-label={`Registrar permiso de ${vol.name}`}
+                                className="h-7"
+                                disabled={attendance.status === "Justified" || isPending || loadingId === vol.id}
+                              >
+                                <FileText className="h-4 w-4 text-yellow-600"/>
+                              </Button>
+                              <Button
+                                onClick={() => markAssistance(attendance?.id, vol.id, "Absent")}
+                                variant="outline"
+                                size="icon"
+                                aria-label={`Marcar ausencia de ${vol.name}`}
+                                className="h-7 w-7"
+                                disabled={attendance.status === "Absent" || isPending || loadingId === vol.id}
+                              >
+                                <X className="h-4 w-4 text-red-600"/>
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      }
 
-        {volunteers.length === 0 && (
-          <div className="text-center py-12">
-            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4"/>
-            <p className="text-gray-500">No hay voluntarios en este grupo</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
-        )}
 
-        <AttendanceModal
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-          attendance={modalAttendance}
-          volunteers={volunteers}
-          serverTime={serverTime}
-          initialVolunteerId={modalInitialVolunteerId}
-        />
+          {volunteers.length === 0 && (
+            <div className="text-center py-12">
+              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4"/>
+              <p className="text-gray-500">No hay voluntarios en este grupo</p>
+            </div>
+          )}
+
+          <AttendanceModal
+            isOpen={isModalOpen}
+            onClose={handleModalClose}
+            attendance={modalAttendance}
+            volunteers={volunteers}
+            serverTime={serverTime}
+            initialVolunteerId={modalInitialVolunteerId}
+          />
+        </div>
       </div>
     </AuthGuard>
   )
