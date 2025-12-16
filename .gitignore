@@ -29,3 +29,6 @@ next-env.d.ts
 
 # idea
 /.idea
+
+# migrations dependencies
+prisma/scripts/migrate/volunteers/node_modules
