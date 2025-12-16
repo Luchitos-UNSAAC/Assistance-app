@@ -3,10 +3,10 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
-import AuthWrapper from "@/components/auth-wrapper"
 import BottomNavigation from "@/components/bottom-navigation"
 import {ClientRenderSecure} from "@/components/client-render-secure";
 import DeleteConfirmationModal from "@/components/delete-confirm-modal";
+import {Navbar} from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -26,7 +26,8 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
             <ClientRenderSecure>
-              <AuthWrapper>{children}</AuthWrapper>
+              <Navbar />
+              <main>{children}</main>
               <BottomNavigation />
               <DeleteConfirmationModal />
             </ClientRenderSecure>
@@ -37,3 +38,5 @@ export default function RootLayout({
     </html>
   )
 }
+
+// className="pt-20 pb-20"

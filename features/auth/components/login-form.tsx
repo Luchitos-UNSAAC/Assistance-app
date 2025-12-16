@@ -7,12 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 import { useAuthStore } from "@/lib/auth-store"
-import { Eye, EyeOff, User, Shield, Crown } from "lucide-react"
+import {Eye, EyeOff, LogIn} from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {loginUser} from "@/features/auth/actions/login-user";
 import {useRouter} from "next/navigation";
+import Image from "next/image";
 
 export default function LoginForm() {
   const setUser = useAuthStore((state) => state.setUser)
@@ -84,7 +84,7 @@ export default function LoginForm() {
           title: "Inicio de sesión exitoso",
           description: "Bienvenido a LUCHOS UNSAAC",
         })
-        router.refresh()
+        router.push('/')
       } else {
         const errorMessage = result.error || "Ocurrió un error al iniciar sesión"
         toast({
@@ -98,10 +98,6 @@ export default function LoginForm() {
     })
   }
 
-  const handleDemoLogin = (email: string, password: string) => {
-    setFormData({ email, password })
-  }
-
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
@@ -113,15 +109,28 @@ export default function LoginForm() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          {/*<div className="mx-auto w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">*/}
-          {/*  <LogIn className="h-8 w-8 text-white" />*/}
-          {/*</div>*/}
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+        <div className="text-center space-y-4">
+          {/* Logo circular con gradiente */}
+          <div className="relative mx-auto w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+            <Image
+              src="/logo.jpeg"
+              alt="Logo Luchos UNSAAC"
+              fill
+              className="object-cover rounded-full"
+            />
+          </div>
+
+          {/* Título con gradiente */}
+          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             LUCHOS UNSAAC
           </h1>
-          <p className="text-gray-600">Plataforma de Voluntarios Caninos</p>
+
+          {/* Descripción */}
+          <p className="text-gray-600 text-lg">
+            Plataforma de Voluntarios Caninos
+          </p>
         </div>
+
 
         {/* Login Form */}
         <Card className="bg-white/90 backdrop-blur-sm border-2 border-white/20 shadow-2xl">

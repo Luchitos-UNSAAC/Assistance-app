@@ -6,7 +6,7 @@ import { UserRole, GroupRole } from "@prisma/client";
 
 interface UpdateVolunteerToManagerByIdAndDayProps {
   volunteerId: string
-  day: "LUNES" | "MARTES" | "MIERCOLES" | "JUEVES" | "VIERNES" | "SABADO" | "DOMINGO"
+  day: "LUNES" | "MARTES" | "MIERCOLES" | "JUEVES" | "VIERNES" | "SABADO_MANIANA" | "SABADO_TARDE" | "DOMINGO"
 }
 
 export const updateVolunteerToManagerByIdAndDay = async (body: UpdateVolunteerToManagerByIdAndDayProps) => {
@@ -39,7 +39,6 @@ export const updateVolunteerToManagerByIdAndDay = async (body: UpdateVolunteerTo
         deletedAt: null,
       }
     })
-    console.log("groupByDay", groupByDay);
     if (!groupByDay) {
       return {
         success: false,
@@ -56,7 +55,6 @@ export const updateVolunteerToManagerByIdAndDay = async (body: UpdateVolunteerTo
         volunteer: true
       }
     })
-    console.log("existingGroupMember", existingGroupMember);
     if (existingGroupMember) {
       await prisma.groupMember.update({
         where: {
