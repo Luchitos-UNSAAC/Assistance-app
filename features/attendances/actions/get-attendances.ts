@@ -43,6 +43,7 @@ export const getAttendancesAndVolunteers = async () => {
         name: true,
         email: true,
         status: true,
+        user: true,
         attendances: {
           where: {
             deletedAt: null,
@@ -87,6 +88,9 @@ export const getAttendancesAndVolunteers = async () => {
         name: volunteer.name,
         email: volunteer.email,
         status: mapVolunteerStatus(volunteer.status),
+        user: {
+          avatar: volunteer?.user?.avatar || undefined,
+        },
         attendanceToday:
           volunteer.attendances.length > 0
             ? {

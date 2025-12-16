@@ -14,6 +14,9 @@ import {useRouter} from "next/navigation"
 import AttendanceModal from "@/components/attendance-modal"
 import {createAttendancesForToday} from "@/features/attendances/actions/create-attendances-for-today";
 import {editAttendanceById} from "@/features/attendances/actions/edit-attendance-by-id";
+import UserMenu from "@/components/user-menu";
+import {AvatarDog} from "@/components/avatar";
+import {cn} from "@/lib/utils";
 
 interface AttendanceListProps {
   volunteers: VolunteerForSelect[]
@@ -117,7 +120,7 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
   return (
     <AuthGuard requiredRole="MANAGER">
       <div className="pt-20 pb-20">
-        <div className="p-3 space-y-4">
+        <div className="px-3 space-y-1">
           {/* Header */}
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold text-gray-900">Asistencias de hoy</h1>
@@ -127,9 +130,9 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
                 <Button
                   onClick={handleCreateAttendances}
                   disabled={isPending}
-                  className="bg-purple-600 text-white hover:bg-purple-700"
+                  className="bg-purple-600 text-white hover:bg-purple-700 animate-pulse"
                 >
-                  Hoy
+                  Abrir
                 </Button>
               }
 
@@ -146,7 +149,7 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
 
 
           {/* Lista de voluntarios */}
-          <div className="space-y-4">
+          <div className="space-y-1">
             {volunteers.map((vol) => {
               const attendance = vol.attendanceToday
               const attendanceStatus = attendance?.status ?? "No record"
@@ -171,15 +174,19 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
 
               return (
                 <Card key={vol.id} className="gradient-card">
-                  <CardContent className="p-3">
+                  <CardContent className="px-3 py-2">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6">
                       {/* Left: Volunteer info */}
                       <div className="flex items-start gap-3">
-                        <div className="p-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-md shrink-0">
-                          <Calendar className="h-4 w-4 text-white"/>
-                        </div>
+                        {/*<div className="p-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-md shrink-0">*/}
+                        {/*  /!*<Calendar className="h-4 w-4 text-white"/>*!/*/}
+                        {/*</div>*/}
+                        <AvatarDog
+                          avatarUrl={vol?.user?.avatar || undefined}
+                          name={vol.name} />
                         <div className="text-sm leading-snug">
-                          <h3 className="font-semibold text-gray-900 truncate max-w-[160px]">{vol.name}</h3>
+                          <h3 className={cn('font-semibold text-gray-900 truncate max-w-[240px]',
+                            !attendancesForTodayIsAlreadyCreated && 'truncate max-w-[160px]')}>{vol.name}</h3>
                           <p className="text-xs text-gray-600">{vol.email}</p>
                           {attendance?.date && (
                             <p className="text-xs text-gray-500">

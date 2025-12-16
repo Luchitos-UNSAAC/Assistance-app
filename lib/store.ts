@@ -1,4 +1,6 @@
 import { create } from "zustand"
+import {User} from "@/lib/auth-store";
+import {User as UserP} from "@prisma/client"
 
 export type StatusAttendance = "Present" | "Absent" | "Justified" | "Late"
 
@@ -20,6 +22,9 @@ export interface VolunteerForSelect {
   email: string
   status: "Active" | "Inactive" | "Suspended"
   attendanceToday?: Attendance
+  user?: {
+    avatar?: string
+  }
 }
 
 export interface Attendance {

@@ -20,19 +20,21 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
   return (
     <AuthGuard requiredRole="VOLUNTEER">
       <div className="pt-20 pb-20">
-        <div className="p-4 space-y-6">
+        <div className="p-3 space-y-2">
           {/* Header */}
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Bienvenido!
+          <div className="text-center space-y-3">
+            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-purple-800 via-pink-400 to-pink-800 bg-clip-text text-transparent animate-pulse">
+              🐶 ¡Bienvenido! 🐾
             </h1>
-            <p className="text-gray-600">
-              {isVolunteerView ? "Mi Panel de Voluntario" : "Plataforma de Voluntarios"}
+            <p className="text-gray-500 text-md">
+              {isVolunteerView
+                ? "Mi Panel de Voluntario 🐕"
+                : "Plataforma de Voluntarios 🐾"}
             </p>
           </div>
 
           {/* Stats Cards */}
-          <div className="flex gap-4 w-full">
+          <div className="flex gap-3 w-full">
             {!isVolunteerView && (
               <Card className="gradient-card">
                 <CardContent className="p-3">
@@ -160,16 +162,14 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
           {/* Upcoming Birthdays */}
           {reviewDashboard.upcomingBirthdays.length > 0 && (
             <Card className="gradient-card">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Gift className="h-5 w-5 text-pink-600" />
-                  <span>{"Próximos Cumpleaños"}</span>
-                </CardTitle>
-              </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="flex items-center space-x-2 mt-3 mb-2">
+                  <Gift className="h-5 w-5 text-pink-600" />
+                  <span className='text-xl font-bold'>{"Próximos Cumpleaños"}</span>
+                </div>
+                <div className="space-y-1">
                   {reviewDashboard.upcomingBirthdays.map((volunteer) => (
-                    <div key={volunteer.id} className="flex items-center justify-between p-3 bg-white/50 rounded-lg">
+                    <div key={volunteer.id} className="flex items-center justify-between px-2 py-2 bg-white/50 rounded-lg">
                       <div>
                         <p className="font-medium text-gray-900 truncate max-w-[180px] sm:max-w-[230px]">
                           {volunteer?.isToday && <span className="mr-1">🎂</span>}
@@ -199,7 +199,7 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
                       }
                       {volunteer?.isToday && (
                         <span className="inline-flex items-center bg-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                          Hoy cumpleaños
+                          Hoy
                           </span>
                       )}
                     </div>

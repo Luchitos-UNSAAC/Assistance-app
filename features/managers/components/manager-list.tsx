@@ -15,6 +15,7 @@ import {deleteManagerById} from "@/features/managers/actions/delete-manager-by-i
 import {useRouter} from "next/navigation";
 import {useDeleteModalStore} from "@/lib/delete-modal-store";
 import ManagerModal from "@/features/managers/components/manager-modal";
+import {AvatarDog} from "@/components/avatar";
 
 interface ManagersListProps {
   volunteers: Volunteer[]
@@ -86,12 +87,13 @@ export default function ManagersList({managers, attendances, volunteers}: Manage
   return (
     <AuthGuard requiredRole="ADMIN">
       <div className="pt-20 pb-20">
-        <div className="p-4 space-y-6">
+        <div className="px-4 space-y-1">
           {/* Header */}
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">Encargados</h1>
             {canManageVolunteers && (
               <Button
+                size={'sm'}
                 onClick={() => {
                   setSelectedVolunteer(null)
                   setIsModalOpen(true)
@@ -119,12 +121,13 @@ export default function ManagersList({managers, attendances, volunteers}: Manage
                   key={volunteer.id}
                   className="gradient-card hover:shadow-lg transition-all duration-200"
                 >
-                  <CardContent className="p-4">
+                  <CardContent className="px-4 py-2">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-                          <User className="h-4 w-4 text-white" />
-                        </div>
+                        {/*<div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">*/}
+                        {/*  <User className="h-4 w-4 text-white" />*/}
+                        {/*</div>*/}
+                        <AvatarDog name={volunteer.name} avatarUrl={undefined}/>
                         <div>
                           <h3 className="font-semibold text-gray-900">{volunteer.name}</h3>
                           <Badge

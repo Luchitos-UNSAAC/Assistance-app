@@ -1,4 +1,5 @@
 "use server";
+
 import {prisma} from "@/lib/prisma";
 import type {WeekDay} from "@/features/calls/types/form";
 import {GroupRole} from "@prisma/client";
@@ -16,7 +17,7 @@ export const getGroupForToday = async () => {
         role: GroupRole.LEADER,
       },
     });
-    
+
   } catch (error) {
     console.error("[ERROR_GET_GROUP_FOR_TODAY]", error);
     return null
