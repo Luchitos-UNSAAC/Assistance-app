@@ -110,6 +110,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
           address: formData.address,
           birthday: formData.birthday,
           status: formData.status,
+          dni: formData.dni,
         }
         const volunteerId = volunteer.id
         const response = await editVolunteerById(volunteerId, body)
@@ -128,6 +129,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
         })
       })
     } else {
+      console.log(formData)
       startTransition(async () => {
         const body = {
           name: formData.name,
@@ -138,6 +140,7 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
           status: formData.status,
           dni: formData.dni,
         }
+
         const response = await addVolunteer(body)
         if (!response.success) {
           toast({

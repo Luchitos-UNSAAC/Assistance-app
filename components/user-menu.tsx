@@ -30,14 +30,14 @@ export default function UserMenu() {
       description: "Has cerrado sesión exitosamente",
     })
   }
-  
+
   const hasPermission = useAuthStore((state) => state.hasPermission)
   const isAdmin = hasPermission("ADMIN")
-  
+
   const handleProfileClick = () => {
     router.push("/profile")
   }
-  
+
   const handleSettingsClick = () => {
     router.push("/admin/assistances")
   }
@@ -68,9 +68,12 @@ export default function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10 border-2 border-white/20 ">
-            <AvatarImage/>
-            <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+          <Avatar className="h-10 w-10 border-2 border-white/20">
+            <AvatarImage
+              src={user.avatar || `https://robohash.org/1?set=set4`}
+              alt={user.name}
+            />
+            <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold">
               {user.name
                 .split(" ")
                 .map((n) => n[0])
@@ -112,13 +115,13 @@ export default function UserMenu() {
             </DropdownMenuItem>
           )
         }
-       
+
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-red-50 text-red-600">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Cerrar Sesión</span>
         </DropdownMenuItem>
-        
+
         <Separator className="my-2" />
       {/*  Version app */}
         <div className="px-4 py-2 text-xs text-gray-400 text-center">

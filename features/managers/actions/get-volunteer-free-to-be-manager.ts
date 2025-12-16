@@ -17,7 +17,7 @@ export const getVolunteerFreeToBeManager = async () => {
         volunteer: {
           status: VolunteerStatus.ACTIVE,
           deletedAt: null,
-        }
+        },
       },
       include: {
         volunteer: {
@@ -40,9 +40,12 @@ export const getVolunteerFreeToBeManager = async () => {
             }
           },
         }
+      },
+      orderBy: {
+        name: "asc"
       }
     })
-    
+
     const mapAttendanceStatus = (status: AttendanceStatus) => {
       switch (status) {
         case AttendanceStatus.PRESENT:
@@ -55,7 +58,7 @@ export const getVolunteerFreeToBeManager = async () => {
           return "Late";
       }
     }
-    
+
     const managersMapped: Volunteer[] =  activeManagers.map((manager) => ({
       id: manager?.volunteer?.id || '',
       name: manager.name,
@@ -73,7 +76,7 @@ export const getVolunteerFreeToBeManager = async () => {
       })) || [],
     }));
     return managersMapped;
-    
+
   } catch (error) {
     console.error("[ERROR_GET_ACTIVE_MANAGERS]", error);
     return [];

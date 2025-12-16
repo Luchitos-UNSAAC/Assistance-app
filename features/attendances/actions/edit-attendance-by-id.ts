@@ -1,6 +1,6 @@
 "use server"
 
-import { prisma } from "@/lib/prisma";
+import {prisma} from "@/lib/prisma";
 import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
 import {AttendanceStatus} from "@prisma/client";
 import {getCurrentUser} from "@/lib/get-current-user";
@@ -28,9 +28,9 @@ export const editAttendanceById = async (attendanceId: string, body: EditAttenda
         message: `No existe el voluntario`
       };
     }
-    
+
     const existingAttendance = await prisma.attendance.findUnique({
-      where: { id: attendanceId },
+      where: {id: attendanceId},
     })
     if (!existingAttendance) {
       return {
@@ -38,7 +38,7 @@ export const editAttendanceById = async (attendanceId: string, body: EditAttenda
         message: `No existe la asistencia con el ID proporcionado`
       };
     }
-    
+
     const mapAttendanceStatus = (status: StatusAttendance) => {
       switch (status) {
         case "Present":
@@ -51,9 +51,9 @@ export const editAttendanceById = async (attendanceId: string, body: EditAttenda
           return AttendanceStatus.LATE;
       }
     }
-    
+
     const statusFormatted = mapAttendanceStatus(body.status);
-    
+
     const response = await prisma.attendance.update({
       where: {
         id: attendanceId,
@@ -71,7 +71,7 @@ export const editAttendanceById = async (attendanceId: string, body: EditAttenda
         message: `Error al actualizar la asistencia`,
       }
     }
-    
+
     return {
       success: true,
     }

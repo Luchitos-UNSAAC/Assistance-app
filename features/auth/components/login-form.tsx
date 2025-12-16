@@ -28,36 +28,6 @@ export default function LoginForm() {
   const [pending, starTransition] = useTransition()
   const router = useRouter()
 
-  const demoUsers = [
-    {
-      email: "voluntario5@unsaac.edu",
-      password: "123456",
-      role: "VOLUNTEER",
-      name: "María López",
-      icon: User,
-      color: "bg-blue-500",
-      description: "Solo ve su perfil y asistencias",
-    },
-    {
-      email: "manager2@unsaac.edu",
-      password: "123456",
-      role: "MANAGER",
-      name: "Carlos Mendoza",
-      icon: Shield,
-      color: "bg-purple-500",
-      description: "Crea voluntarios y registra asistencias",
-    },
-    {
-      email: "admin@unsaac.edu",
-      password: "123456",
-      role: "ADMIN",
-      name: "Ana García",
-      icon: Crown,
-      color: "bg-pink-500",
-      description: "Acceso completo al sistema",
-    },
-  ]
-
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
@@ -87,7 +57,7 @@ export default function LoginForm() {
     if (pending) {
       return
     }
-      
+
     const email = formData.email.trim().toLowerCase()
     const password = formData.password.trim()
     starTransition(async () => {
@@ -107,7 +77,7 @@ export default function LoginForm() {
           name: result.data.name,
           role: result.data.role,
           volunteerId: result.data.volunteerId || undefined,
-          avatar: "/placeholder.svg?height=40&width=40", // Placeholder avatar
+          avatar: result.data.avatar || undefined
         }
         setUser(user)
         toast({
@@ -216,66 +186,6 @@ export default function LoginForm() {
           </CardContent>
         </Card>
 
-        {/* Demo Users */}
-        <Card className="bg-white/95 backdrop-blur-md border border-gray-100 shadow-xl rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-center text-gray-900 text-lg font-semibold">
-              Usuarios de Demostración
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent className="space-y-3">
-            {demoUsers.map((user) => (
-              <div
-                key={user.email}
-                className="flex items-center justify-between p-3 bg-white/70 rounded-xl border border-gray-100 hover:shadow-md hover:bg-white/90 transition-all duration-200 active:scale-[0.98]"
-              >
-                {/* Left: User Info */}
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className={`p-2.5 ${user.color} rounded-full shadow-sm`}>
-                    <user.icon className="h-4 w-4 text-white" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{user.name}</p>
-                    <p className="text-sm text-gray-600 truncate">{user.email}</p>
-                    <p className="text-xs text-gray-500">{user.description}</p>
-                  </div>
-                </div>
-                
-                {/* Right: Actions */}
-                <div className="flex flex-col items-end justify-between gap-1 min-w-[80px]">
-                  <Badge
-                    variant="secondary"
-                    className={`text-[10px] px-2 py-0.5 rounded-md ${
-                      user.role === "ADMIN"
-                        ? "bg-pink-100 text-pink-800"
-                        : user.role === "MANAGER"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-blue-100 text-blue-800"
-                    }`}
-                  >
-                    {user.role}
-                  </Badge>
-                  <Button
-                    onClick={() => handleDemoLogin(user.email, user.password)}
-                    variant="outline"
-                    size="sm"
-                    className="h-7 text-[11px] px-2 border-gray-300 hover:border-purple-400 hover:text-purple-600 rounded-md"
-                  >
-                    Usar
-                  </Button>
-                </div>
-              </div>
-            ))}
-            
-            {/* Password Hint */}
-            <div className="text-center pt-3 border-t border-gray-100">
-              <p className="text-xs text-gray-500">
-                Contraseña para todos: <span className="font-medium">123456</span>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )

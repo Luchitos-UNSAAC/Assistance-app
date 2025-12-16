@@ -1,0 +1,39 @@
+# EditorConfig is awesome: https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# JavaScript / TypeScript
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+
+# JSON, config files
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# Markdown (no cortar espacios al final, se usan para saltos de línea)
+[*.md]
+trim_trailing_whitespace = false
+
+# Shell scripts
+[*.sh]
+indent_style = space
+indent_size = 2
+
+# Prisma schema
+[*.prisma]
+indent_size = 2
+
+# Env files
+[*.env]
+trim_trailing_whitespace = false
+
+# Makefiles (tabs obligatorios)
+[Makefile]
+indent_style = tab

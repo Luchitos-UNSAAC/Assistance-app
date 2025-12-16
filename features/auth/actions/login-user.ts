@@ -23,7 +23,7 @@ export async function loginUser(email: string, password: string) {
         error: "Contraseña incorrecta"
       }
     }
-    
+
     const volunteer = await getCurrentVolunteerByUserId(user.volunteerId);
     if (!volunteer) {
       return {
@@ -32,7 +32,7 @@ export async function loginUser(email: string, password: string) {
       }
     }
     cookies().set("userEmail", email, { httpOnly: true, secure: true });
-    
+
     return {
       success: true,
       data: {
@@ -40,7 +40,8 @@ export async function loginUser(email: string, password: string) {
         email: user.email,
         name: user.name,
         volunteerId: volunteer.id,
-        role: user.role
+        role: user.role,
+        avatar: user.avatar,
       }
     }
   } catch (error) {
