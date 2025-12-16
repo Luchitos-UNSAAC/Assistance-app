@@ -1,17 +1,17 @@
 "use client"
 
-import React, { useTransition } from "react"
+import React, {useTransition} from "react"
 
-import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { type Volunteer } from "@/lib/store"
-import { useToast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation";
-import { editVolunteerById } from "@/features/volunteers/actions/edit-volunteer-by-id";
-import { addVolunteer } from "@/features/volunteers/actions/add-volunteer";
+import {useState, useEffect} from "react"
+import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {type Volunteer} from "@/lib/store"
+import {useToast} from "@/hooks/use-toast"
+import {useRouter} from "next/navigation";
+import {editVolunteerById} from "@/features/volunteers/actions/edit-volunteer-by-id";
+import {addVolunteer} from "@/features/volunteers/actions/add-volunteer";
 
 interface VolunteerModalProps {
   isOpen: boolean
@@ -19,8 +19,8 @@ interface VolunteerModalProps {
   volunteer?: Volunteer
 }
 
-export default function VolunteerModal({ isOpen, onClose, volunteer }: VolunteerModalProps) {
-  const { toast } = useToast()
+export default function VolunteerModal({isOpen, onClose, volunteer}: VolunteerModalProps) {
+  const {toast} = useToast()
   const [pending, startTransition] = useTransition()
   const router = useRouter()
 
@@ -44,7 +44,9 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
         dni: volunteer.dni || "",
         phone: volunteer.phone,
         address: volunteer.address,
-        birthday: new Date(volunteer.birthday).toISOString().split("T")[0],
+        birthday: volunteer?.birthday
+          ? new Date(volunteer?.birthday).toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0],
         status: volunteer.status,
       })
     } else {
@@ -129,7 +131,6 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
         })
       })
     } else {
-      console.log(formData)
       startTransition(async () => {
         const body = {
           name: formData.name,
@@ -161,9 +162,9 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
   }
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({...prev, [field]: value}))
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }))
+      setErrors((prev) => ({...prev, [field]: ""}))
     }
   }
 
@@ -255,11 +256,11 @@ export default function VolunteerModal({ isOpen, onClose, volunteer }: Volunteer
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}
-              disabled={pending}>
+                    disabled={pending}>
               Cancelar
             </Button>
             <Button type="submit" className="gradient-button text-white"
-              disabled={pending}>
+                    disabled={pending}>
               {volunteer ? "Actualizar" : "Guardar"}
             </Button>
           </div>

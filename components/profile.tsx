@@ -12,6 +12,7 @@ import {Badge} from "@/components/ui/badge";
 import {format, parseISO} from "date-fns";
 import {es} from "date-fns/locale";
 import VolunteerModal from "@/features/volunteers/components/volunteer-modal";
+import UserMenu from "@/components/user-menu";
 
 interface ProfileProps{
   volunteer: Volunteer
@@ -22,7 +23,7 @@ export default function Profile({ volunteer }: ProfileProps) {
   const { user } = useAuthStore()
   const attendances = useAttendanceStore((state) => state.attendances)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  
+
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-4">
@@ -34,14 +35,17 @@ export default function Profile({ volunteer }: ProfileProps) {
       </div>
     )
   }
-  
+
   const attendanceStats = {
     present: volunteer.attendances.filter((a) => a.status === "Present").length,
     absent: volunteer.attendances.filter((a) => a.status === "Absent").length,
     justified: volunteer.attendances.filter((a) => a.status === "Justified").length,
     total: volunteer.attendances.length,
   }
-  
+
+  const missingData =
+    !volunteer.dni?.trim() || !volunteer.address?.trim();
+
   return (
     <AuthGuard requiredRole="VOLUNTEER">
       <div className="p-4 space-y-6">
@@ -49,10 +53,15 @@ export default function Profile({ volunteer }: ProfileProps) {
         {/* Profile Card */}
         <Card className="gradient-card">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-                <User className="h-8 w-8 text-white" />
+            {
+              missingData && <div className="w-full">
+              <span className="text-red-400 animate-pulse text-sm text-end">
+                Completar datos 🛑
+              </span>
               </div>
+            }
+            <div className="flex items-center space-x-4 mb-6">
+              <UserMenu justImage={true} />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Mi Perfil</h1>
                 <Badge
@@ -67,7 +76,7 @@ export default function Profile({ volunteer }: ProfileProps) {
                 Editar
               </Button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
@@ -76,25 +85,39 @@ export default function Profile({ volunteer }: ProfileProps) {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-700">{volunteer.phone}</span>
+                  {
+                    volunteer.phone
+                      ? <span className="text-gray-700">{volunteer.phone}</span>
+                      : <span className="text-gray-400 text-sm">No registrado</span>
+                  }
+
                 </div>
               </div>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <MapPin className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-700">{volunteer.address}</span>
+                  {
+                    volunteer.address
+                      ? <span className="text-gray-700">{volunteer.address}</span>
+                      : <span className="text-gray-400 text-sm">No registrado</span>
+                  }
                 </div>
                 <div className="flex items-center space-x-3">
                   <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="text-gray-700">
-                    {format(parseISO(volunteer.birthday), "dd 'de' MMMM 'de' yyyy", { locale: es })}
+                  {
+                    volunteer?.birthday
+                      ? <span className="text-gray-700">
+                    {format(parseISO(volunteer?.birthday), "dd 'de' MMMM 'de' yyyy", { locale: es })}
                   </span>
+                      : <span className="text-gray-400 text-sm">No registrado</span>
+                  }
+
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Attendance Stats */}
         <Card className="gradient-card">
           <CardHeader>
@@ -113,14 +136,14 @@ export default function Profile({ volunteer }: ProfileProps) {
                 <p className="text-2xl font-bold text-red-600">{attendanceStats.absent}</p>
                 <p className="text-sm text-red-700">Ausente</p>
               </div>
-              <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                <p className="text-2xl font-bold text-yellow-600">{attendanceStats.justified}</p>
-                <p className="text-sm text-yellow-700">Justificado</p>
-              </div>
+              {/*<div className="text-center p-3 bg-yellow-50 rounded-lg">*/}
+              {/*  <p className="text-2xl font-bold text-yellow-600">{attendanceStats.justified}</p>*/}
+              {/*  <p className="text-sm text-yellow-700">Justificado</p>*/}
+              {/*</div>*/}
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Attendance History */}
         <Card className="gradient-card">
           <CardHeader>
@@ -171,7 +194,7 @@ export default function Profile({ volunteer }: ProfileProps) {
             )}
           </CardContent>
         </Card>
-        
+
         <VolunteerModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} volunteer={volunteer} />
       </div>
     </AuthGuard>

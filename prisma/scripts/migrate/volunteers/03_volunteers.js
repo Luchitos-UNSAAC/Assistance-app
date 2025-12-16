@@ -60,7 +60,7 @@ async function main() {
   let countAuxForImage = 1;
 
   for (const row of rows) {
-    const urlForImage = `https://robohash.org/${countAuxForImage}?set=set4}`
+    const urlForImage = `https://robohash.org/${countAuxForImage}?set=set4`
     // console.log(row)
     const rawNames =
       row['﻿NOMBRES'] ??
