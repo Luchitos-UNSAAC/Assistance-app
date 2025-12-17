@@ -7,8 +7,10 @@ export default function AdminLayout({
 }) {
   return (
     <div className="p-6">
-      <HeaderAdmin />
-      {children}
+      <div className="pt-20 pb-20">
+        <HeaderAdmin />
+        {children}
+      </div>
     </div>
   );
 }
