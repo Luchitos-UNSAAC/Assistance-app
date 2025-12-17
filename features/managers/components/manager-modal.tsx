@@ -262,7 +262,8 @@ export default function ManagerModal({ isOpen, onClose, volunteer, volunteers }:
                     <SelectItem value="MIERCOLES">MIERCOLES</SelectItem>
                     <SelectItem value="JUEVES">JUEVES</SelectItem>
                     <SelectItem value="VIERNES">VIERNES</SelectItem>
-                    <SelectItem value="SABADO">SABADO</SelectItem>
+                    <SelectItem value="SABADO_MANIANA">SABADO MANIANA</SelectItem>
+                    <SelectItem value="SABADO_TARDE">SABADO TARDE</SelectItem>
                     <SelectItem value="DOMINGO">DOMINGO</SelectItem>
                   </SelectContent>
                 </Select>

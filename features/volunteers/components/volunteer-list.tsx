@@ -144,7 +144,8 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
                     {/* Header */}
                     <div className="flex justify-between items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <div className="hidden md:block p-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
+                        <div
+                          className="hidden md:block p-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
                           <User className="h-4 w-4 text-white"/>
                         </div>
                         <div className="text-sm">

@@ -28,10 +28,8 @@ export const getVolunteerGroupedToday = async () => {
             deletedAt: null
           }
         },
-        user: {
-          role: {
-            not: 'ADMIN'
-          }
+        createdBy: {
+          not: 'first_migration'
         }
       },
       include: {
