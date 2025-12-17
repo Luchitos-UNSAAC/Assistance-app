@@ -7,6 +7,8 @@ import BottomNavigation from "@/components/bottom-navigation"
 import {ClientRenderSecure} from "@/components/client-render-secure";
 import DeleteConfirmationModal from "@/components/delete-confirm-modal";
 import {Navbar} from "@/components/navbar";
+import {cookies} from "next/headers";
+import {redirect} from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
   description: "Gestión de voluntarios para el cuidado canino en UNSAAC",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode

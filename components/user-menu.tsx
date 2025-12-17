@@ -33,6 +33,7 @@ export default function UserMenu({justImage = false}: UserMenuProps) {
       title: "Sesión cerrada",
       description: "Has cerrado sesión exitosamente",
     })
+    router.push('/auth/login')
   }
 
   const hasPermission = useAuthStore((state) => state.hasPermission)

@@ -93,132 +93,137 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
 
   return (
     <AuthGuard requiredRole="MANAGER">
-      <div className="p-4 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Voluntarios</h1>
-          {canManageVolunteers && (
-            <div className="flex items-center gap-2">
-              {
-                newVolunteers.length > 0 && (
-                  <Button onClick={() => setIsNewModalOpen(true)}>
-                    <AlertCircle className="h-4 w-4 md:mr-2"/>
-                    <span className='hidden md:block'> Nuevos: {newVolunteers.length}</span>
-                  </Button>
-                )
-              }
-              <Button
-                onClick={() => {
-                  setSelectedVolunteer(null)
-                  setIsModalOpen(true)
-                }}
-                className="gradient-button text-white"
-              >
-                <Plus className="h-4 w-4"/>
-              </Button>
-            </div>
-          )}
-        </div>
+      <div className="pt-20 pb-20">
+        <div className="px-4 space-y-1">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold text-gray-900">Voluntarios</h1>
+            {canManageVolunteers && (
+              <div className="flex items-center gap-2">
+                {
+                  newVolunteers.length > 0 && (
+                    <Button
+                      size={'sm'}
+                      onClick={() => setIsNewModalOpen(true)}>
+                      <AlertCircle className="h-2 w-2 md:mr-2"/>
+                      <span className='hidden md:block'> Nuevos: {newVolunteers.length}</span>
+                    </Button>
+                  )
+                }
+                <Button
+                  size={'sm'}
+                  onClick={() => {
+                    setSelectedVolunteer(null)
+                    setIsModalOpen(true)
+                  }}
+                  className="gradient-button text-white"
+                >
+                  <Plus className="h-2 w-2"/>
+                </Button>
+              </div>
+            )}
+          </div>
 
-        {/* Search */}
-        <SearchBar
-          value={searchTerm}
-          onChange={setSearchTerm}
-          placeholder="Buscar por nombre o email..."
-        />
+          {/* Search */}
+          <SearchBar
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Buscar por nombre o email..."
+          />
 
-        {/* Volunteers List */}
-        <div className="space-y-4">
-          {filteredVolunteers.map((volunteer) => {
-            const stats = getAttendanceStats(volunteer.id)
-            return (
-              <Card
-                key={volunteer.id}
-                className="gradient-card hover:shadow-md transition-all duration-200"
-              >
-                <CardContent className="p-3 space-y-2">
-                  {/* Header */}
-                  <div className="flex justify-between items-center gap-2">
-                    <div className="flex items-center gap-2">
-                      <div className="hidden md:block p-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-                        <User className="h-4 w-4 text-white"/>
-                      </div>
-                      <div className="text-sm">
-                        <h3 className="font-semibold text-gray-900 leading-tight">
-                          <span className="block max-w-[150px] truncate">
+          {/* Volunteers List */}
+          <div className="space-y-1">
+            {filteredVolunteers.map((volunteer) => {
+              const stats = getAttendanceStats(volunteer.id)
+              return (
+                <Card
+                  key={volunteer.id}
+                  className="gradient-card hover:shadow-md transition-all duration-200"
+                >
+                  <CardContent className="p-3 space-y-1">
+                    {/* Header */}
+                    <div className="flex justify-between items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="hidden md:block p-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
+                          <User className="h-4 w-4 text-white"/>
+                        </div>
+                        <div className="text-sm">
+                          <h3 className="font-semibold text-gray-900 leading-tight">
+                          <span className="block max-w-[200px] truncate">
                             {volunteer.name}
                           </span>
-                        </h3>
-                        {canManageVolunteers && (
-                          <div className="flex gap-1">
-                            <Button variant="outline" size="icon" className="h-7 w-7"
-                                    onClick={() => handleEdit(volunteer.id)}>
-                              <Pencil className="h-3.5 w-3.5"/>
-                            </Button>
-                            {
-                              user?.role === 'ADMIN' && <Button variant="destructive" size="icon" className="h-7 w-7"
-                                                                onClick={() => handleDelete(volunteer.id)}>
-                                <Trash className="h-3.5 w-3.5"/>
+                          </h3>
+                          {canManageVolunteers && (
+                            <div className="flex gap-1">
+                              <Button variant="outline" size="icon" className="h-7 w-7"
+                                      onClick={() => handleEdit(volunteer.id)}>
+                                <Pencil className="h-3.5 w-3.5"/>
                               </Button>
-                            }
-                            {
-                              missingCompleteData(volunteer)
-                              && <div className='flex items-center justify-center'>
+                              {
+                                user?.role === 'ADMIN' && <Button variant="destructive" size="icon" className="h-7 w-7"
+                                                                  onClick={() => handleDelete(volunteer.id)}>
+                                  <Trash className="h-3.5 w-3.5"/>
+                                </Button>
+                              }
+                              {
+                                missingCompleteData(volunteer)
+                                && <div className='flex items-center justify-center'>
                               <span className='text-red-400 text-xs rounded animate-pulse'>
                                 Completar datos 🛑</span>
-                              </div>
-                            }
+                                </div>
+                              }
 
-                          </div>
-                        )}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Stats about the attendances and not attendances */}
-                    <div className="flex gap-1 flex-col items-end justify-end text-[11px]">
-                      <div className="w-full flex gap-1 flex-col items-end justify-end">
+                      {/* Stats about the attendances and not attendances */}
+                      <div className="flex gap-1 flex-col items-end justify-end text-[11px]">
+                        <div className="w-full flex gap-1 flex-col items-end justify-end">
                         <span
                           className="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 font-medium text-green-700 ring-1 ring-green-600/20">
                           {stats.present} Presente{stats.present !== 1 ? "s" : ""}
                         </span>
-                        <span
-                          className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 font-medium text-red-700 ring-1 ring-red-600/20">
+                          <span
+                            className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 font-medium text-red-700 ring-1 ring-red-600/20">
                           {stats.absent} Inasistencia{stats.absent !== 1 ? "s" : ""}
                         </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-            )
-          })}
-        </div>
-
-        {filteredVolunteers.length === 0 && (
-          <div className="text-center py-12">
-            <User className="h-12 w-12 text-gray-400 mx-auto mb-4"/>
-            <p className="text-gray-500">No se encontraron voluntarios</p>
+              )
+            })}
           </div>
-        )}
 
-        {/* Volunteer Modal */}
-        {canManageVolunteers && (
-          <VolunteerModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            volunteer={selectedVolunteer ? volunteers.find((v) => v.id === selectedVolunteer) : undefined}
+          {filteredVolunteers.length === 0 && (
+            <div className="text-center py-12">
+              <User className="h-12 w-12 text-gray-400 mx-auto mb-4"/>
+              <p className="text-gray-500">No se encontraron voluntarios</p>
+            </div>
+          )}
+
+          {/* Volunteer Modal */}
+          {canManageVolunteers && (
+            <VolunteerModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              volunteer={selectedVolunteer ? volunteers.find((v) => v.id === selectedVolunteer) : undefined}
+            />
+          )}
+
+          <VolunteerNewModal
+            isOpen={isNewModalOpen}
+            onClose={() => {
+              setIsNewModalOpen(false)
+              router.refresh()
+            }}
+            newVolunteers={newVolunteers}
           />
-        )}
-
-        <VolunteerNewModal
-          isOpen={isNewModalOpen}
-          onClose={() => {
-            setIsNewModalOpen(false)
-            router.refresh()
-          }}
-          newVolunteers={newVolunteers}
-        />
+        </div>
       </div>
     </AuthGuard>
   )

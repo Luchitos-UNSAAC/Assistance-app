@@ -63,7 +63,7 @@ export default function Profile({ volunteer }: ProfileProps) {
               <div className="flex items-center space-x-4 mb-6">
                 <UserMenu justImage={true} />
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Mi Perfil</h1>
+                  <h1 className="text-xl font-bold text-gray-900">Mi Perfil</h1>
                   <Badge
                     variant={volunteer.status === "Active" ? "default" : "secondary"}
                     className={volunteer.status === "Active" ? "bg-green-500 hover:bg-green-600" : ""}
@@ -81,13 +81,13 @@ export default function Profile({ volunteer }: ProfileProps) {
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3">
                     <Mail className="h-4 w-4 text-gray-500" />
-                    <span className="text-gray-700">{volunteer.email}</span>
+                    <span className="text-gray-700 text-sm">{volunteer.email}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Phone className="h-4 w-4 text-gray-500" />
                     {
                       volunteer.phone
-                        ? <span className="text-gray-700">{volunteer.phone}</span>
+                        ? <span className="text-gray-700 text-sm">{volunteer.phone}</span>
                         : <span className="text-gray-400 text-sm">No registrado</span>
                     }
 
@@ -98,7 +98,7 @@ export default function Profile({ volunteer }: ProfileProps) {
                     <MapPin className="h-4 w-4 text-gray-500" />
                     {
                       volunteer.address
-                        ? <span className="text-gray-700">{volunteer.address}</span>
+                        ? <span className="text-gray-700 text-sm">{volunteer.address}</span>
                         : <span className="text-gray-400 text-sm">No registrado</span>
                     }
                   </div>
@@ -106,7 +106,7 @@ export default function Profile({ volunteer }: ProfileProps) {
                     <Calendar className="h-4 w-4 text-gray-500" />
                     {
                       volunteer?.birthday
-                        ? <span className="text-gray-700">
+                        ? <span className="text-gray-700 text-sm">
                     {format(parseISO(volunteer?.birthday), "dd 'de' MMMM 'de' yyyy", { locale: es })}
                   </span>
                         : <span className="text-gray-400 text-sm">No registrado</span>
@@ -123,17 +123,17 @@ export default function Profile({ volunteer }: ProfileProps) {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <BarChart3 className="h-5 w-5 text-purple-600" />
-                <span>Mis Estadísticas de Asistencia</span>
+                <span className='text-xl'>Mis Estadísticas de Asistencia</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">{attendanceStats.present}</p>
+                  <p className="text-xl font-bold text-green-600">{attendanceStats.present}</p>
                   <p className="text-sm text-green-700">Presente</p>
                 </div>
                 <div className="text-center p-3 bg-red-50 rounded-lg">
-                  <p className="text-2xl font-bold text-red-600">{attendanceStats.absent}</p>
+                  <p className="text-xl font-bold text-red-600">{attendanceStats.absent}</p>
                   <p className="text-sm text-red-700">Ausente</p>
                 </div>
                 {/*<div className="text-center p-3 bg-yellow-50 rounded-lg">*/}
@@ -147,7 +147,12 @@ export default function Profile({ volunteer }: ProfileProps) {
           {/* Attendance History */}
           <Card className="gradient-card">
             <CardHeader>
-              <CardTitle>Mi Historial de Asistencias</CardTitle>
+              <CardTitle className="flex items-center space-x-2">
+                <BarChart3 className="h-5 w-5 text-purple-600" />
+                <span className="text-xl">
+                  Mi Historial de Asistencias
+                </span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {volunteer.attendances.length > 0 ? (
@@ -190,7 +195,7 @@ export default function Profile({ volunteer }: ProfileProps) {
                     ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">No hay registros de asistencia</p>
+                <p className="text-gray-500 text-center py-8 text-sm">No hay registros de asistencia</p>
               )}
             </CardContent>
           </Card>
