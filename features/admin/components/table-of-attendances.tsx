@@ -5,6 +5,7 @@ import {format} from "date-fns";
 import {VolunteerWithAttendancesByStatus} from "@/features/admin/actions/get-volunteers-with-attendances-for-admin";
 import {ArrowDown, ArrowUp, ArrowUpDown} from "lucide-react";
 import AuthGuard from "@/components/auth-guard";
+import {MultiSelect} from "@/components/ui/multi-select";
 
 const ATTENDANCE_STATUSES = ['PRESENT', 'ABSENT', 'JUSTIFIED', 'LATE'] as const;
 const STATUS_LABELS: Record<string, string> = {
@@ -22,10 +23,42 @@ type SortKey =
 
 type SortDirection = 'asc' | 'desc';
 
+const WEEK_DAYS = [
+  'LUNES',
+  'MARTES',
+  'MIERCOLES',
+  'JUEVES',
+  'VIERNES',
+  'SABADO_MANIANA',
+  'SABADO_TARDE',
+  'DOMINGO',
+] as const;
+
+const WEEK_DAY_LABELS: Record<string, string> = {
+  LUNES: 'Lunes',
+  MARTES: 'Martes',
+  MIERCOLES: 'Miércoles',
+  JUEVES: 'Jueves',
+  VIERNES: 'Viernes',
+  SABADO_MANIANA: 'Sábado Maniana',
+  SABADO_TARDE: 'Sábado Tarde',
+  DOMINGO: 'Domingo',
+};
+
 export default function TableOfAttendances({data}: { data: VolunteerWithAttendancesByStatus[] }) {
   const [sortKey, setSortKey] = React.useState<SortKey>('name');
   const [sortDirection, setSortDirection] = React.useState<SortDirection>('asc');
   const [search, setSearch] = React.useState('');
+  const [selectedDays, setSelectedDays] = React.useState<string[]>([]);
+
+  const scheduleOptions = WEEK_DAYS.map(day => ({
+    value: day,
+    label: WEEK_DAY_LABELS[day],
+    style: {
+      badgeColor: "#000",
+      iconColor: "#000",
+    },
+  }));
 
   const showPhone = useMemo(() => data.some((r) => Boolean(r.phone && r.phone.trim() !== '')), [data]);
   const columnCount = 3 + (showPhone ? 1 : 0) + ATTENDANCE_STATUSES.length + 1;
@@ -50,8 +83,19 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
     );
   }, [data, search]);
 
+  const filteredBySchedule = useMemo(() => {
+    if (selectedDays.length === 0) return filteredData;
+
+    return filteredData.filter(row =>
+      row.groupMembers?.some(member =>
+        member.group?.dayOfWeek &&
+        selectedDays.includes(member.group.dayOfWeek)
+      )
+    );
+  }, [filteredData, selectedDays]);
+
   const sortedData = useMemo(() => {
-    const copy = [...filteredData];
+    const copy = [...filteredBySchedule];
 
     copy.sort((a, b) => {
       let valueA: string | number = '';
@@ -85,7 +129,7 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
     });
 
     return copy;
-  }, [filteredData, sortKey, sortDirection]);
+  }, [filteredBySchedule, filteredData, sortKey, sortDirection]);
 
   const SortIcon = ({ column }: { column: SortKey }) => {
     if (sortKey !== column) {
@@ -106,7 +150,16 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
             placeholder="Buscar por nombre..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full md:w-64 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full md:w-64 px-3 py-2 border border-gray-500 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-transparent bg-transparent"
+          />
+          {/* Filtro por horario */}
+          <MultiSelect
+            className=''
+            options={scheduleOptions}
+            defaultValue={selectedDays}
+            onValueChange={setSelectedDays}
+            placeholder="Filtrar por horario"
+            variant="inverted"
           />
         </div>
         {/* Desktop/table view */}
@@ -168,8 +221,8 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
               </tr>
             ) : (
               sortedData.map((row, index) => (
-                <tr key={row.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm whitespace-nowrap">{index + 1}</td>
+                <tr key={row.id}>
+                  <td className="px-4 py-3 text-sm ">{index + 1}</td>
                   <td className="px-4 py-3 text-sm">{row.name}</td>
                   <td className="px-4 py-3 text-center text-sm">{row.attendances.PRESENT ?? 0}</td>
 
