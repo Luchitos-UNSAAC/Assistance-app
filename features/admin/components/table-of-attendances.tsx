@@ -3,9 +3,10 @@
 import React, {useMemo} from 'react';
 import {format} from "date-fns";
 import {VolunteerWithAttendancesByStatus} from "@/features/admin/actions/get-volunteers-with-attendances-for-admin";
-import {ArrowDown, ArrowUp, ArrowUpDown} from "lucide-react";
+import {ArrowDown, ArrowUp, ArrowUpDown, Edit} from "lucide-react";
 import AuthGuard from "@/components/auth-guard";
 import {MultiSelect} from "@/components/ui/multi-select";
+import {ButtonActions} from "@/features/admin/components/button-actions";
 
 const ATTENDANCE_STATUSES = ['PRESENT', 'ABSENT', 'JUSTIFIED', 'LATE'] as const;
 const STATUS_LABELS: Record<string, string> = {
@@ -210,6 +211,7 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
                 <SortIcon column="birthday" />
               </span>
               </th>
+              <th className="px-4 py-3 text-left text-sm font-medium">Acciones</th>
             </tr>
             </thead>
             <tbody className="bg-white divide-y">
@@ -221,7 +223,7 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
               </tr>
             ) : (
               sortedData.map((row, index) => (
-                <tr key={row.id}>
+                <tr key={row.id} className='hover:bg-gray-300'>
                   <td className="px-4 py-3 text-sm ">{index + 1}</td>
                   <td className="px-4 py-3 text-sm">{row.name}</td>
                   <td className="px-4 py-3 text-center text-sm">{row.attendances.PRESENT ?? 0}</td>
@@ -256,6 +258,11 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
                         ? format(row.birthday, "yyyy-MM-dd")
                         : '-'
                     }
+                  </td>
+
+                  {/*Acciones*/}
+                  <td className="px-4 py-1 text-sm">
+                    <ButtonActions volunteer={row} />
                   </td>
                 </tr>
               ))
