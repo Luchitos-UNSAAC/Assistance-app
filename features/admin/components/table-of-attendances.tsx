@@ -145,6 +145,12 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
   return (
     <AuthGuard requiredRole="ADMIN">
       <div className="mt-6 w-full">
+        <div className="mb-3">
+          <h1 className='text-2xl font-bold'>Voluntarios</h1>
+          <p className="text-gray-800">
+            Gestion de voluntarios y asistencias
+          </p>
+        </div>
         <div className="mb-4 flex items-center gap-3">
           <input
             type="text"

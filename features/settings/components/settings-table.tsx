@@ -1,0 +1,85 @@
+'use client';
+
+import {Setting} from "@prisma/client";
+import {Edit, Plus, Trash2} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+
+interface SettingsTableProps {
+  data: Setting[];
+}
+
+export default function SettingsTable({data}: SettingsTableProps) {
+  const router = useRouter();
+
+  if (data.length === 0) {
+    return (
+      <div className="flex flex-col align-center justify-center text-sm text-gray-500 gap-2">
+        No hay configuraciones registradas.
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Button
+        variant={'outline'}
+        onClick={() => router.push("/admin/settings/new")}
+      >
+        <Plus />
+        Agregar
+      </Button>
+      <div className="overflow-x-auto bg-white shadow rounded-lg w-full">
+        <table className="min-w-full table-auto">
+          <thead className="bg-gray-50">
+          <tr>
+            <th className="px-4 py-3 text-left text-sm font-medium">
+              Key
+            </th>
+            <th className="px-4 py-3 text-left text-sm font-medium">
+              Value
+            </th>
+            <th className="px-4 py-3 text-right text-sm font-medium">
+              Acciones
+            </th>
+          </tr>
+          </thead>
+
+          <tbody className="divide-y">
+          {data.map((setting) => (
+            <tr key={setting.id} className="hover:bg-gray-100">
+              <td className="px-4 py-3 text-sm font-mono">
+                {setting.key}
+              </td>
+
+              <td className="px-4 py-3 text-sm break-all">
+                {setting.value}
+              </td>
+
+              <td className="px-4 py-3 text-right">
+                <div className="inline-flex gap-2">
+                  <button
+                    className="p-2 rounded hover:bg-gray-200"
+                    title="Editar"
+                    onClick={()=> router.push(`/admin/settings/${setting.id}/edit`)}
+                  >
+                    <Edit className="h-4 w-4"/>
+                  </button>
+
+                  <button
+                    className="p-2 rounded hover:bg-red-100 text-red-600"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="h-4 w-4"/>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  );
+}
