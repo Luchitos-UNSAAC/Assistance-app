@@ -6,8 +6,13 @@ import {getVolunteerOfFreeDaySetting} from "@/features/attendances/actions/get-v
 export const revalidate = 10;
 
 export default async function VolunteersPage() {
-  const volunteers = await getAttendancesAndVolunteers();
-  const volunteerMap = volunteers.map(v => v.id);
+  const data = await getAttendancesAndVolunteers();
+  if (!data) {
+    return null;
+  }
+  const {volunteersForSelect, isPossibleToMarkAttendances} = data;
+
+  const volunteerMap = volunteersForSelect.map(v => v.id);
 
   const volunteersFreeDaySetting = await getVolunteerOfFreeDaySetting(volunteerMap);
   const serverTime = getServerTime();
@@ -15,9 +20,10 @@ export default async function VolunteersPage() {
   return (
     <div className="space-y-2">
       <AttendanceList
-        volunteers={volunteers}
+        volunteers={volunteersForSelect}
         serverTime={serverTime}
         volunteersFreeDaySetting={volunteersFreeDaySetting}
+        isPossibleToMarkAttendances={isPossibleToMarkAttendances}
       />
     </div>
   );

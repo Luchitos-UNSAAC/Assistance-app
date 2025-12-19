@@ -1,22 +1,51 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { VolunteerForSelect } from "@/lib/store";
-import { AttendanceStatus, VolunteerStatus } from "@prisma/client";
-import { getGroupOfCurrentVolunteer } from "@/lib/get-group-of-current-volunteer";
-import { getCurrentVolunteer } from "@/lib/get-current-volunteer";
+import {prisma} from "@/lib/prisma";
+import {VolunteerForSelect} from "@/lib/store";
+import {AttendanceStatus, VolunteerStatus, WeekDay} from "@prisma/client";
+import {getGroupOfCurrentVolunteer} from "@/lib/get-group-of-current-volunteer";
+import {getCurrentVolunteer} from "@/lib/get-current-volunteer";
 
-export const getAttendancesAndVolunteers = async () => {
+const DAY_MAP: Record<number, WeekDay> = {
+  0: WeekDay.DOMINGO,
+  1: WeekDay.LUNES,
+  2: WeekDay.MARTES,
+  3: WeekDay.MIERCOLES,
+  4: WeekDay.JUEVES,
+  5: WeekDay.VIERNES,
+  6: WeekDay.SABADO_MANIANA,
+}
+
+interface GetAttendancesResponse {
+  volunteersForSelect: VolunteerForSelect[]
+  isPossibleToMarkAttendances: boolean
+}
+
+export const getAttendancesAndVolunteers = async (): Promise<GetAttendancesResponse | null> => {
   try {
     const currentVolunteer = await getCurrentVolunteer();
     if (!currentVolunteer) {
-      return [];
+      return null
     }
 
     const currentGroup = await getGroupOfCurrentVolunteer(currentVolunteer.id);
     if (!currentGroup) {
-      return [];
+      return null
     }
+
+    let isPossibleToMarkAttendances = false;
+    const day = new Date().getDay()
+    const todayWeekDay = DAY_MAP[day]
+    if (day === 6) {
+      if (currentGroup.dayOfWeek === WeekDay.SABADO_MANIANA || currentGroup.dayOfWeek === WeekDay.SABADO_TARDE) {
+        isPossibleToMarkAttendances = true;
+      }
+    } else {
+      if (todayWeekDay === currentGroup.dayOfWeek) {
+        isPossibleToMarkAttendances = true;
+      }
+    }
+
 
     const today = new Date();
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
@@ -55,7 +84,7 @@ export const getAttendancesAndVolunteers = async () => {
           take: 1,
         },
       },
-      orderBy: { name: "asc" },
+      orderBy: {name: "asc"},
     });
 
     const mapAttendanceStatus = (status: AttendanceStatus) => {
@@ -103,9 +132,12 @@ export const getAttendancesAndVolunteers = async () => {
       })
     );
 
-    return volunteersForSelect;
+    return {
+      isPossibleToMarkAttendances,
+      volunteersForSelect,
+    };
   } catch (error) {
     console.error("[ERROR_GET_ATTENDANCES]", error);
-    return [];
+    return null
   }
 };

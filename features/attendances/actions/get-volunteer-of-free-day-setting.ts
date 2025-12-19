@@ -16,8 +16,6 @@ export const getVolunteerOfFreeDaySetting = async (excludedIds: string[]) => {
       return [];
     }
 
-    console.log("[freeDay]", freeDay.value)
-
     const freeDayBoolean = freeDay.value === 'true';
     if (!freeDayBoolean) {
       return [];

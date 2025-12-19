@@ -23,9 +23,10 @@ interface AttendanceListProps {
   volunteers: VolunteerForSelect[]
   serverTime: string
   volunteersFreeDaySetting: Volunteer[];
+  isPossibleToMarkAttendances: boolean
 }
 
-export default function AttendanceList({volunteers, serverTime, volunteersFreeDaySetting}: AttendanceListProps) {
+export default function AttendanceList({volunteers, serverTime, volunteersFreeDaySetting, isPossibleToMarkAttendances}: AttendanceListProps) {
   const {toast} = useToast()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -106,7 +107,7 @@ export default function AttendanceList({volunteers, serverTime, volunteersFreeDa
             <h1 className="text-xl font-bold text-gray-900">Asistencias de hoy</h1>
 
             <div className="flex items-center gap-2">
-              {!attendancesForTodayIsAlreadyCreated &&
+              {isPossibleToMarkAttendances && !attendancesForTodayIsAlreadyCreated &&
                 <Button
                   onClick={handleCreateAttendances}
                   disabled={isPending}
@@ -115,19 +116,23 @@ export default function AttendanceList({volunteers, serverTime, volunteersFreeDa
                   Abrir
                 </Button>
               }
+              {
+                isPossibleToMarkAttendances && <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => router.refresh()}
+                  aria-label="Refrescar"
+                >
+                  <RotateCcw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`}/>
+                </Button>
+              }
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.refresh()}
-                aria-label="Refrescar"
-              >
-                <RotateCcw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`}/>
-              </Button>
             </div>
           </div>
 
-          <VolunteersFreeDaySetting volunteersFreeDaySetting={volunteersFreeDaySetting}  />
+          <VolunteersFreeDaySetting
+            isPossibleToMarkAttendances={isPossibleToMarkAttendances}
+            volunteersFreeDaySetting={volunteersFreeDaySetting}  />
 
           {/* Lista de voluntarios */}
           <div className="space-y-1">
