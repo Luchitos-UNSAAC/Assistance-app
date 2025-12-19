@@ -5,7 +5,7 @@ import {usePathname} from "next/navigation";
 
 const links = [
   { href: "/admin/assistances", label: "Asistencias" },
-  { href: "/admin/generate-reports", label: "Generar Reportes" },
+  { href: "/admin/reports", label: "Generar Reportes" },
 ]
 
 export const HeaderAdmin = () => {

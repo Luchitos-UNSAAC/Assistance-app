@@ -26,42 +26,48 @@ export default function SettingsTable({data}: SettingsTableProps) {
         variant={'outline'}
         onClick={() => router.push("/admin/settings/new")}
       >
-        <Plus />
+        <Plus/>
         Agregar
       </Button>
       <div className="overflow-x-auto bg-white shadow rounded-lg w-full">
         <table className="min-w-full table-auto">
           <thead className="bg-gray-50">
           <tr>
-            <th className="px-4 py-3 text-left text-sm font-medium">
+            <th className="px-4 py-1 text-left text-sm font-medium">
+              #
+            </th>
+            <th className="px-4 py-1 text-left text-sm font-medium">
               Key
             </th>
-            <th className="px-4 py-3 text-left text-sm font-medium">
+            <th className="px-4 py-1 text-left text-sm font-medium">
               Value
             </th>
-            <th className="px-4 py-3 text-right text-sm font-medium">
+            <th className="px-4 py-1 text-right text-sm font-medium">
               Acciones
             </th>
           </tr>
           </thead>
 
           <tbody className="divide-y">
-          {data.map((setting) => (
+          {data.map((setting, index) => (
             <tr key={setting.id} className="hover:bg-gray-100">
-              <td className="px-4 py-3 text-sm font-mono">
+              <td className="px-4 py-1 text-sm">
+                {index + 1}
+              </td>
+              <td className="px-4 py-1 text-sm font-mono">
                 {setting.key}
               </td>
 
-              <td className="px-4 py-3 text-sm break-all">
+              <td className="px-4 py-1 text-sm break-all">
                 {setting.value}
               </td>
 
-              <td className="px-4 py-3 text-right">
+              <td className="px-4 py-1 text-right">
                 <div className="inline-flex gap-2">
                   <button
                     className="p-2 rounded hover:bg-gray-200"
                     title="Editar"
-                    onClick={()=> router.push(`/admin/settings/${setting.id}/edit`)}
+                    onClick={() => router.push(`/admin/settings/${setting.id}/edit`)}
                   >
                     <Edit className="h-4 w-4"/>
                   </button>

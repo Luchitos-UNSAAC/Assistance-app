@@ -13,17 +13,19 @@ import {es} from "date-fns/locale"
 import {useRouter} from "next/navigation"
 import AttendanceModal from "@/components/attendance-modal"
 import {createAttendancesForToday} from "@/features/attendances/actions/create-attendances-for-today";
-import {editAttendanceById} from "@/features/attendances/actions/edit-attendance-by-id";
-import UserMenu from "@/components/user-menu";
+import {editAttendanceById} from "@/features/attendances/actions/edit-attendance-by-id"
 import {AvatarDog} from "@/components/avatar";
 import {cn} from "@/lib/utils";
+import {Volunteer} from "@prisma/client";
+import {VolunteersFreeDaySetting} from "@/features/attendances/components/volunteers-free-day-settings";
 
 interface AttendanceListProps {
   volunteers: VolunteerForSelect[]
   serverTime: string
+  volunteersFreeDaySetting: Volunteer[];
 }
 
-export default function AttendanceList({volunteers, serverTime}: AttendanceListProps) {
+export default function AttendanceList({volunteers, serverTime, volunteersFreeDaySetting}: AttendanceListProps) {
   const {toast} = useToast()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -36,28 +38,6 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
   const openCreateModalFor = (volunteerId: string) => {
     setModalInitialVolunteerId(volunteerId)
     setModalAttendance(null)
-    setIsModalOpen(true)
-  }
-
-  const openEditModalFor = (vol: VolunteerForSelect, newStatus?: StatusAttendance) => {
-    const a = vol.attendanceToday
-    if (!a) return
-
-    const status = newStatus || a.status
-
-    const attendance: AttendanceWithVolunteer = {
-      id: a.id,
-      date: a.date,
-      status,
-      volunteer: {
-        id: vol.id,
-        name: vol.name,
-        email: vol.email,
-      },
-    }
-
-    setModalAttendance(attendance)
-    setModalInitialVolunteerId(null)
     setIsModalOpen(true)
   }
 
@@ -147,6 +127,7 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
             </div>
           </div>
 
+          <VolunteersFreeDaySetting volunteersFreeDaySetting={volunteersFreeDaySetting}  />
 
           {/* Lista de voluntarios */}
           <div className="space-y-1">

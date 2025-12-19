@@ -296,6 +296,8 @@ model Setting {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+
+  @@map("settings")
 }
 
 enum GroupRole {
