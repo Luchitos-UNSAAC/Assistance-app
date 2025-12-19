@@ -5,32 +5,44 @@ const prisma = new PrismaClient();
 
 const volunteers = [
   {
-    email: "adu@gmail.com",
+    email: "120895@gmail.com",
     day: WeekDay.LUNES,
+  },
+  {
+    email: "rodrigofy123@gmail.com",
+    day: WeekDay.MARTES,
+  },
+  {
+    email: "rodrigofy123@gmail.com",
+    day: WeekDay.SABADO_MANIANA,
+  },
+  {
+    email: "pazrioscanales@gmail.com",
+    day: WeekDay.SABADO_TARDE,
   }
 ]
 
 async function main() {
   try {
-    for (const volunteer of volunteers) {
+    for (const vol of volunteers) {
       const volunteer = await prisma.volunteer.findUnique({
         where: {
-          email: volunteer.email
+          email: vol.email
         },
       })
       if (!volunteer) {
-        console.log("[VOLUNTEER_NOT_FOUND]", volunteer.email);
+        console.log("[VOLUNTEER_NOT_FOUND]", vol.email);
         continue;
       }
 
       const groupByDay = await prisma.group.findFirst({
         where: {
-          dayOfWeek: volunteer.day,
+          dayOfWeek: vol.day,
           deletedAt: null,
         }
       })
       if (!groupByDay) {
-        console.log("[GROUP_DAY_NOT_FOUND]", volunteer.day);
+        console.log("[GROUP_DAY_NOT_FOUND]", vol.day);
         continue;
       }
 
@@ -60,7 +72,7 @@ async function main() {
             role: UserRole.MANAGER
           }
         })
-        console.log("[SUCCESS_VOLUNTEER]", volunteer.email);
+        console.log("[SUCCESS_VOLUNTEER]", vol.email);
         continue;
       }
 
@@ -84,7 +96,7 @@ async function main() {
           role: UserRole.MANAGER
         }
       })
-      console.log("[SUCCESS_VOLUNTEER]", volunteer.email);
+      console.log("[SUCCESS_VOLUNTEER]", vol.email);
     }
   } catch (error) {
     console.error("[ERROR_VOLUNTEER_TO_MANAGERS]:",error);

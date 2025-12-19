@@ -19,6 +19,7 @@ const DAY_MAP: Record<number, WeekDay> = {
 interface GetAttendancesResponse {
   volunteersForSelect: VolunteerForSelect[]
   isPossibleToMarkAttendances: boolean
+  todayWeekDay: WeekDay
 }
 
 export const getAttendancesAndVolunteers = async (): Promise<GetAttendancesResponse | null> => {
@@ -37,15 +38,14 @@ export const getAttendancesAndVolunteers = async (): Promise<GetAttendancesRespo
     const day = new Date().getDay()
     const todayWeekDay = DAY_MAP[day]
     if (day === 6) {
-      if (currentGroup.dayOfWeek === WeekDay.SABADO_MANIANA || currentGroup.dayOfWeek === WeekDay.SABADO_TARDE) {
-        isPossibleToMarkAttendances = true;
-      }
+      isPossibleToMarkAttendances = true;
     } else {
       if (todayWeekDay === currentGroup.dayOfWeek) {
         isPossibleToMarkAttendances = true;
       }
     }
 
+    const dayOfGroup = currentGroup.dayOfWeek;
 
     const today = new Date();
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
@@ -135,6 +135,7 @@ export const getAttendancesAndVolunteers = async (): Promise<GetAttendancesRespo
     return {
       isPossibleToMarkAttendances,
       volunteersForSelect,
+      todayWeekDay: dayOfGroup
     };
   } catch (error) {
     console.error("[ERROR_GET_ATTENDANCES]", error);

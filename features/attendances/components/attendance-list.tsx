@@ -16,7 +16,7 @@ import {createAttendancesForToday} from "@/features/attendances/actions/create-a
 import {editAttendanceById} from "@/features/attendances/actions/edit-attendance-by-id"
 import {AvatarDog} from "@/components/avatar";
 import {cn} from "@/lib/utils";
-import {Volunteer} from "@prisma/client";
+import {Volunteer, WeekDay} from "@prisma/client";
 import {VolunteersFreeDaySetting} from "@/features/attendances/components/volunteers-free-day-settings";
 
 interface AttendanceListProps {
@@ -24,9 +24,16 @@ interface AttendanceListProps {
   serverTime: string
   volunteersFreeDaySetting: Volunteer[];
   isPossibleToMarkAttendances: boolean
+  todayWeekDay: WeekDay
 }
 
-export default function AttendanceList({volunteers, serverTime, volunteersFreeDaySetting, isPossibleToMarkAttendances}: AttendanceListProps) {
+export default function AttendanceList({
+                                         volunteers,
+                                         serverTime,
+                                         volunteersFreeDaySetting,
+                                         isPossibleToMarkAttendances,
+                                         todayWeekDay
+                                       }: AttendanceListProps) {
   const {toast} = useToast()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -97,6 +104,13 @@ export default function AttendanceList({volunteers, serverTime, volunteersFreeDa
   }
 
   const attendancesForTodayIsAlreadyCreated = volunteers.every(v => v.attendanceToday)
+  const todayWeekDayFormatted = () => {
+    if (todayWeekDay === 'SABADO_MANIANA' || todayWeekDay === 'SABADO_TARDE'){
+      return 'SABADO'
+    } else {
+      return todayWeekDay
+    }
+  }
 
   return (
     <AuthGuard requiredRole="MANAGER">
@@ -104,7 +118,17 @@ export default function AttendanceList({volunteers, serverTime, volunteersFreeDa
         <div className="px-3 space-y-1">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900">Asistencias de hoy</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-md font-semibold text-gray-900">
+                {isPossibleToMarkAttendances ? 'Asistencias de hoy' : 'Dia de asistencias:'}
+              </h1>
+
+              {!isPossibleToMarkAttendances && (
+                <span className="rounded-full bg-fuchsia-300 px-3 py-1 text-sm font-medium text-fuchsia-700">
+                  {todayWeekDayFormatted()}
+                </span>
+              )}
+            </div>
 
             <div className="flex items-center gap-2">
               {isPossibleToMarkAttendances && !attendancesForTodayIsAlreadyCreated &&
@@ -132,7 +156,7 @@ export default function AttendanceList({volunteers, serverTime, volunteersFreeDa
 
           <VolunteersFreeDaySetting
             isPossibleToMarkAttendances={isPossibleToMarkAttendances}
-            volunteersFreeDaySetting={volunteersFreeDaySetting}  />
+            volunteersFreeDaySetting={volunteersFreeDaySetting}/>
 
           {/* Lista de voluntarios */}
           <div className="space-y-1">
@@ -169,7 +193,7 @@ export default function AttendanceList({volunteers, serverTime, volunteersFreeDa
                         {/*</div>*/}
                         <AvatarDog
                           avatarUrl={vol?.user?.avatar || undefined}
-                          name={vol.name} />
+                          name={vol.name}/>
                         <div className="text-sm leading-snug">
                           <h3 className={cn('font-semibold text-gray-900 truncate max-w-[240px]',
                             !attendancesForTodayIsAlreadyCreated && 'truncate max-w-[160px]')}>{vol.name}</h3>

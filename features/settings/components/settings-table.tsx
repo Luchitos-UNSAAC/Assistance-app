@@ -4,6 +4,7 @@ import {Setting} from "@prisma/client";
 import {Edit, Plus, Trash2} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
+import {cn} from "@/lib/utils";
 
 interface SettingsTableProps {
   data: Setting[];
@@ -59,7 +60,20 @@ export default function SettingsTable({data}: SettingsTableProps) {
               </td>
 
               <td className="px-4 py-1 text-sm break-all">
-                {setting.value}
+                {setting.type === "BOOLEAN" ? (
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                      setting.value === "true"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    )}
+                  >
+                    {setting.value === "true" ? "Activo" : "Desactivado"}
+                  </span>
+                ) : (
+                  <span>{setting.value}</span>
+                )}
               </td>
 
               <td className="px-4 py-1 text-right">

@@ -46,11 +46,29 @@ const WEEK_DAY_LABELS: Record<string, string> = {
   DOMINGO: 'Domingo',
 };
 
+const USER_ROLES = ['ADMIN', 'MANAGER', 'VOLUNTEER'] as const;
+
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: 'Admin',
+  MANAGER: 'Encargado',
+  VOLUNTEER: 'Voluntario',
+};
+
 export default function TableOfAttendances({data}: { data: VolunteerWithAttendancesByStatus[] }) {
   const [sortKey, setSortKey] = React.useState<SortKey>('name');
   const [sortDirection, setSortDirection] = React.useState<SortDirection>('asc');
   const [search, setSearch] = React.useState('');
   const [selectedDays, setSelectedDays] = React.useState<string[]>([]);
+  const [selectedRoles, setSelectedRoles] = React.useState<string[]>([]);
+
+  const roleOptions = USER_ROLES.map(role => ({
+    value: role,
+    label: ROLE_LABELS[role],
+    style: {
+      badgeColor: "#000",
+      iconColor: "#000",
+    },
+  }));
 
   const scheduleOptions = WEEK_DAYS.map(day => ({
     value: day,
@@ -95,8 +113,16 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
     );
   }, [filteredData, selectedDays]);
 
+  const filteredByRole = useMemo(() => {
+    if (selectedRoles.length === 0) return filteredBySchedule;
+
+    return filteredBySchedule.filter(row =>
+      row.user?.role && selectedRoles.includes(row.user.role)
+    );
+  }, [filteredBySchedule, selectedRoles]);
+
   const sortedData = useMemo(() => {
-    const copy = [...filteredBySchedule];
+    const copy = [...filteredByRole];
 
     copy.sort((a, b) => {
       let valueA: string | number = '';
@@ -130,7 +156,7 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
     });
 
     return copy;
-  }, [filteredBySchedule, filteredData, sortKey, sortDirection]);
+  }, [filteredByRole, filteredData, sortKey, sortDirection]);
 
   const SortIcon = ({ column }: { column: SortKey }) => {
     if (sortKey !== column) {
@@ -161,11 +187,17 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
           />
           {/* Filtro por horario */}
           <MultiSelect
-            className=''
             options={scheduleOptions}
             defaultValue={selectedDays}
             onValueChange={setSelectedDays}
             placeholder="Filtrar por horario"
+            variant="inverted"
+          />
+          <MultiSelect
+            options={roleOptions}
+            defaultValue={selectedRoles}
+            onValueChange={setSelectedRoles}
+            placeholder="Filtrar por rol"
             variant="inverted"
           />
         </div>
@@ -190,7 +222,7 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
                 onClick={() => handleSort('present')}
               >
                <span className="inline-flex items-center">
-                Asistencia
+                Asistencias
                 <SortIcon column="present" />
               </span>
               </th>
@@ -199,14 +231,15 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
                 onClick={() => handleSort('absent')}
               >
                <span className="inline-flex items-center">
-                Deuda
+                Faltas
                 <SortIcon column="absent" />
               </span>
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Tombola</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Objetos</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Convocatoria</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Numero</th>
+              {/*<th className="px-4 py-3 text-left text-sm font-medium">Tombola</th>*/}
+              {/*<th className="px-4 py-3 text-left text-sm font-medium">Objetos</th>*/}
+              {/*<th className="px-4 py-3 text-left text-sm font-medium">Convocatoria</th>*/}
+              {/*<th className="px-4 py-3 text-left text-sm font-medium">Numero</th>*/}
+              <th className="px-4 py-3 text-left text-sm font-medium">Correo</th>
               <th className="px-4 py-3 text-left text-sm font-medium">Horario</th>
               <th
                 className="px-4 py-3 text-left text-sm font-medium cursor-pointer"
@@ -231,23 +264,38 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
               sortedData.map((row, index) => (
                 <tr key={row.id} className='hover:bg-gray-300'>
                   <td className="px-4 py-3 text-sm ">{index + 1}</td>
-                  <td className="px-4 py-3 text-sm">{row.name}</td>
+                  <td className="px-4 py-3 text-sm">
+                    {row.name}
+                    {row?.user?.role === 'MANAGER' && (
+                      <span className="mx-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+                        ENCARGADO
+                      </span>
+                    )}
+                    {row?.user?.role === 'ADMIN' && (
+                      <span className="mx-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-fuchsia-700">
+                        ADMI
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-center text-sm">{row.attendances.PRESENT ?? 0}</td>
 
                   {/*Deuda*/}
                   <td className="px-4 py-3 text-center text-sm">{row.attendances.ABSENT ?? 0}</td>
 
-                  {/*Tombola*/}
-                  <td className="px-4 py-3 text-center text-sm">-</td>
+                  {/*/!*Tombola*!/*/}
+                  {/*<td className="px-4 py-3 text-center text-sm">-</td>*/}
 
-                  {/*Objetos*/}
-                  <td className="px-4 py-3 text-center text-sm">-</td>
+                  {/*/!*Objetos*!/*/}
+                  {/*<td className="px-4 py-3 text-center text-sm">-</td>*/}
 
-                  {/*Convocatoria*/}
-                  <td className="px-4 py-3 text-center text-sm">-</td>
+                  {/*/!*Convocatoria*!/*/}
+                  {/*<td className="px-4 py-3 text-center text-sm">-</td>*/}
 
                   {/*Numero*/}
-                  <td className="px-4 py-3 text-sm">{row?.phone}</td>
+                  {/*<td className="px-4 py-3 text-sm">{row?.phone}</td>*/}
+
+                  {/*Correo*/}
+                  <td className="px-4 py-3 text-sm">{row?.email}</td>
 
                   {/*Horario*/}
                   <td className="px-4 py-3 text-sm">

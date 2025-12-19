@@ -10,7 +10,7 @@ export default async function VolunteersPage() {
   if (!data) {
     return null;
   }
-  const {volunteersForSelect, isPossibleToMarkAttendances} = data;
+  const {volunteersForSelect, isPossibleToMarkAttendances, todayWeekDay} = data;
 
   const volunteerMap = volunteersForSelect.map(v => v.id);
 
@@ -24,6 +24,7 @@ export default async function VolunteersPage() {
         serverTime={serverTime}
         volunteersFreeDaySetting={volunteersFreeDaySetting}
         isPossibleToMarkAttendances={isPossibleToMarkAttendances}
+        todayWeekDay={todayWeekDay}
       />
     </div>
   );
