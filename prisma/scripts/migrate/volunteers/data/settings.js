@@ -4,8 +4,8 @@ export const settings = [
     "key": "DIA_LIBRE",
     "value": "false",
     "type": "BOOLEAN",
-    "createdAt": "2025-12-18 20:17:08.461",
-    "updatedAt": "2025-12-18 20:17:08.461",
+    "createdAt": new Date(),
+    "updatedAt": new Date(),
     "deletedAt": null
   },
   {
@@ -13,8 +13,8 @@ export const settings = [
     "key": "MAXIMAS_FALTAS",
     "value": "10",
     "type": "NUMBER",
-    "createdAt": "2025-12-18 20:23:12.397",
-    "updatedAt": "2025-12-18 20:23:12.397",
+    "createdAt": new Date(),
+    "updatedAt": new Date(),
     "deletedAt": null
   },
   {
@@ -22,8 +22,17 @@ export const settings = [
     "key": "MAXIMAS_TARDANZAS",
     "value": "10",
     "type": "NUMBER",
-    "createdAt": "2025-12-18 20:26:43.897",
-    "updatedAt": "2025-12-18 20:26:43.897",
+    "createdAt": new Date(),
+    "updatedAt": new Date(),
+    "deletedAt": null
+  },
+  {
+    "id": "cmjbw5fsp0002rnlewixiktta",
+    "key": "KILO_ARROCILLO",
+    "value": "1.5",
+    "type": "NUMBER",
+    "createdAt": new Date(),
+    "updatedAt": new Date(),
     "deletedAt": null
   }
 ]

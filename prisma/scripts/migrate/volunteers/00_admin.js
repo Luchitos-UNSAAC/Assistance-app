@@ -2,7 +2,7 @@ import {PrismaClient} from "@prisma/client";
 import {volunteers} from "./data/volunteers.js";
 import {groups} from "./data/groups.js";
 import {members} from "./data/members.js";
-import {settings} from "./data/settings"
+import {settings} from "./data/settings.js"
 
 const prisma = new PrismaClient();
 
