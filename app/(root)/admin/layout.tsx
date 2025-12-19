@@ -1,10 +1,16 @@
 import {AdminSidebar} from "@/features/admin/components/layout-admin";
+import {getCurrentAdminUser} from "@/lib/get-current-admin-user";
+import {redirect} from "next/navigation";
 
-export default function AdminLayout({
+export default async function AdminLayout({
                                       children,
                                     }: {
   children: React.ReactNode;
 }) {
+  const userAdmin = await getCurrentAdminUser();
+  if (!userAdmin) {
+    redirect('/')
+  }
   return (
     <div className="flex max-h-screen">
       {/* Sidebar */}

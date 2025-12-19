@@ -13,6 +13,9 @@ export const getSettings = async ()=> {
     const settings = await prisma.setting.findMany({
       where: {
         deletedAt: null,
+      },
+      orderBy: {
+        createdAt: 'asc',
       }
     })
     if (settings.length === 0) {
