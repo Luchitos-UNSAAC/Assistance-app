@@ -13,17 +13,27 @@ import {es} from "date-fns/locale"
 import {useRouter} from "next/navigation"
 import AttendanceModal from "@/components/attendance-modal"
 import {createAttendancesForToday} from "@/features/attendances/actions/create-attendances-for-today";
-import {editAttendanceById} from "@/features/attendances/actions/edit-attendance-by-id";
-import UserMenu from "@/components/user-menu";
+import {editAttendanceById} from "@/features/attendances/actions/edit-attendance-by-id"
 import {AvatarDog} from "@/components/avatar";
 import {cn} from "@/lib/utils";
+import {Volunteer, WeekDay} from "@prisma/client";
+import {VolunteersFreeDaySetting} from "@/features/attendances/components/volunteers-free-day-settings";
 
 interface AttendanceListProps {
   volunteers: VolunteerForSelect[]
   serverTime: string
+  volunteersFreeDaySetting: Volunteer[];
+  isPossibleToMarkAttendances: boolean
+  todayWeekDay: WeekDay
 }
 
-export default function AttendanceList({volunteers, serverTime}: AttendanceListProps) {
+export default function AttendanceList({
+                                         volunteers,
+                                         serverTime,
+                                         volunteersFreeDaySetting,
+                                         isPossibleToMarkAttendances,
+                                         todayWeekDay
+                                       }: AttendanceListProps) {
   const {toast} = useToast()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -36,28 +46,6 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
   const openCreateModalFor = (volunteerId: string) => {
     setModalInitialVolunteerId(volunteerId)
     setModalAttendance(null)
-    setIsModalOpen(true)
-  }
-
-  const openEditModalFor = (vol: VolunteerForSelect, newStatus?: StatusAttendance) => {
-    const a = vol.attendanceToday
-    if (!a) return
-
-    const status = newStatus || a.status
-
-    const attendance: AttendanceWithVolunteer = {
-      id: a.id,
-      date: a.date,
-      status,
-      volunteer: {
-        id: vol.id,
-        name: vol.name,
-        email: vol.email,
-      },
-    }
-
-    setModalAttendance(attendance)
-    setModalInitialVolunteerId(null)
     setIsModalOpen(true)
   }
 
@@ -116,6 +104,13 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
   }
 
   const attendancesForTodayIsAlreadyCreated = volunteers.every(v => v.attendanceToday)
+  const todayWeekDayFormatted = () => {
+    if (todayWeekDay === 'SABADO_MANIANA' || todayWeekDay === 'SABADO_TARDE'){
+      return 'SABADO'
+    } else {
+      return todayWeekDay
+    }
+  }
 
   return (
     <AuthGuard requiredRole="MANAGER">
@@ -123,10 +118,20 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
         <div className="px-3 space-y-1">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900">Asistencias de hoy</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-md font-semibold text-gray-900">
+                {isPossibleToMarkAttendances ? 'Asistencias de hoy' : 'Dia de asistencias:'}
+              </h1>
+
+              {!isPossibleToMarkAttendances && (
+                <span className="rounded-full bg-fuchsia-300 px-3 py-1 text-sm font-medium text-fuchsia-700">
+                  {todayWeekDayFormatted()}
+                </span>
+              )}
+            </div>
 
             <div className="flex items-center gap-2">
-              {!attendancesForTodayIsAlreadyCreated &&
+              {isPossibleToMarkAttendances && !attendancesForTodayIsAlreadyCreated &&
                 <Button
                   onClick={handleCreateAttendances}
                   disabled={isPending}
@@ -135,18 +140,23 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
                   Abrir
                 </Button>
               }
+              {
+                isPossibleToMarkAttendances && <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => router.refresh()}
+                  aria-label="Refrescar"
+                >
+                  <RotateCcw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`}/>
+                </Button>
+              }
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.refresh()}
-                aria-label="Refrescar"
-              >
-                <RotateCcw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`}/>
-              </Button>
             </div>
           </div>
 
+          <VolunteersFreeDaySetting
+            isPossibleToMarkAttendances={isPossibleToMarkAttendances}
+            volunteersFreeDaySetting={volunteersFreeDaySetting}/>
 
           {/* Lista de voluntarios */}
           <div className="space-y-1">
@@ -183,7 +193,7 @@ export default function AttendanceList({volunteers, serverTime}: AttendanceListP
                         {/*</div>*/}
                         <AvatarDog
                           avatarUrl={vol?.user?.avatar || undefined}
-                          name={vol.name} />
+                          name={vol.name}/>
                         <div className="text-sm leading-snug">
                           <h3 className={cn('font-semibold text-gray-900 truncate max-w-[240px]',
                             !attendancesForTodayIsAlreadyCreated && 'truncate max-w-[160px]')}>{vol.name}</h3>

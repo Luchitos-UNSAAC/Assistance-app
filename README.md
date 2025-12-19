@@ -169,7 +169,7 @@ Git
 
 6. **Create db from docker:**
    ```bash
-   cd ./dev-tools/docker-compose && docker compose up -d
+   cd ./dev-tools/assistance-infra && docker compose up -d
    ```
 7. **Create a `.env` file:**
    - Copy the `.env.example` to `.env`

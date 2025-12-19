@@ -25,6 +25,7 @@ export interface VolunteerForSelect {
   user?: {
     avatar?: string
   }
+  day?: StatusAttendance
 }
 
 export interface Attendance {

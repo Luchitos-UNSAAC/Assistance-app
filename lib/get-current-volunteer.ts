@@ -5,14 +5,17 @@ import { UserRole } from "@prisma/client";
 export const getCurrentVolunteer = async (role?: UserRole) => {
   const cookieStore = cookies();
   const userEmail = cookieStore.get("userEmail")?.value; // Or token decoding if you use JWT
-  
+  if (!userEmail) {
+    return null;
+  }
+
   const whereClause: any = {
     email: userEmail,
   }
   if (role) {
     whereClause.role = role;
   }
-  
+
   const userFromDb = await prisma.user.findUnique({
     where: {
       ...whereClause
@@ -24,11 +27,11 @@ export const getCurrentVolunteer = async (role?: UserRole) => {
   if (!userFromDb) {
     return null;
   }
-  
+
   if (!userFromDb.volunteer) {
     return null;
   }
-  
+
   return {
     id: userFromDb.volunteer.id,
     name: userFromDb.volunteer.name,

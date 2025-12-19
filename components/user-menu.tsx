@@ -44,7 +44,7 @@ export default function UserMenu({justImage = false}: UserMenuProps) {
   }
 
   const handleSettingsClick = () => {
-    router.push("/admin/assistances")
+    router.push("/admin/volunteers")
   }
 
   const getRoleIcon = () => {

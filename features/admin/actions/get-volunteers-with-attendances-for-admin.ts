@@ -1,7 +1,7 @@
 "use server"
 
 import {prisma} from "@/lib/prisma";
-import {Group, GroupMember, Volunteer} from "@prisma/client";
+import {Group, GroupMember, Volunteer, User} from "@prisma/client";
 
 export type VolunteerWithAttendancesByStatus = Volunteer & {
   groupMembers: (GroupMember & {
@@ -11,7 +11,8 @@ export type VolunteerWithAttendancesByStatus = Volunteer & {
     PRESENT: number;
     ABSENT: number;
     LATE: number;
-  }
+  },
+  user: User | null
 }
 
 export const getVolunteersWithAttendancesForAdmin = async () => {
@@ -30,6 +31,7 @@ export const getVolunteersWithAttendancesForAdmin = async () => {
             group: true
           }
         },
+        user: true,
       },
       // take: 20,
       orderBy: {
@@ -53,6 +55,7 @@ export const getVolunteersWithAttendancesForAdmin = async () => {
           ABSENT: stats.find(s => s.status === "ABSENT")?._count._all ?? 0,
           LATE: stats.find(s => s.status === "LATE")?._count._all ?? 0,
         },
+        user: v.user,
       }
     })
     return volunteersWithAttendance

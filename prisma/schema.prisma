@@ -76,6 +76,7 @@ model Attendance {
   id        String           @id @default(cuid())
   date      DateTime
   status    AttendanceStatus @default(PRESENT)
+  source    String?
   notes     String?
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
@@ -285,6 +286,26 @@ model GroupMember {
 
   @@unique([groupId, volunteerId])
   @@map("group_members")
+}
+
+model Setting {
+  id    String      @id @default(cuid())
+  key   String
+  value String
+  type  SettingType @default(JSON)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("settings")
+}
+
+enum SettingType {
+  BOOLEAN
+  NUMBER
+  TEXT
+  JSON
 }
 
 enum GroupRole {
