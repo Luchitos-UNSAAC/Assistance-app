@@ -177,7 +177,7 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
             Gestion de voluntarios y asistencias
           </p>
         </div>
-        <div className="mb-4 flex items-center gap-3">
+        <div className="mb-4 flex items-center gap-3 flex-col md:flex-row">
           <input
             type="text"
             placeholder="Buscar por nombre..."

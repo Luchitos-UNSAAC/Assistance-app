@@ -2,15 +2,26 @@ import {GroupRole, PrismaClient, UserRole, WeekDay} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-
 const volunteers = [
   {
     email: "120895@gmail.com",
     day: WeekDay.LUNES,
   },
   {
-    email: "rodrigofy123@gmail.com",
+    email: "chaskavicoria@gmail.com",
     day: WeekDay.MARTES,
+  },
+  {
+    email: "215389@unsaac.edu.pe",
+    day: WeekDay.MIERCOLES,
+  },
+  {
+    email: "211858@unsaac.edu.pe",
+    day: WeekDay.JUEVES,
+  },
+  {
+    email: "cahuanamaal@gmail.com",
+    day: WeekDay.VIERNES,
   },
   {
     email: "rodrigofy123@gmail.com",
@@ -19,7 +30,12 @@ const volunteers = [
   {
     email: "pazrioscanales@gmail.com",
     day: WeekDay.SABADO_TARDE,
+  },
+  {
+    email: "hurtadoammyzahili20@gmail.com",
+    day: WeekDay.DOMINGO,
   }
+  //
 ]
 
 async function main() {

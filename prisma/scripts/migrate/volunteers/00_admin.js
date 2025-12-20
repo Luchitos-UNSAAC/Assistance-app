@@ -53,6 +53,9 @@ async function main() {
   console.log("All done! 🌱");
 }
 
+// Karen
+// 77576801
+
 main()
   .catch((e) => {
     console.error("❌ Error during seed:", e);
