@@ -8,6 +8,8 @@ import {Badge} from "@/components/ui/badge"
 import {Input} from "@/components/ui/input"
 import {Button} from "@/components/ui/button"
 import {Label} from "@/components/ui/label";
+import {ArrowLeft} from "lucide-react";
+import {useRouter} from "next/navigation";
 
 const STATUS_LABELS: Record<AttendanceStatus, string> = {
   PRESENT: "Presente",
@@ -31,6 +33,7 @@ type AttendanceScoreKey = keyof VolunteerWithAttendancesAndScore["scoreAttendanc
 
 export default function VolunteerAttendancesForAdmin({data}: Props) {
   const {volunteer, scoreAttendances} = data
+  const router = useRouter()
 
   const [statusFilter, setStatusFilter] =
     useState<AttendanceStatus | "ALL">("ALL")
@@ -48,6 +51,10 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
 
   return (
     <div className="space-y-2 w-full mt-3">
+      <div className="flex gap-2" onClick={()=>router.push('/admin/volunteers')}>
+        <ArrowLeft />
+        Regresar
+      </div>
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold">{volunteer.name}</h1>
@@ -68,8 +75,8 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 items-end">
-        <div className='flex flex-col gap-1'>
+      <div className="flex gap-3 items-end md:flex-row flex-col w-full">
+        <div className='flex flex-col gap-1 w-full'>
           <Label>
             Estado
           </Label>
@@ -87,7 +94,7 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
           </select>
         </div>
 
-        <div>
+        <div className='w-full'>
           <Label>
             Inicio
           </Label>
@@ -98,7 +105,7 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
           />
         </div>
 
-        <div>
+        <div className='w-full'>
           <Label>
             Fin
           </Label>
@@ -110,6 +117,7 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
         </div>
 
         <Button
+          className='w-full'
           variant="outline"
           onClick={() => {
             setStatusFilter("ALL")
