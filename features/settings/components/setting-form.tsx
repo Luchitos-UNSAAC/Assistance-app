@@ -6,7 +6,6 @@ import {Button} from "@/components/ui/button";
 import {updateSetting} from "@/features/settings/actions/update-setting-by-id";
 import {createNewSetting} from "@/features/settings/actions/create-new-setting";
 import {SettingType} from "@prisma/client"
-import {Switch} from "@/components/ui/switch";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {cn} from "@/lib/utils";
 
@@ -119,52 +118,45 @@ export default function SettingForm({setting}: Props) {
       </Select>
 
       {/* VALUE */}
-      {
-        type !== SettingType.BOOLEAN
-          ? <div>
-            <label className="block text-sm font-medium mb-1">
-              Value
-            </label>
-            <textarea
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              rows={4}
-              className="w-full px-3 py-2 border rounded-md text-sm
-                     focus:outline-none focus:ring-2 focus:ring-black"
-            />
+      {type === SettingType.BOOLEAN && (
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Value
+          </label>
+
+          <div className="flex rounded-lg border overflow-hidden w-fit">
+            <button
+              type="button"
+              onClick={() => setValue("true")}
+              className={cn(
+                "px-4 py-2 text-sm font-medium transition",
+                value === "true"
+                  ? "bg-green-600 text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-100"
+              )}
+            >
+              Activo
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setValue("false")}
+              className={cn(
+                "px-4 py-2 text-sm font-medium transition",
+                value === "false"
+                  ? "bg-red-600 text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-100"
+              )}
+            >
+              Desactivado
+            </button>
           </div>
-          : <div>
-            <label className="block text-sm font-medium mb-1">
-              Value
-            </label>
-            <div className="flex gap-2 items-center">
-              <Switch
-                className="
-              data-[state=checked]:bg-black
-              data-[state=unchecked]:bg-gray-100
-              transition-colors
-              focus-visible:ring-2
-              focus-visible:ring-red-700
-              border-gray-950
-            "
-                checked={value === 'true'}
-                onCheckedChange={(checked) =>
-                  setValue(checked ? 'true' : 'false')
-                }
-              />
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                  value === "true"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                )}
-              >
-            {value === "true" ? "Activo" : "Desactivado"}
-            </span>
-            </div>
-          </div>
-      }
+
+          <p className="text-xs text-gray-500 mt-2">
+            Define si la configuración estará habilitada o no
+          </p>
+        </div>
+      )}
 
       {/* ERROR */}
       {error && (
