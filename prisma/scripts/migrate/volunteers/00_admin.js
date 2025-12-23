@@ -34,13 +34,13 @@ async function main() {
   }
 
   // Add members
-  for (const member of members) {
-    await prisma.groupMember.upsert({
-      where: {id: member.id},
-      update: {},
-      create: member,
-    });
-  }
+  // for (const member of members) {
+  //   await prisma.groupMember.upsert({
+  //     where: {id: member.id},
+  //     update: {},
+  //     create: member,
+  //   });
+  // }
 
   for (const setting of settings) {
     await prisma.setting.upsert({

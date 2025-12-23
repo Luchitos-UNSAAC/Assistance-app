@@ -1,7 +1,7 @@
 export let groups = [
     {
         id: "cmfahdfo300022w5x5i5bjzid",
-        name: "Grupo LUNES",
+        name: "1. LUNES",
         description: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -13,7 +13,7 @@ export let groups = [
     },
     {
         id: "cmfk5777s00022w42hjmyrkt1",
-        name: "Grupo MARTES",
+        name: "2. MARTES",
         description: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -25,7 +25,7 @@ export let groups = [
     },
     {
         id: "cmfahdfo300042w5x7zk5inw8",
-        name: "Grupo MIERCOLES",
+        name: "3. MIERCOLES",
         description: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -37,7 +37,7 @@ export let groups = [
     },
     {
         id: "cmfahdsjr00062w5xus4xahd9",
-        name: "Grupo JUEVES",
+        name: "4. JUEVES",
         description: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -49,7 +49,7 @@ export let groups = [
     },
     {
         id: "cmfaiweqh000a2wdw90ifrgz4",
-        name: "Grupo VIERNES",
+        name: "5. VIERNES",
         description: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -61,7 +61,7 @@ export let groups = [
     },
     {
         id: "cmfakwy4j000t2wdwqaz486wu",
-        name: "Grupo SABADO MAÑANA",
+        name: "6. SABADO MAÑANA",
         description: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -73,7 +73,7 @@ export let groups = [
     },
     {
         id: "cmfakwy4j000t2wdwqaz486wa",
-        name: "Grupo SABADO TARDE",
+        name: "7. SABADO TARDE",
         description: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -85,7 +85,7 @@ export let groups = [
     },
     {
         id: "cmfk5777s00042w42rv6wcpc6",
-        name: "Grupo DOMINGO",
+        name: "8. DOMINGO",
         description: null,
         createdAt: new Date(),
         updatedAt: new Date(),
