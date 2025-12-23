@@ -18,7 +18,7 @@ export let volunteers = [
     user: {
       id: "cme09w21z000007if6wg7fxfk",
       email: "admin@unsaac.edu.pe",
-      password: "987654",
+      password: "987789@!",
       name: "Administrador Edu",
       role: UserRole.ADMIN,
       createdAt: new Date(),
@@ -31,67 +31,67 @@ export let volunteers = [
       dni: "00000000",
       avatar: null
     }
-  },
-  {
-    id: "cme0volun0000307if8zy60hp3",
-    name: "Carlos Mendoza",
-    email: "manager2@unsaac.edu.pe",
-    phone: "+5193737373737",
-    address: "Cusco, Peru",
-    birthday: undefined,
-    status: VolunteerStatus.ACTIVE,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    createdBy: "first_migration",
-    updatedBy: null,
-    deletedBy: null,
-    deletedAt: null,
-    user: {
-      id: "cme0user0000307if8zy60hp4",
-      email: "manager2@unsaac.edu.pe",
-      password: "123123", // ⚠️ Hash in production
-      name: "Carlos Mendoza",
-      role: UserRole.MANAGER,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      volunteerId: "cme0volun0000307if8zy60hp3",
-      createdBy: "first_migration",
-      updatedBy: null,
-      deletedBy: null,
-      dni: "22222222",
-      avatar: null,
-      deletedAt: null
-    }
-  },
-  {
-    id: "cme0volun0000307if8zy60hp1",
-    name: "María López",
-    email: "voluntario5@unsaac.edu.pe",
-    phone: "+5192828282828",
-    address: "Cusco, Peru",
-    birthday: undefined,
-    status: VolunteerStatus.ACTIVE,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    createdBy: "first_migration",
-    updatedBy: null,
-    deletedBy: null,
-    deletedAt: null,
-    user: {
-      id: "cme0user0000307if8zy60hp2",
-      email: "voluntario5@unsaac.edu.pe",
-      password: "123123", // ⚠️ Hash in production
-      name: "María López",
-      role: UserRole.VOLUNTEER,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      volunteerId: "cme0volun0000307if8zy60hp1",
-      createdBy: "first_migration",
-      updatedBy: null,
-      deletedBy: null,
-      dni: "11111111",
-      avatar: null,
-      deletedAt: null
-    }
-  },
+  }
+  // {
+  //   id: "cme0volun0000307if8zy60hp3",
+  //   name: "Carlos Mendoza",
+  //   email: "manager2@unsaac.edu.pe",
+  //   phone: "+5193737373737",
+  //   address: "Cusco, Peru",
+  //   birthday: undefined,
+  //   status: VolunteerStatus.ACTIVE,
+  //   createdAt: new Date(),
+  //   updatedAt: new Date(),
+  //   createdBy: "first_migration",
+  //   updatedBy: null,
+  //   deletedBy: null,
+  //   deletedAt: null,
+  //   user: {
+  //     id: "cme0user0000307if8zy60hp4",
+  //     email: "manager2@unsaac.edu.pe",
+  //     password: "123123", // ⚠️ Hash in production
+  //     name: "Carlos Mendoza",
+  //     role: UserRole.MANAGER,
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //     volunteerId: "cme0volun0000307if8zy60hp3",
+  //     createdBy: "first_migration",
+  //     updatedBy: null,
+  //     deletedBy: null,
+  //     dni: "22222222",
+  //     avatar: null,
+  //     deletedAt: null
+  //   }
+  // },
+  // {
+  //   id: "cme0volun0000307if8zy60hp1",
+  //   name: "María López",
+  //   email: "voluntario5@unsaac.edu.pe",
+  //   phone: "+5192828282828",
+  //   address: "Cusco, Peru",
+  //   birthday: undefined,
+  //   status: VolunteerStatus.ACTIVE,
+  //   createdAt: new Date(),
+  //   updatedAt: new Date(),
+  //   createdBy: "first_migration",
+  //   updatedBy: null,
+  //   deletedBy: null,
+  //   deletedAt: null,
+  //   user: {
+  //     id: "cme0user0000307if8zy60hp2",
+  //     email: "voluntario5@unsaac.edu.pe",
+  //     password: "123123", // ⚠️ Hash in production
+  //     name: "María López",
+  //     role: UserRole.VOLUNTEER,
+  //     createdAt: new Date(),
+  //     updatedAt: new Date(),
+  //     volunteerId: "cme0volun0000307if8zy60hp1",
+  //     createdBy: "first_migration",
+  //     updatedBy: null,
+  //     deletedBy: null,
+  //     dni: "11111111",
+  //     avatar: null,
+  //     deletedAt: null
+  //   }
+  // }
 ];
