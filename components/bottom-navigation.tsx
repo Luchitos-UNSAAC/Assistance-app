@@ -11,7 +11,7 @@ const navigation = [
   { name: "Mi Perfil", href: "/profile", icon: Users, requiredRole: "VOLUNTEER" as const, volunteerOnly: true },
   { name: "Asistencias", href: "/attendance", icon: Calendar, requiredRole: "MANAGER" as const },
   { name: "Voluntarios", href: "/volunteers", icon: Users, requiredRole: "MANAGER" as const },
-  { name: "Encargados", href: "/managers", icon: Users2Icon, requiredRole: "ADMIN" as const },
+  // { name: "Encargados", href: "/managers", icon: Users2Icon, requiredRole: "ADMIN" as const },
 ]
 
 export default function BottomNavigation() {

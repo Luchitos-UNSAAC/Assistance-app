@@ -11,6 +11,7 @@ import {
 } from "@/features/admin/actions/save-initial-attendance"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
+import {useRouter} from "next/navigation";
 
 export const InitialAttendanceModal = () => {
   const { isOpen, volunteer, close } = useInitialAttendanceModal()
@@ -23,6 +24,8 @@ export const InitialAttendanceModal = () => {
   const [pending, startTransition] = useTransition()
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+
+  const router = useRouter();
 
   if (!isOpen || !volunteer) return null
 
@@ -62,6 +65,7 @@ export const InitialAttendanceModal = () => {
         })
 
         close()
+        router.refresh()
       } finally {
         setIsLoading(false)
       }

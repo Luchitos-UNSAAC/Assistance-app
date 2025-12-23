@@ -9,13 +9,6 @@ import {MultiSelect} from "@/components/ui/multi-select";
 import {ButtonActions} from "@/features/admin/components/button-actions";
 
 const ATTENDANCE_STATUSES = ['PRESENT', 'ABSENT', 'JUSTIFIED', 'LATE'] as const;
-const STATUS_LABELS: Record<string, string> = {
-  PRESENT: 'Presente',
-  ABSENT: 'Ausente',
-  JUSTIFIED: 'Justificado',
-  LATE: 'Tarde',
-};
-
 type SortKey =
   | 'name'
   | 'present'
@@ -269,11 +262,19 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
                     {row?.user?.role === 'MANAGER' && (
                       <span className="mx-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
                         ENCARGADO
+                        {
+                        row?.groupMembers?.some(member => member.role === 'LEADER')
+                          && ` - ${row?.groupMembers?.find(member => member.role === 'LEADER')?.group.dayOfWeek}`
+                      }
                       </span>
                     )}
                     {row?.user?.role === 'ADMIN' && (
                       <span className="mx-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-fuchsia-700">
                         ADMI
+                        {
+                          row?.groupMembers?.some(member => member.role === 'LEADER')
+                          && ` - ${row?.groupMembers?.find(member => member.role === 'LEADER')?.group.dayOfWeek}`
+                        }
                       </span>
                     )}
                   </td>
@@ -326,44 +327,104 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
         </div>
 
         {/* Mobile/card view */}
-        {
-          isMobile && (
-            <div className="md:hidden flex flex-col gap-3">
-              {sortedData.length === 0 ? (
-                <div className="bg-white shadow rounded-lg p-4 text-center text-sm text-gray-500">No hay datos para el rango
-                  seleccionado.</div>
-              ) : (
-                sortedData.map((row, index) => (
-                  <article key={row.id} className="bg-white shadow rounded-lg p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <div className="text-sm font-medium">{row.name}</div>
-                          <div className="text-xs text-gray-500">#{index + 1}</div>
-                        </div>
-                        <div className="text-sm text-gray-600 break-words">{row.email}</div>
-                        {showPhone && <div className="text-sm text-gray-600">{row.phone}</div>}
+        {isMobile && (
+          <div className="md:hidden flex flex-col gap-3">
+            {sortedData.length === 0 ? (
+              <div className="bg-white shadow rounded-lg p-4 text-center text-sm text-gray-500">
+                No hay datos para el rango seleccionado.
+              </div>
+            ) : (
+              sortedData.map((row, index) => (
+                <article
+                  key={row.id}
+                  className="bg-white shadow rounded-xl p-4 space-y-3"
+                >
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-semibold">
+                  {row.name}
+                </span>
+
+                        {row.user?.role && (
+                          <span className="text-xs rounded-full bg-blue-100 px-2 py-0.5 font-medium text-blue-700">
+                    {ROLE_LABELS[row.user.role]}
+                  </span>
+                        )}
+
+                        <span className="text-xs text-gray-400">
+                  #{index + 1}
+                </span>
                       </div>
-                      <div className="text-right">
-                        <div className="text-xs text-gray-500">Total</div>
-                        <div className="text-lg font-semibold">Total</div>
+
+                      <div className="text-xs text-gray-600 break-words">
+                        {row.email}
+                      </div>
+
+                      {row.birthday && (
+                        <div className="text-xs text-gray-500">
+                          🎂 {format(row.birthday, "yyyy-MM-dd")}
+                        </div>
+                      )}
+                    </div>
+
+                    <ButtonActions volunteer={row} />
+                  </div>
+
+                  {/* Schedule / Days */}
+                  <div className="flex flex-wrap gap-1">
+                    {row.groupMembers.length === 0 ? (
+                      <span className="text-xs text-gray-400">
+                Sin días asignados
+              </span>
+                    ) : (
+                      row.groupMembers.map((member) => (
+                        <span
+                          key={member.groupId}
+                          className="text-xs rounded-full bg-green-100 px-2 py-0.5 text-green-700"
+                        >
+                  {WEEK_DAY_LABELS[member.group.dayOfWeek]}
+                </span>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Attendance stats */}
+                  <div className="grid grid-cols-4 gap-2 pt-2">
+                    <div className="bg-green-50 rounded-md p-2 text-center">
+                      <div className="text-xs text-gray-500">Presente</div>
+                      <div className="text-sm font-semibold text-green-700">
+                        {row.attendances.PRESENT ?? 0}
                       </div>
                     </div>
 
-                    <div className="mt-3 grid grid-cols-4 gap-2">
-                      {ATTENDANCE_STATUSES.map((s) => (
-                        <div key={s} className="bg-gray-50 rounded-md p-2 text-center">
-                          <div className="text-xs text-gray-500">{STATUS_LABELS[s]}</div>
-                          <div className="text-sm font-medium">{0}</div>
-                        </div>
-                      ))}
+                    <div className="bg-red-50 rounded-md p-2 text-center">
+                      <div className="text-xs text-gray-500">Ausente</div>
+                      <div className="text-sm font-semibold text-red-700">
+                        {row.attendances.ABSENT ?? 0}
+                      </div>
                     </div>
-                  </article>
-                ))
-              )}
-            </div>
-          )
-        }
+
+                    {/*<div className="bg-yellow-50 rounded-md p-2 text-center">*/}
+                    {/*  <div className="text-xs text-gray-500">Tarde</div>*/}
+                    {/*  <div className="text-sm font-semibold text-yellow-700">*/}
+                    {/*    {row.attendances.LATE ?? 0}*/}
+                    {/*  </div>*/}
+                    {/*</div>*/}
+
+                    {/*<div className="bg-gray-100 rounded-md p-2 text-center">*/}
+                    {/*  <div className="text-xs text-gray-500">Just.</div>*/}
+                    {/*  <div className="text-sm font-semibold">*/}
+                    {/*    {row.attendances.JUSTIFIED ?? 0}*/}
+                    {/*  </div>*/}
+                    {/*</div>*/}
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </AuthGuard>
   );

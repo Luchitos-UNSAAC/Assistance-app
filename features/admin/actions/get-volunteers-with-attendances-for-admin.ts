@@ -15,20 +15,35 @@ export type VolunteerWithAttendancesByStatus = Volunteer & {
   user: User | null
 }
 
+export type VolunteerForAdmin = {
+  volunteers: VolunteerWithAttendancesByStatus[]
+  groups: Group[]
+}
+
 export const getVolunteersWithAttendancesForAdmin = async () => {
   try {
     const volunteersFirst = await prisma.volunteer.findMany({
       where: {
         user: {
-          role: {
-            not: 'ADMIN'
-          }
-        }
+          deletedAt: null
+        },
+        createdBy: {
+          not: 'first_migration'
+        },
+        deletedAt: null
       },
       include: {
         groupMembers: {
           include: {
             group: true
+          },
+          where: {
+            deletedAt: null
+          },
+          orderBy: {
+            group: {
+              name: 'asc'
+            }
           }
         },
         user: true,
@@ -46,6 +61,15 @@ export const getVolunteersWithAttendancesForAdmin = async () => {
       },
     })
 
+    const groups = await prisma.group.findMany({
+      where: {
+        deletedAt: null,
+      },
+      orderBy: {
+        name: 'asc'
+      }
+    })
+
     const volunteersWithAttendance: VolunteerWithAttendancesByStatus[] = volunteersFirst.map(v => {
       const stats = attendanceStats.filter(a => a.volunteerId === v.id)
       return {
@@ -58,9 +82,17 @@ export const getVolunteersWithAttendancesForAdmin = async () => {
         user: v.user,
       }
     })
-    return volunteersWithAttendance
+
+    const result: VolunteerForAdmin = {
+      volunteers: volunteersWithAttendance,
+      groups,
+    }
+    return result
   } catch (e) {
     console.log("[ERROR_GET_VOLUNTEER_WITH_ATTENDANCES_FOR_ADMIN", e)
-    return []
+    return {
+      volunteers: [],
+      groups: [],
+    }
   }
 }
