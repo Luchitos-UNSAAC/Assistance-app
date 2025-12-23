@@ -262,11 +262,19 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
                     {row?.user?.role === 'MANAGER' && (
                       <span className="mx-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
                         ENCARGADO
+                        {
+                        row?.groupMembers?.some(member => member.role === 'LEADER')
+                          && ` - ${row?.groupMembers?.find(member => member.role === 'LEADER')?.group.dayOfWeek}`
+                      }
                       </span>
                     )}
                     {row?.user?.role === 'ADMIN' && (
                       <span className="mx-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-fuchsia-700">
                         ADMI
+                        {
+                          row?.groupMembers?.some(member => member.role === 'LEADER')
+                          && ` - ${row?.groupMembers?.find(member => member.role === 'LEADER')?.group.dayOfWeek}`
+                        }
                       </span>
                     )}
                   </td>

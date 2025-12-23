@@ -25,10 +25,10 @@ export const getVolunteersWithAttendancesForAdmin = async () => {
     const volunteersFirst = await prisma.volunteer.findMany({
       where: {
         user: {
-          role: {
-            not: 'ADMIN'
-          },
           deletedAt: null
+        },
+        createdBy: {
+          not: 'first_migration'
         },
         deletedAt: null
       },
