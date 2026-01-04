@@ -12,7 +12,7 @@ export const getVolunteerByScheduleToday = async () => {
       return [];
     }
     const today = new Date();
-    
+
     const mapperDay = (day: number): WeekDay => {
       switch (day) {
         case 1:
@@ -26,14 +26,14 @@ export const getVolunteerByScheduleToday = async () => {
         case 5:
           return WeekDay.VIERNES;
         case 6:
-          return WeekDay.SABADO;
+          return WeekDay.SABADO_MANIANA;
         case 0:
           return WeekDay.DOMINGO;
         default:
           return WeekDay.LUNES;
       }
     }
-    
+
     const dayOfWeek: WeekDay = mapperDay(today.getDay());
     const activeVolunteersByGroupId = await prisma.volunteer.findMany({
       where: {
@@ -71,7 +71,7 @@ export const getVolunteerByScheduleToday = async () => {
         }
       }
     })
-    
+
     const mapAttendanceStatus = (status: AttendanceStatus) => {
       switch (status) {
         case AttendanceStatus.PRESENT:
@@ -84,7 +84,7 @@ export const getVolunteerByScheduleToday = async () => {
           return "Late";
       }
     }
-    
+
     const volunteersMapped: Volunteer[] =  activeVolunteersByGroupId.map((volunteer) => ({
       id: volunteer.id || '',
       name: volunteer.name,
@@ -102,7 +102,7 @@ export const getVolunteerByScheduleToday = async () => {
       })) || [],
     }));
     return volunteersMapped;
-    
+
   } catch (error) {
     console.error("[ERROR_GET_ACTIVE_VOLUNTEERS]", error);
     return [];
