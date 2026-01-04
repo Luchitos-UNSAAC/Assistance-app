@@ -1,7 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 import { useAuthStore } from "@/lib/auth-store"
 import { TrendingUp, Gift, User, Users } from "lucide-react"
 import { format, parseISO } from "date-fns"
@@ -91,73 +90,6 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
               </Card>
             )}
           </div>
-
-          {/* Quick Access for Volunteer */}
-          {/*{user?.volunteerId && (*/}
-          {/*  <Card className="gradient-card">*/}
-          {/*    <CardContent className="p-4 space-y-4">*/}
-
-          {/*      /!* Ver Perfil *!/*/}
-          {/*      /!*<Link href={`/volunteers/${user.volunteerId}`}>*!/*/}
-          {/*      /!*  <div className="flex items-center justify-between p-3 bg-white/50 rounded-lg hover:bg-white/70 transition-all duration-200 cursor-pointer">*!/*/}
-          {/*      /!*    <div className="flex items-center space-x-3">*!/*/}
-          {/*      /!*      <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">*!/*/}
-          {/*      /!*        <User className="h-4 w-4 text-white" />*!/*/}
-          {/*      /!*      </div>*!/*/}
-          {/*      /!*      <div>*!/*/}
-          {/*      /!*        <p className="font-medium text-gray-900">Ver Mi Perfil Completo</p>*!/*/}
-          {/*      /!*        <p className="text-sm text-gray-600">Historial de asistencias y estadísticas</p>*!/*/}
-          {/*      /!*      </div>*!/*/}
-          {/*      /!*    </div>*!/*/}
-          {/*      /!*    <div className="text-purple-600">→</div>*!/*/}
-          {/*      /!*  </div>*!/*/}
-          {/*      /!*</Link>*!/*/}
-
-          {/*      /!* Historial de Asistencias *!/*/}
-          {/*      {reviewDashboard.myAttendancesHistory && reviewDashboard.myAttendancesHistory.length > 0 && (*/}
-          {/*        <div className="space-y-2 px-4">*/}
-          {/*          <h3 className="text-sm font-semibold text-gray-700">Mi historial reciente de asistencias</h3>*/}
-          {/*          <ul className="divide-y divide-gray-200">*/}
-          {/*            {reviewDashboard.myAttendancesHistory.map((attendance, index) => (*/}
-          {/*              <li key={index} className="py-2 flex justify-between items-center text-sm">*/}
-          {/*                <div>*/}
-          {/*                  <p className="text-gray-900">*/}
-          {/*                    {format(parseISO(attendance.date), "dd 'de' MMMM", { locale: es })}*/}
-          {/*                  </p>*/}
-          {/*                  <p className="text-xs text-gray-500">*/}
-          {/*                    {format(parseISO(attendance.date), "EEEE", { locale: es })}*/}
-          {/*                  </p>*/}
-          {/*                </div>*/}
-          {/*                <Badge*/}
-          {/*                  variant={*/}
-          {/*                    attendance.status === "Present"*/}
-          {/*                      ? "default"*/}
-          {/*                      : attendance.status === "Justified"*/}
-          {/*                        ? "secondary"*/}
-          {/*                        : "destructive"*/}
-          {/*                  }*/}
-          {/*                  className={*/}
-          {/*                    attendance.status === "Present"*/}
-          {/*                      ? "bg-green-500 hover:bg-green-600"*/}
-          {/*                      : attendance.status === "Justified"*/}
-          {/*                        ? "bg-yellow-500 hover:bg-yellow-600"*/}
-          {/*                        : "bg-red-500 hover:bg-red-600"*/}
-          {/*                  }*/}
-          {/*                >*/}
-          {/*                  {attendance.status === "Present"*/}
-          {/*                    ? "Presente"*/}
-          {/*                    : attendance.status === "Justified"*/}
-          {/*                      ? "Justificado"*/}
-          {/*                      : "Ausente"}*/}
-          {/*                </Badge>*/}
-          {/*              </li>*/}
-          {/*            ))}*/}
-          {/*          </ul>*/}
-          {/*        </div>*/}
-          {/*      )}*/}
-          {/*    </CardContent>*/}
-          {/*  </Card>*/}
-          {/*)}*/}
 
           {/* Upcoming Birthdays */}
           {reviewDashboard.upcomingBirthdays.length > 0 && (
