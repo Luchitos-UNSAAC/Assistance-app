@@ -1,4 +1,9 @@
-### Login
+### Profile
 GET http://localhost:3000/api/v2/profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbWUwOXcyMXowMDAwMDdpZjZ3ZzdmeGZrIiwiZW1haWwiOiJhZG1pbkB1bnNhYWMuZWR1LnBlIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY3NTY2MDM1LCJleHAiOjE3NjgxNzA4MzV9.PBfzvsgK1wD8OrM4YF4JlCxizi76zz0FwI8uy6g1bHc
+
+### Me
+GET http://localhost:3000/api/v2/users/me
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbWUwOXcyMXowMDAwMDdpZjZ3ZzdmeGZrIiwiZW1haWwiOiJhZG1pbkB1bnNhYWMuZWR1LnBlIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY3NTY2MDM1LCJleHAiOjE3NjgxNzA4MzV9.PBfzvsgK1wD8OrM4YF4JlCxizi76zz0FwI8uy6g1bHc

@@ -6,3 +6,22 @@ Content-Type: application/json
   "email": "admin@unsaac.edu.pe",
   "password": "987654"
 }
+
+### Login
+POST http://luchos.mldsoftware.com/api/v2/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@unsaac.edu.pe",
+  "password": "987789@!"
+}
+
+### Me
+GET http://luchos.mldsoftware.com/api/v2/profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbWUwOXcyMXowMDAwMDdpZjZ3ZzdmeGZrIiwiZW1haWwiOiJhZG1pbkB1bnNhYWMuZWR1LnBlIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY3NTcxNzUzLCJleHAiOjE3NjgxNzY1NTN9.Ib3ZM4ER1FprzNW0ZSkC27H8b4-VEpUhO1-593Ox1qs
+
+{
+  "email": "admin@unsaac.edu.pe",
+  "password": "987789@!"
+}

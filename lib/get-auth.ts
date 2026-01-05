@@ -1,6 +1,7 @@
 import { verifyJWT } from "@/lib/jwt";
 
 export async function getAuthPayload(req: Request) {
+  console.log("[Authorization]", req.headers.get("authorization"))
   const authHeader = req.headers.get("authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
