@@ -7,6 +7,16 @@ Content-Type: application/json
   "password": "987654"
 }
 
+### Me
+GET http://localhost:3000/api/v2/users/me
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbWUwOXcyMXowMDAwMDdpZjZ3ZzdmeGZrIiwiZW1haWwiOiJhZG1pbkB1bnNhYWMuZWR1LnBlIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY3NTcyNzUxLCJleHAiOjE3NjgxNzc1NTF9.RjboTKtmF6yh-7K4kC0e6gal5FSjlnMbc1NDKKjdw44
+
+{
+  "email": "admin@unsaac.edu.pe",
+  "password": "987654"
+}
+
 ### Login
 POST http://luchos.mldsoftware.com/api/v2/auth/login
 Content-Type: application/json
@@ -17,9 +27,19 @@ Content-Type: application/json
 }
 
 ### Me
-GET http://luchos.mldsoftware.com/api/v2/profile
+GET https://luchos.mldsoftware.com/api/v2/users/me
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbWUwOXcyMXowMDAwMDdpZjZ3ZzdmeGZrIiwiZW1haWwiOiJhZG1pbkB1bnNhYWMuZWR1LnBlIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY3NTcxNzUzLCJleHAiOjE3NjgxNzY1NTN9.Ib3ZM4ER1FprzNW0ZSkC27H8b4-VEpUhO1-593Ox1qs
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbWUwOXcyMXowMDAwMDdpZjZ3ZzdmeGZrIiwiZW1haWwiOiJhZG1pbkB1bnNhYWMuZWR1LnBlIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY3NTcyODEzLCJleHAiOjE3NjgxNzc2MTN9.zDtLkvz-atOMXYp811YDqA-yFCt8artNcBaLEmE7vsI
+
+{
+  "email": "admin@unsaac.edu.pe",
+  "password": "987789@!"
+}
+
+### Attendances
+GET https://luchos.mldsoftware.com/api/v2/attendances
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbWUwOXcyMXowMDAwMDdpZjZ3ZzdmeGZrIiwiZW1haWwiOiJhZG1pbkB1bnNhYWMuZWR1LnBlIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY3NTcyODEzLCJleHAiOjE3NjgxNzc2MTN9.zDtLkvz-atOMXYp811YDqA-yFCt8artNcBaLEmE7vsI
 
 {
   "email": "admin@unsaac.edu.pe",

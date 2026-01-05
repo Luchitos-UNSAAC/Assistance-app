@@ -25,6 +25,7 @@ model User {
 
   volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
   volunteerId String?    @unique
+  Device      Device[]
 
   @@map("users")
 }
@@ -68,6 +69,7 @@ model Volunteer {
   notifications    Notification[]
   callParticipants CallParticipant[]
   groupMembers     GroupMember[]
+  Device           Device[]
 
   @@map("volunteers")
 }
@@ -299,6 +301,33 @@ model Setting {
   deletedAt DateTime?
 
   @@map("settings")
+}
+
+model Device {
+  id          String  @id @default(cuid())
+  userId      String?
+  volunteerId String?
+
+  deviceId   String // UUID generado por la app
+  platform   String // ANDROID | IOS
+  osVersion  String?
+  model      String?
+  brand      String?
+  appVersion String?
+
+  pushToken    String? // FCM / APNs
+  lastIp       String?
+  lastActiveAt DateTime?
+  isActive     Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User?      @relation(fields: [userId], references: [id])
+  volunteer Volunteer? @relation(fields: [volunteerId], references: [id])
+
+  @@unique([deviceId])
+  @@map("devices")
 }
 
 enum SettingType {
