@@ -1,8 +1,10 @@
 import { verifyJWT } from "@/lib/jwt";
+import {headers} from "next/headers";
 
 export async function getAuthPayload(req: Request) {
-  console.log("[Authorization]", req.headers.get("authorization"))
-  const authHeader = req.headers.get("authorization");
+  const headersList = headers();
+  const authHeader = headersList.get("authorization");
+  console.log("[Authorization]", authHeader)
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw new Error("NO_TOKEN");
