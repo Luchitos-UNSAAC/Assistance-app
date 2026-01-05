@@ -1,0 +1,13 @@
+### Login
+POST http://localhost:3000/api/v2/devices/register
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbWUwOXcyMXowMDAwMDdpZjZ3ZzdmeGZrIiwiZW1haWwiOiJhZG1pbkB1bnNhYWMuZWR1LnBlIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY3NTY2MDM1LCJleHAiOjE3NjgxNzA4MzV9.PBfzvsgK1wD8OrM4YF4JlCxizi76zz0FwI8uy6g1bHc
+
+{
+  "deviceId": "c92f4e7a-0a7a-4f0c-8d3e-8a7b8f92e999",
+  "platform": "ANDROID",
+  "osVersion": "14",
+  "model": "Pixel 7",
+  "brand": "Google",
+  "appVersion": "1.0.3"
+}
