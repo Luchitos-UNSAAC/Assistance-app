@@ -48,7 +48,7 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
     return {present, absent, justified, total: volunteerAttendances.length}
   }
 
-  const canManageVolunteers = hasPermission("MANAGER")
+  const canManageVolunteers = hasPermission("ADMIN")
 
   const handleEdit = (id: string) => {
     setSelectedVolunteer(id)
@@ -216,6 +216,7 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
             />
           )}
 
+          {/* Free day modal */}
           <VolunteerNewModal
             isOpen={isNewModalOpen}
             onClose={() => {

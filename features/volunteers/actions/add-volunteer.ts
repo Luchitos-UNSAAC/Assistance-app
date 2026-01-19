@@ -32,28 +32,28 @@ export const addVolunteer = async (body: AddManagerBody) => {
         message: `No existe el voluntario`
       };
     }
-    
-    const isAdmin = currentUser.role === UserRole.ADMIN;
-    if(isAdmin) {
-      const verifyIfAdminBelongsToGroup = await prisma.groupMember.findFirst({
-        where: {
-          volunteerId: currentVolunteer.id,
-          role: GroupRole.LEADER,
-        }
-      });
-      if (!verifyIfAdminBelongsToGroup) {
-        // Added, first search which group the admin belongs to as leader
-        const adminGroup = await prisma.groupMember.findFirst({
-          where: {
-            role: GroupRole.LEADER,
-            volunteer: {
-            
-            }
-          }
-        });
-      }
-    }
-    
+
+    // const isAdmin = currentUser.role === UserRole.ADMIN;
+    // if(isAdmin) {
+    //   const verifyIfAdminBelongsToGroup = await prisma.groupMember.findFirst({
+    //     where: {
+    //       volunteerId: currentVolunteer.id,
+    //       role: GroupRole.LEADER,
+    //     }
+    //   });
+    //   if (!verifyIfAdminBelongsToGroup) {
+    //     // Added, first search which group the admin belongs to as leader
+    //     const adminGroup = await prisma.groupMember.findFirst({
+    //       where: {
+    //         role: GroupRole.LEADER,
+    //         volunteer: {
+    //
+    //         }
+    //       }
+    //     });
+    //   }
+    // }
+
     const currentGroupMemberVolunteer = await prisma.groupMember.findFirst({
       where: {
         volunteerId: currentVolunteer.id,
@@ -66,9 +66,9 @@ export const addVolunteer = async (body: AddManagerBody) => {
         message: `No tienes permisos para agregar voluntarios`,
       }
     }
-    
+
     const newVolunteerId = body.newVolunteerId;
-    
+
     if (newVolunteerId) {
       const existingVolunteer = await prisma.volunteer.findUnique({
         where: {
@@ -82,7 +82,7 @@ export const addVolunteer = async (body: AddManagerBody) => {
           message: `No existe el voluntario`,
         }
       }
-      
+
       const existingGroupMember = await prisma.groupMember.findFirst({
         where: {
           volunteerId: existingVolunteer.id,
@@ -95,7 +95,7 @@ export const addVolunteer = async (body: AddManagerBody) => {
           message: `El voluntario ya pertenece al grupo`,
         }
       }
-      
+
       await prisma.groupMember.create({
         data: {
           role: GroupRole.MEMBER,
@@ -106,7 +106,7 @@ export const addVolunteer = async (body: AddManagerBody) => {
       return {
         success: true,
       }
-      
+
     } else {
       const existingNewVolunteer = await prisma.volunteer.findUnique({
         where: {
@@ -120,9 +120,9 @@ export const addVolunteer = async (body: AddManagerBody) => {
           message: `Ya existe un voluntario con este email`,
         }
       }
-      
+
       const statusFormatted = body.status === "Active" ? VolunteerStatus.ACTIVE : VolunteerStatus.INACTIVE;
-      
+
       const newVolunteer = await prisma.volunteer.create({
         data: {
           name: body.name,
@@ -159,7 +159,7 @@ export const addVolunteer = async (body: AddManagerBody) => {
           message: `Error al agregar el voluntario`,
         }
       }
-      
+
       return {
         success: true,
       }
