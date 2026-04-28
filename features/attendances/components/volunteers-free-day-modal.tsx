@@ -47,7 +47,7 @@ export function VolunteersFreeDayModal({
   }, [open])
 
   const filteredVolunteers = useMemo(() => {
-    if (search.trim().length < 3) return []
+    if (search.trim().length < 2) return []
     const term = search.toLowerCase()
     return volunteers.filter(v =>
       v.name.toLowerCase().includes(term)
@@ -123,7 +123,7 @@ export function VolunteersFreeDayModal({
         <div className="flex-1 overflow-y-auto space-y-2">
           {filteredVolunteers.length === 0 ? (
             <p className="text-center text-sm text-gray-500 py-6 animate-pulse">
-              Escribe el nombre del voluntario
+              Escribe el nombre del voluntario que no esta en la lista
             </p>
           ) : (
             filteredVolunteers.map((v) => (

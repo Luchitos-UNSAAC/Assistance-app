@@ -3,7 +3,7 @@
 import {prisma} from "@/lib/prisma";
 import {getCurrentUser} from "@/lib/get-current-user";
 
-export async function changePassword(newPassword: string) {
+export async function changePassword(newPassword: string, birthday: Date){
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser) {
@@ -31,7 +31,16 @@ export async function changePassword(newPassword: string) {
         email: email
       },
       data: {
-        password: newPassword
+        password: newPassword,
+      }
+    })
+
+    await prisma.volunteer.update({
+      where: {
+        email: email
+      },
+      data: {
+        birthday: birthday,
       }
     })
 
