@@ -22,7 +22,6 @@ export const getGroupOfCurrentVolunteer = async (volunteerId: string) => {
         }
       }
     })
-    console.log(groupOfCurrentVolunteer)
     if (groupOfCurrentVolunteer.length === 0) {
       return null;
     }
