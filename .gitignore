@@ -32,3 +32,5 @@ next-env.d.ts
 
 # migrations dependencies
 prisma/scripts/migrate/volunteers/node_modules
+prisma/scripts/migrate/volunteers/data_csv/old_csv.csv
+prisma/scripts/migrate/volunteers/data_csv/new_list.csv
