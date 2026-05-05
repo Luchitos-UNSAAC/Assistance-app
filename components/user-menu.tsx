@@ -1,6 +1,7 @@
 "use client"
-import {Button} from "@/components/ui/button"
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,160 +10,128 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {Badge} from "@/components/ui/badge"
-import {useAuthStore, UserRole} from "@/lib/auth-store"
-import {LogOut, User, Settings, Shield, Crown, UserCircle} from "lucide-react"
-import {useToast} from "@/hooks/use-toast"
-import {useRouter} from "next/navigation";
-import {Separator} from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge"
+import { useAuthStore } from "@/lib/auth-store"
+import { LogOut, User, Shield, Crown, UserCircle, Settings } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 interface UserMenuProps {
-  justImage: boolean;
+  justImage?: boolean;
 }
 
-export default function UserMenu({justImage = false}: UserMenuProps) {
-  const {user, logout} = useAuthStore()
-  const {toast} = useToast()
+export default function UserMenu({ justImage = false }: UserMenuProps) {
+  const { user, logout } = useAuthStore()
+  const { toast } = useToast()
   const router = useRouter()
 
   if (!user) return null
 
   const handleLogout = () => {
     logout()
-    toast({
-      title: "Sesión cerrada",
-      description: "Has cerrado sesión exitosamente",
-    })
+    toast({ title: "Sesión cerrada", description: "Vuelve pronto." })
     router.push('/auth/login')
   }
 
-  const hasPermission = useAuthStore((state) => state.hasPermission)
-  const isAdmin = hasPermission("ADMIN")
+  const isAdmin = useAuthStore((state) => state.hasPermission("ADMIN"))
 
-  const handleProfileClick = () => {
-    router.push("/profile")
-  }
-
-  const handleSettingsClick = () => {
-    router.push("/admin/volunteers")
-  }
-
-  const getRoleIcon = () => {
-    switch (user.role) {
-      case "ADMIN":
-        return <Crown className="h-3 w-3"/>
-      case "MANAGER":
-        return <Shield className="h-3 w-3"/>
-      default:
-        return <User className="h-3 w-3"/>
+  // Mapeo semántico de ROLES (KISS)
+  const roleConfig: Record<string, { label: string, icon: any, className: string }> = {
+    ADMIN: {
+      label: 'Admin',
+      icon: Crown,
+      className: "bg-primary/10 text-primary border-primary/20"
+    },
+    MANAGER: {
+      label: 'Encargado',
+      icon: Shield,
+      className: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 border-violet-200/50"
+    },
+    USER: {
+      label: 'Voluntario',
+      icon: User,
+      className: "bg-secondary text-secondary-foreground"
     }
   }
 
-  const getRoleColor = () => {
-    switch (user.role) {
-      case "ADMIN":
-        return "bg-pink-100 text-pink-800"
-      case "MANAGER":
-        return "bg-purple-100 text-purple-800"
-      default:
-        return "bg-blue-100 text-blue-800"
-    }
-  }
+  const currentRole = roleConfig[user.role] || roleConfig.USER
+  const IconRole = currentRole.icon
 
-  const mapRole = () => {
-    switch (user.role) {
-      case "ADMIN":
-        return 'Admin'
-      case "MANAGER":
-        return 'Encargado'
-      default:
-        return 'Voluntario'
-    }
-  }
+  const UserAvatar = () => (
+    <Avatar className="h-10 w-10 border-2 border-border/50 shadow-sm">
+      <AvatarImage src={user.avatar || `https://robohash.org/${user.id}?set=set4`} alt={user.name} />
+      <AvatarFallback className="bg-gradient-to-br from-primary to-violet-400 text-primary-foreground text-xs font-bold">
+        {user.name.split(" ").map(n => n[0]).join("").toUpperCase()}
+      </AvatarFallback>
+    </Avatar>
+  )
+
+  if (justImage) return <UserAvatar />
 
   return (
-    <>
-      {
-        justImage
-          ? <Avatar className="h-10 w-10 border-2 border-white/20">
-            <AvatarImage
-              src={user.avatar || `https://robohash.org/1?set=set4`}
-              alt={user.name}
-            />
-            <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold">
-              {user.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          : <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar className="h-10 w-10 border-2 border-white/20">
-                  <AvatarImage
-                    src={user.avatar || `https://robohash.org/1?set=set4`}
-                    alt={user.name}
-                  />
-                  <AvatarFallback
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-semibold">
-                    {user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border-2 border-purple-200 shadow-2xl" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <p className="text-sm font-medium leading-none">{user.name}</p>
-                    <Badge variant="secondary" className={`text-xs ${getRoleColor()}`}>
-                <span className="flex items-center space-x-1">
-                  {getRoleIcon()}
-                  <span>{mapRole()}</span>
-                </span>
-                    </Badge>
-                  </div>
-                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator/>
-              <DropdownMenuItem
-                className="cursor-pointer hover:bg-purple-50"
-                onClick={handleProfileClick}>
-                <User className="mr-2 h-4 w-4"/>
-                <span>Perfil</span>
-              </DropdownMenuItem>
-              {
-                isAdmin && (
-                  <DropdownMenuItem
-                    className="cursor-pointer bg-purple-50 hover:bg-purple-100 font-medium text-purple-700"
-                    onClick={handleSettingsClick}>
-                    <UserCircle className="mr-2 h-4 w-4"/>
-                    <span>Admin</span>
-                  </DropdownMenuItem>
-                )
-              }
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:ring-2 hover:ring-primary/20 transition-all">
+          <UserAvatar />
+        </Button>
+      </DropdownMenuTrigger>
 
-              <DropdownMenuSeparator/>
-              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-red-50 text-red-600">
-                <LogOut className="mr-2 h-4 w-4"/>
-                <span>Cerrar Sesión</span>
-              </DropdownMenuItem>
+      <DropdownMenuContent
+        className="w-64 bg-popover/95 backdrop-blur-md border-border shadow-xl rounded-xl"
+        align="end"
+        sideOffset={8}
+      >
+        <DropdownMenuLabel className="font-normal p-4">
+          <div className="flex flex-col space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold text-foreground leading-none">{user.name}</p>
+              <Badge variant="outline" className={cn("text-[10px] px-2 py-0 h-5 font-bold uppercase tracking-wider", currentRole.className)}>
+                <IconRole className="mr-1 h-3 w-3" />
+                {currentRole.label}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground truncate font-medium">{user.email}</p>
+          </div>
+        </DropdownMenuLabel>
 
-              <Separator className="my-2"/>
-              {/*  Version app */}
-              <div className="px-4 py-2 text-xs text-gray-400 text-center">
-                <span>Versión 1.0.0</span>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-      }
-    </>
+        <DropdownMenuSeparator />
+
+        <div className="p-1">
+          <DropdownMenuItem onClick={() => router.push("/profile")} className="rounded-lg cursor-pointer">
+            <User className="mr-2 h-4 w-4 text-muted-foreground" />
+            <span>Mi Perfil</span>
+          </DropdownMenuItem>
+
+          {isAdmin && (
+            <DropdownMenuItem
+              onClick={() => router.push("/admin/volunteers")}
+              className="rounded-lg cursor-pointer bg-primary/5 text-primary focus:bg-primary/10 focus:text-primary font-semibold"
+            >
+              <UserCircle className="mr-2 h-4 w-4" />
+              <span>Panel de Control</span>
+            </DropdownMenuItem>
+          )}
+        </div>
+
+        <DropdownMenuSeparator />
+
+        <div className="p-1">
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="rounded-lg cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Cerrar Sesión</span>
+          </DropdownMenuItem>
+        </div>
+
+        <div className="p-3 bg-muted/30 mt-1 rounded-b-lg border-t border-border/50">
+          <p className="text-[10px] text-center font-bold text-muted-foreground tracking-widest uppercase italic">
+            Versión 1.0.0 — LUCHOS
+          </p>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

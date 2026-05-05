@@ -7,8 +7,6 @@ import BottomNavigation from "@/components/bottom-navigation"
 import {ClientRenderSecure} from "@/components/client-render-secure";
 import DeleteConfirmationModal from "@/components/delete-confirm-modal";
 import {Navbar} from "@/components/navbar";
-import {cookies} from "next/headers";
-import {redirect} from "next/navigation";
 import {needChangePassword} from "@/features/auth/actions/need-change-password";
 import {ChangePasswordModal} from "@/features/auth/components/change-password-modal";
 

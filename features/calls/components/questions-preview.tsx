@@ -40,24 +40,24 @@ export default function PreviewQuestions({ questions: serverQuestions, call }: Q
             : "checkbox",
     options: Array.isArray(q.options) ? (q.options.filter((opt): opt is string => typeof opt === "string") as string[]) : [],
   });
-  
+
   useEffect(() => {
     setLocalQuestions(serverQuestions.map(mapFromPrisma));
   }, [serverQuestions]);
-  
-  
+
+
   return (
     <div className="max-w-3xl mx-auto space-y-4 p-6">
      <div className="flex flex-col   md:flex-row gap-2 justify-between">
        <h1 className="text-2xl font-bold mb-4">Vista previa</h1>
-       <Button onClick={() => router.push("/calls")}
+       <Button onClick={() => router.back()}
                variant='outline'
        >
          <ArrowLeft className="w-4 h-4"/>
          Volver a Convocatorias
        </Button>
      </div>
-      
+
       {commonQuestionsList.map((item, index) => (
         <Card className="p-4">
           <CardContent>
@@ -65,7 +65,7 @@ export default function PreviewQuestions({ questions: serverQuestions, call }: Q
             {item.type === "short" && (
               <Input placeholder="Respuesta corta" disabled />
             )}
-            
+
             {item.type === "paragraph" && (
               <textarea
                 className="w-full border rounded-md p-2"
@@ -76,19 +76,19 @@ export default function PreviewQuestions({ questions: serverQuestions, call }: Q
           </CardContent>
         </Card>
       ))}
-      
-      
+
+
       {localQuestions.map((q,index2) => (
         <Card key={q.id} className="p-4">
           <CardContent>
             <p className="font-medium mb-2">
               {commonQuestionsList.length + index2 + 1 }. {q.text}
             </p>
-            
+
             {q.type === "short" && (
               <Input placeholder="Respuesta corta" disabled />
             )}
-            
+
             {q.type === "paragraph" && (
               <textarea
                 className="w-full border rounded-md p-2"
@@ -96,7 +96,7 @@ export default function PreviewQuestions({ questions: serverQuestions, call }: Q
                 disabled
               />
             )}
-            
+
             {q.type === "multiple" &&
               q.options?.map((opt, i) => (
                 <div key={i} className="flex items-center space-x-2">
@@ -104,7 +104,7 @@ export default function PreviewQuestions({ questions: serverQuestions, call }: Q
                   <span>{opt}</span>
                 </div>
               ))}
-            
+
             {q.type === "checkbox" &&
               q.options?.map((opt, i) => (
                 <div key={i} className="flex items-center space-x-2">

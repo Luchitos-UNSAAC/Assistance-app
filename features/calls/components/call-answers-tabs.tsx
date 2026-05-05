@@ -86,7 +86,7 @@ export default function CallAnswersTabs({ callId, questions, participantsCount, 
     <div className="space-y-6">
       {/* Header + tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <Button onClick={()=> router.push("/calls")}
+        <Button onClick={()=> router.back()}
                 variant='outline'
         >
           <ArrowLeft className="w-4 h-4" />
@@ -96,7 +96,7 @@ export default function CallAnswersTabs({ callId, questions, participantsCount, 
           <h1 className="text-2xl font-semibold">Respuestas - Convocatoria</h1>
           <p className="text-sm text-muted-foreground mt-1">Convocatoria: <span className="font-medium">{call.title}</span> • Participantes: <span className="font-medium">{participantsCount}</span></p>
         </div>
-        
+
         <div className="flex gap-2 items-center">
           <div className="rounded-md bg-muted inline-flex p-0.5">
             <button
@@ -116,7 +116,7 @@ export default function CallAnswersTabs({ callId, questions, participantsCount, 
           </div>
         </div>
       </div>
-      
+
       {/* Tab content */}
       <div>
         {activeTab === "questions" ? (
@@ -134,7 +134,7 @@ function QuestionsTab({ questions, callId }: { questions: QuestionWithAnswers[];
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "answered" | "no-answers">("all");
   const [expandedId, setExpandedId] = useState<Record<string, boolean>>({});
-  
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return questions
@@ -147,9 +147,9 @@ function QuestionsTab({ questions, callId }: { questions: QuestionWithAnswers[];
         }) }))
       .filter((quest) => (filter === "all") ? true : (filter === "answered" ? quest.answers.length > 0 : quest.answers.length === 0));
   }, [questions, query, filter]);
-  
+
   const toggle = (id: string) => setExpandedId((s) => ({ ...s, [id]: !s[id] }));
-  
+
   // simple export
   const exportJSON = () => {
     const payload = { callId, exportedAt: new Date().toISOString(), questions: filtered };
@@ -162,7 +162,7 @@ function QuestionsTab({ questions, callId }: { questions: QuestionWithAnswers[];
     a.remove();
     URL.revokeObjectURL(url);
   };
-  
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -176,7 +176,7 @@ function QuestionsTab({ questions, callId }: { questions: QuestionWithAnswers[];
           <Button size="sm" onClick={exportJSON}><FileText size={14} className="mr-2" /> Exportar</Button>
         </div>
       </div>
-      
+
       {filtered.length === 0 ? (
         <Card><CardContent><p className="text-sm text-muted-foreground">No hay preguntas con el filtro aplicado.</p></CardContent></Card>
       ) : (
@@ -189,7 +189,7 @@ function QuestionsTab({ questions, callId }: { questions: QuestionWithAnswers[];
                 <Button size="sm" onClick={() => toggle(q.id)}>{expandedId[q.id] ? "Ocultar" : "Ver respuestas"}</Button>
               </div>
             </CardHeader>
-            
+
             {expandedId[q.id] && (
               <CardContent>
                 {q.answers.length === 0 ? <p className="text-sm text-muted-foreground">Sin respuestas aún</p> :
@@ -206,7 +206,7 @@ function QuestionsTab({ questions, callId }: { questions: QuestionWithAnswers[];
                             {a.schedules.length > 0 && <div className="text-xs mt-1">{a.schedules.map((s) => <span key={s.id} className="inline-block px-2 py-0.5 bg-muted rounded text-xs mr-1">{formatSchedule(s)}</span>)}</div>}
                           </div>
                         </div>
-                        
+
                         <div className="mt-3">
                           <Label>Respuesta</Label>
                           <div className="mt-1 text-sm">{a.selectedOptions ? a.selectedOptions.join(", ") : a.answer ?? <span className="text-muted-foreground">(vacío)</span>}</div>
@@ -230,7 +230,7 @@ function QuestionsTab({ questions, callId }: { questions: QuestionWithAnswers[];
 function SchedulesTab({ schedules, callId }: { schedules: ScheduleWithParticipants[]; callId: string }) {
   const [query, setQuery] = useState("");
   const [onlyWithParticipants, setOnlyWithParticipants] = useState(false);
-  
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return schedules
@@ -243,7 +243,7 @@ function SchedulesTab({ schedules, callId }: { schedules: ScheduleWithParticipan
         }) }))
       .filter((s) => (onlyWithParticipants ? s.participants.length > 0 : true));
   }, [schedules, query, onlyWithParticipants]);
-  
+
   const exportCSV = () => {
     const headers = ["scheduleId", "schedule", "participantId", "name", "email", "answersSummary"];
     const rows = [headers.join(",")];
@@ -268,7 +268,7 @@ function SchedulesTab({ schedules, callId }: { schedules: ScheduleWithParticipan
     a.remove();
     URL.revokeObjectURL(url);
   };
-  
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -281,7 +281,7 @@ function SchedulesTab({ schedules, callId }: { schedules: ScheduleWithParticipan
           <Button size="sm" onClick={exportCSV}><Download size={14} className="mr-2" /> Exportar CSV</Button>
         </div>
       </div>
-      
+
       {filtered.length === 0 ? <Card><CardContent><p className="text-sm text-muted-foreground">No hay horarios con los filtros aplicados.</p></CardContent></Card> :
         filtered.map((s) => (
           <Card key={s.id}>
@@ -301,7 +301,7 @@ function SchedulesTab({ schedules, callId }: { schedules: ScheduleWithParticipan
                         </div>
                         <div className="text-xs text-muted-foreground">{formatDateTime(p.createdAt)}</div>
                       </div>
-                      
+
                       <div className="mt-2 text-sm">
                         <div className="text-xs text-muted-foreground">Respuestas relevantes:</div>
                         <ul className="mt-1 list-disc list-inside text-sm">

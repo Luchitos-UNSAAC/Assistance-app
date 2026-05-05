@@ -43,31 +43,31 @@ export default function CallForVolunteersFormPage() {
       { mode: "WEEKLY", dayOfWeek: "DOMINGO", startTime: "15:30", endTime: "16:00" },
     ],
   });
-  
+
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
-  
+
   const handleChangeField = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   const addSchedule = () => {
     setForm((prev) => ({
       ...prev,
       schedules: [...prev.schedules, { mode: "WEEKLY", dayOfWeek: "LUNES", startTime: "09:00", endTime: "12:00" }],
     }));
   };
-  
+
   const removeSchedule = (idx: number) => {
     setForm((prev) => ({
       ...prev,
       schedules: prev.schedules.filter((_, i) => i !== idx),
     }));
   };
-  
+
   const updateSchedule = (idx: number, patch: Partial<ScheduleInput>) => {
     setForm((prev) => {
       const copy = [...prev.schedules];
@@ -84,14 +84,14 @@ export default function CallForVolunteersFormPage() {
       return { ...prev, schedules: copy };
     });
   };
-  
+
   const validateClient = (): string | null => {
     if (!form.title.trim()) return "El título es obligatorio.";
     if (!form.description.trim()) return "La descripción es obligatoria.";
     if (!form.deadline) return "La fecha límite es obligatoria.";
-    
+
     if (!form.schedules.length) return "Agrega al menos un horario.";
-    
+
     for (let i = 0; i < form.schedules.length; i++) {
       const s = form.schedules[i];
       if (!s.startTime || !s.endTime) return `Horario #${i + 1}: completa las horas.`;
@@ -101,17 +101,17 @@ export default function CallForVolunteersFormPage() {
     }
     return null;
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors(null);
-    
+
     const err = validateClient();
     if (err) {
       setErrors(err);
       return;
     }
-    
+
     setSubmitting(true);
     try {
       const res = await fetch("/api/calls", {
@@ -142,14 +142,14 @@ export default function CallForVolunteersFormPage() {
       setSubmitting(false);
     }
   };
-  
+
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-md rounded-2xl p-6">
       <div className="flex flex-col md:flex-row justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Crear convocatoria
         </h2>
-        <Button onClick={()=> router.push("/calls")}
+        <Button onClick={()=> router.back()}
                 variant='outline'
         >
           <ArrowLeft className="w-4 h-4" />
@@ -161,23 +161,23 @@ export default function CallForVolunteersFormPage() {
           {errors}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="block">
           <span className="text-gray-700">Título</span>
           <input type="text" name="title" value={form.title} onChange={handleChangeField} required className={classInput()} />
         </label>
-        
+
         <label className="block">
           <span className="text-gray-700">Descripción</span>
           <textarea name="description" value={form.description} onChange={handleChangeField} required className={classInput("min-h-28")} />
         </label>
-        
+
         <label className="block">
           <span className="text-gray-700">Ubicación (opcional)</span>
           <input type="text" name="location" value={form.location} onChange={handleChangeField} className={classInput()} />
         </label>
-        
+
         <label className="block">
           <span className="text-gray-700">Modalidad</span>
           <select name="modality" value={form.modality} onChange={handleChangeField} className={classInput()}>
@@ -186,26 +186,26 @@ export default function CallForVolunteersFormPage() {
             <option value="HYBRID">Híbrido</option>
           </select>
         </label>
-        
+
         <label className="block">
           <span className="text-gray-700">Requisitos (opcional)</span>
           <textarea name="requirements" value={form.requirements} onChange={handleChangeField} className={classInput()} />
         </label>
-        
+
         <label className="block">
           <span className="text-gray-700">Beneficios (opcional)</span>
           <textarea name="benefits" value={form.benefits} onChange={handleChangeField} className={classInput()} />
         </label>
-        
+
         <label className="block">
           <span className="text-gray-700">Fecha límite</span>
           <input type="date" name="deadline" value={form.deadline} onChange={handleChangeField} required className={classInput()} />
         </label>
-        
+
         {/* SCHEDULE BUILDER */}
         <fieldset className="border rounded-xl p-4">
           <legend className="px-2 text-gray-800 font-semibold">Horarios disponibles</legend>
-          
+
           <div className="space-y-4">
             {form.schedules.map((s, i) => (
               <div key={i} className="rounded-xl border p-3 bg-gray-50">
@@ -228,7 +228,7 @@ export default function CallForVolunteersFormPage() {
                     />
                     <span>En una fecha</span>
                   </label>
-                  
+
                   <button
                     type="button"
                     onClick={() => removeSchedule(i)}
@@ -238,7 +238,7 @@ export default function CallForVolunteersFormPage() {
                     Eliminar
                   </button>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   {s.mode === "WEEKLY" ? (
                     <label className="block">
@@ -264,7 +264,7 @@ export default function CallForVolunteersFormPage() {
                       />
                     </label>
                   )}
-                  
+
                   <label className="block">
                     <span className="text-gray-700">Desde</span>
                     <input
@@ -274,7 +274,7 @@ export default function CallForVolunteersFormPage() {
                       className={classInput()}
                     />
                   </label>
-                  
+
                   <label className="block">
                     <span className="text-gray-700">Hasta</span>
                     <input
@@ -287,7 +287,7 @@ export default function CallForVolunteersFormPage() {
                 </div>
               </div>
             ))}
-            
+
             <button
               type="button"
               onClick={addSchedule}
@@ -297,7 +297,7 @@ export default function CallForVolunteersFormPage() {
             </button>
           </div>
         </fieldset>
-        
+
         <label className="block">
           <span className="text-gray-700">Estado</span>
           <select name="status" value={form.status} onChange={handleChangeField} className={classInput()}>
@@ -306,7 +306,7 @@ export default function CallForVolunteersFormPage() {
             <option value="DRAFT">Borrador</option>
           </select>
         </label>
-        
+
         <Button
           type="submit"
           disabled={submitting}

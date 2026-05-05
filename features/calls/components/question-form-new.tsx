@@ -38,7 +38,7 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
   const [localQuestions, setLocalQuestions] = useState<Question[]>([]);
   const router = useRouter();
   const { openModal: openModalToDelete } = useDeleteModalStore()
-  
+
   const mapFromPrisma = (q: CallQuestion): Question => ({
     id: q.id,
     text: q.question,
@@ -50,12 +50,12 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
           : q.type === "MULTIPLE"
             ? "multiple"
             : "checkbox",
-    
+
     options: Array.isArray(q.options) ? (q.options.filter((opt): opt is string => typeof opt === "string") as string[]) : [],
     isEditing: false,
     isNew: false,
   });
-  
+
   const mapToPrisma = (q: Question) => ({
     id: q.id || undefined,
     question: q.text,
@@ -69,40 +69,40 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
             : "BOOLEAN",
     options: q.options || [],
   });
-  
+
   useEffect(() => {
     if (questions?.length) {
       setLocalQuestions(questions.map(mapFromPrisma));
     }
   }, [questions]);
-  
+
   const handleSave = async (id?: string, updated?: Partial<Question>) => {
     try {
       const questionToSave = localQuestions.find((q) => q.id === id || q.isNew);
       if (!questionToSave) return;
-      
+
       const payload = mapToPrisma({
         ...questionToSave,
         ...updated,
       });
-      
+
       const res = await fetch(`/api/calls/${call.id}/questions`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(payload),
       });
-      
+
       if (!res.ok) {
         console.error("Error guardando la pregunta");
         return;
       }
-      
+
       router.refresh();
     } catch (error) {
       console.error("Error en handleSave:", error);
     }
   };
-  
+
   const handleDelete = async (id?: string) => {
     openModalToDelete(
       "Eliminar pregunta",
@@ -115,13 +115,13 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
         // router.refresh();
       })
   }
-  
+
   const handleEdit = (id?: string) => {
     setLocalQuestions((prev) =>
       prev.map((q) => ({...q, isEditing: q.id === id}))
     );
   };
-  
+
   const handleAddOption = (id?: string) => {
     setLocalQuestions((prev) =>
       prev.map((q) =>
@@ -129,7 +129,7 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
       )
     );
   };
-  
+
   const handleUpdateOption = (id: string | undefined, index: number, value: string) => {
     setLocalQuestions((prev) =>
       prev.map((q) =>
@@ -142,42 +142,42 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
       )
     );
   };
-  
+
   const handleAddQuestion = () => {
     setLocalQuestions((prev) => [
       ...prev,
       {text: "", type: "short", options: [], isEditing: true, isNew: true},
     ]);
   };
-  
+
   return (
     <div className="max-w-3xl mx-auto space-y-4 px-3 md:px-1">
       <div className="flex flex-col md:flex-row justify-end gap-2">
-        <Button onClick={() => router.push("/calls")}
+        <Button onClick={() => router.back()}
                 variant='outline'
         >
           <ArrowLeft className="w-4 h-4"/>
           Volver a Convocatorias
         </Button>
-        <Link href={`/calls/${call.id}/questions/preview`} target="_blank" className="w-full md:w-auto">
+        <Link href={`/admin/calls/${call.id}/questions/preview`} target="_blank" className="w-full md:w-auto">
           <Button variant="outline">Ver previsualización</Button>
         </Link>
         <Button variant="outline" onClick={handleAddQuestion}>
           Agregar
         </Button>
       </div>
-      
+
       <h1 className="text-2xl font-bold">
         Preguntas Comunes ( {commonQuestionsList.length} )
       </h1>
-      
+
       <div className="flex flex-col gap-2 w-full overflow-x-auto pb-2">
         {commonQuestionsList.map((q, index) => (
           <Card key={q.id ?? index} className="pt-1">
             <CardContent>
               <div key={index} className="flex items-center space-x-2">
                 {/*<input type="checkbox" id={"checkbox-common"+index}/>*/}
-                
+
                 <label htmlFor={"checkbox-common"+index}>{index + 1}. {q.text}</label>
               </div>
             </CardContent>
@@ -203,7 +203,7 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
                     )
                   }
                 />
-                
+
                 <Select
                   value={q.type}
                   onValueChange={(val: QuestionTypeForm) =>
@@ -227,7 +227,7 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
                     </SelectItem>
                   </SelectContent>
                 </Select>
-                
+
                 {(q.type === "multiple" || q.type === "checkbox") && (
                   <div className="space-y-2">
                     {q.options?.map((opt, i) => (
@@ -249,7 +249,7 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
                     </Button>
                   </div>
                 )}
-                
+
                 <Button
                   variant="outline"
                   onClick={() => handleSave(q.id, {text: q.text})}
@@ -284,7 +284,7 @@ export default function QuestionsForm({questions, call}: QuestionsFormProps) {
                       <span>{opt}</span>
                     </div>
                   ))}
-                
+
                 <div className="flex space-x-2 items-center">
                   <Button
                     variant="outline"
