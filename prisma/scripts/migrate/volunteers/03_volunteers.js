@@ -6,9 +6,10 @@ import {PrismaClient, UserRole, WeekDay} from "@prisma/client";
 const prisma = new PrismaClient();
 
 // ===== CONFIG =====
-const CSV_PATH = "./volunteers_15122025.csv";
+// const CSV_PATH = "./volunteers_15122025.csv";
+const CSV_PATH = "./new_list.csv";
 const CALL_ID = "cmj7qoxna00002w815g8tiuhz";
-const DEFAULT_PASSWORD = "TEMP_PASSWORD";
+const DEFAULT_PASSWORD = "TEMP_PASS";
 // ===================
 
 // Mapeo explícito a enum Prisma
@@ -29,7 +30,10 @@ const AREA_MAP = {
   "REDES SOCIALES": "cmj7smac800022w53vzbhflxw",
   "DESARROLLO Y RECAUDACION DE FONDOS_ACTIVIDADES": "cmj7smacd00032w53scsyunwv",
   "FINANZAS": "cmj7smacj00042w53y4f8cdy4",
-}
+  "INFORMATICA": "cmj7smacj00042w53y4f8cdy2",
+  "ACTIVIDADES": "cmj7smacp00052w53k9z8n2x1",
+  "ALIMENTACION": "cmj7smacv00062w53m1q7p5t9",
+};
 
 const GROUP_BY_DAY = {
   LUNES: "cmfahdfo300022w5x5i5bjzid",
@@ -76,6 +80,15 @@ async function main() {
         ? row.CORREO.trim().toLowerCase()
         : `${fullName.replace(/\s+/g, "").toLowerCase()}@gmail.com`;
     // 1️⃣ USER
+
+    // const findUser = await prisma.user.findUnique({
+    //   where: { email },
+    // })
+    // if (findUser) {
+    //   console.log("[Ya existe este usuario]", findUser)
+    //   return;
+    // }
+
     const user = await prisma.user.upsert({
       where: {email},
       update: {},
@@ -93,8 +106,9 @@ async function main() {
 
     let cumple = undefined
 
-    if (row.CUMPLE) {
-      const parsed = dayjs(row.CUMPLE)
+    console.log(row.CUMPLEANIOS || "No Cumple");
+    if (row.CUMPLEANIOS) {
+      const parsed = dayjs(row.CUMPLEANIOS)
 
       if (parsed.isValid()) {
         const birthYear = parsed.year()
@@ -110,7 +124,7 @@ async function main() {
     const volunteerData = {
       name: fullName,
       email,
-      phone: row.CELULAR,
+      phone: "",
       address: "",
       birthday: cumple,
       createdBy: 'second_migration',
@@ -126,80 +140,82 @@ async function main() {
     // 2️⃣ VOLUNTEER
     const volunteer = await prisma.volunteer.upsert({
       where: {email: email},
-      update: {},
+      update: {
+        birthday: volunteerData.birthday,
+      },
       create: volunteerData,
     });
 
     // 3️⃣ CALL PARTICIPANT
-    const participant = await prisma.callParticipant.upsert({
-      where: {
-        volunteerId_callId: {
-          volunteerId: volunteer.id,
-          callId: CALL_ID,
-        },
-      },
-      update: {},
-      create: {
-        volunteerId: volunteer.id,
-        callId: CALL_ID,
-      },
-    });
-
-    // 4️⃣ CALL SCHEDULE + PARTICIPANT SCHEDULE
-    const days = row.HORARIOS
-      ? row.HORARIOS.split(",").map((d) => d.trim())
-      : [];
-
-    for (const day of days) {
-      const weekDay = weekDayMap[day];
-
-      if (!weekDay) {
-        console.warn(`⚠️ Día inválido: ${day}`);
-        continue;
-      }
-
-      const schedule = await prisma.callSchedule.findFirst({
-        where: {
-          callId: CALL_ID,
-          dayOfWeek: weekDay,
-        },
-      });
-
-      if (!schedule) {
-        console.warn(`⚠️ No existe schedule para ${weekDay}`);
-        continue;
-      }
-
-      await prisma.callParticipantSchedule.create({
-        data: {
-          participantId: participant.id,
-          scheduleId: schedule.id,
-        },
-      });
-
-      const groupId = GROUP_BY_DAY[weekDay];
-      if (!groupId) continue;
-
-      await prisma.groupMember.upsert({
-        where: {
-          groupId_volunteerId: {
-            groupId,
-            volunteerId: volunteer.id,
-          },
-        },
-        update: {},
-        create: {
-          groupId,
-          volunteerId: volunteer.id,
-          role: "MEMBER",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      });
-    }
+    // const participant = await prisma.callParticipant.upsert({
+    //   where: {
+    //     volunteerId_callId: {
+    //       volunteerId: volunteer.id,
+    //       callId: CALL_ID,
+    //     },
+    //   },
+    //   update: {},
+    //   create: {
+    //     volunteerId: volunteer.id,
+    //     callId: CALL_ID,
+    //   },
+    // });
+    //
+    // // 4️⃣ CALL SCHEDULE + PARTICIPANT SCHEDULE
+    // const days = row.HORARIOS
+    //   ? row.HORARIOS.split(",").map((d) => d.trim())
+    //   : [];
+    //
+    // for (const day of days) {
+    //   const weekDay = weekDayMap[day];
+    //
+    //   if (!weekDay) {
+    //     console.warn(`⚠️ Día inválido: ${day}`);
+    //     continue;
+    //   }
+    //
+    //   const schedule = await prisma.callSchedule.findFirst({
+    //     where: {
+    //       callId: CALL_ID,
+    //       dayOfWeek: weekDay,
+    //     },
+    //   });
+    //
+    //   if (!schedule) {
+    //     console.warn(`⚠️ No existe schedule para ${weekDay}`);
+    //     continue;
+    //   }
+    //
+    //   await prisma.callParticipantSchedule.create({
+    //     data: {
+    //       participantId: participant.id,
+    //       scheduleId: schedule.id,
+    //     },
+    //   });
+    //
+    //   const groupId = GROUP_BY_DAY[weekDay];
+    //   if (!groupId) continue;
+    //
+    //   await prisma.groupMember.upsert({
+    //     where: {
+    //       groupId_volunteerId: {
+    //         groupId,
+    //         volunteerId: volunteer.id,
+    //       },
+    //     },
+    //     update: {},
+    //     create: {
+    //       groupId,
+    //       volunteerId: volunteer.id,
+    //       role: "MEMBER",
+    //       createdAt: new Date(),
+    //       updatedAt: new Date(),
+    //     },
+    //   });
+    // }
     countAuxForImage++;
 
-    console.log(`✅ Procesado: ${email}`);
+    console.log(`✅ ACTUALIZADO: ${email}`);
   }
 
   console.log("🎉 Seed finalizado correctamente");

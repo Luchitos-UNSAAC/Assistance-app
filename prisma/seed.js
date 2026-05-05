@@ -20,20 +20,20 @@ async function main() {
         },
     });
 
-    await prisma.user.upsert({
-        where: { id: "cme09w21z000007if6wg7fxfk" },
-        update: {},
-        create: {
-            id: "cme09w21z000007if6wg7fxfk",
-            email: "admin@unsaac.edu.pe",
-            password: "123456", // ⚠️ Hash in production
-            name: "Admin Edu",
-            role: UserRole.ADMIN,
-            createdAt: new Date("2025-08-06T13:00:04.000Z"),
-            updatedAt: new Date("2025-08-06T13:00:04.000Z"),
-            volunteerId: volunteerAna.id,
-        },
-    });
+    // await prisma.user.upsert({
+    //     where: { id: "cme09w21z000007if6wg7fxfk" },
+    //     update: {},
+    //     create: {
+    //         id: "cme09w21z000007if6wg7fxfk",
+    //         email: "admin@unsaac.edu.pe",
+    //         password: "123456", // ⚠️ Hash in production
+    //         name: "Admin Edu",
+    //         role: UserRole.ADMIN,
+    //         createdAt: new Date("2025-08-06T13:00:04.000Z"),
+    //         updatedAt: new Date("2025-08-06T13:00:04.000Z"),
+    //         volunteerId: volunteerAna.id,
+    //     },
+    // });
     //
     // // === María López (VOLUNTEER) ===
     // const volunteerMaria = await prisma.volunteer.upsert({

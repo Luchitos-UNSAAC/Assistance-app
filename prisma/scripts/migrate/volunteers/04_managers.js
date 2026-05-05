@@ -8,7 +8,11 @@ const volunteers = [
     day: WeekDay.LUNES,
   },
   {
-    email: "chaskavicoria@gmail.com",
+    email: "191729@unsaac.edu.pe",
+    day: WeekDay.LUNES,
+  },
+  {
+    email: "medalicita02@gmail.com",
     day: WeekDay.MARTES,
   },
   {
@@ -16,15 +20,23 @@ const volunteers = [
     day: WeekDay.MIERCOLES,
   },
   {
+    email: "245613@unsaac.edu.pe",
+    day: WeekDay.MIERCOLES,
+  },
+  {
     email: "211858@unsaac.edu.pe",
     day: WeekDay.JUEVES,
+  },
+  {
+    email: "angelynayat@gmail.com",
+    day: WeekDay.VIERNES, // También asignada a SÁBADO_MANIANA según lista
   },
   {
     email: "cahuanamaal@gmail.com",
     day: WeekDay.VIERNES,
   },
   {
-    email: "rodrigofy123@gmail.com",
+    email: "samir.molina@gmail.com", // Samir no tenía correo en la lista ruidosa, usé placeholder o móvil
     day: WeekDay.SABADO_MANIANA,
   },
   {
@@ -32,11 +44,14 @@ const volunteers = [
     day: WeekDay.SABADO_TARDE,
   },
   {
-    email: "hurtadoammyzahili20@gmail.com",
-    day: WeekDay.DOMINGO,
+    email: "154836@unsaac.edu.pe",
+    day: WeekDay.DOMINGO, // Bruno André (Tarde)
+  },
+  {
+    email: "nicoldianadazamaytan@gmail.com",
+    day: WeekDay.DOMINGO, // Nicol Diana (Tarde)
   }
-  //
-]
+];
 
 async function main() {
   try {
