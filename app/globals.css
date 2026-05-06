@@ -9,17 +9,18 @@
 }
 
 :root {
-  /* Slate Base - Un gris con matiz azulado para armonía total */
+  /* Slate Base - Gris azulado ultra-limpio */
   --background: oklch(0.99 0.01 260);
   --foreground: oklch(0.208 0.042 265.755);
 
-  --card: oklch(1 0 0 / 0.6); /* Transparencia para el Glassmorphism */
+  /* Glassmorphism: Tarjetas con transparencia nativa */
+  --card: oklch(1 0 0 / 0.7);
   --card-foreground: oklch(0.208 0.042 265.755);
 
-  --popover: oklch(1 0 0);
+  --popover: oklch(1 0 0 / 0.95);
   --popover-foreground: oklch(0.208 0.042 265.755);
 
-  /* Primary: Violeta Vibrante (Brand Color) */
+  /* Primary: El Violeta distintivo de LUCHOS */
   --primary: oklch(0.511 0.262 276.966);
   --primary-foreground: oklch(0.99 0.01 260);
 
@@ -32,41 +33,42 @@
   --accent: oklch(0.94 0.02 260);
   --accent-foreground: oklch(0.208 0.042 265.755);
 
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.627 0.194 28.92);
   --destructive-foreground: oklch(0.99 0.01 260);
 
-  /* Bordes más suaves para Inter */
   --border: oklch(0.929 0.013 255.508);
   --input: oklch(0.929 0.013 255.508);
   --ring: oklch(0.511 0.262 276.966);
 
-  --radius: 0.75rem; /* Un poco más redondeado para el estilo KISS */
-
-  /* Charts con paleta armonizada */
-  --chart-1: oklch(0.511 0.262 276.966);
-  --chart-2: oklch(0.627 0.265 303.9);
-  --chart-3: oklch(0.488 0.243 264.376);
-  --chart-4: oklch(0.696 0.17 162.48);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.85rem; /* Estilo KISS: Bordes ligeramente más curvos y modernos */
 }
 
 .dark {
   --background: oklch(0.129 0.03 264.695);
   --foreground: oklch(0.94 0.02 260);
-  --card: oklch(0.145 0.03 264.695 / 0.8);
+
+  /* Tarjetas oscuras con efecto cristalizado */
+  --card: oklch(0.16 0.03 264.695 / 0.8);
   --card-foreground: oklch(0.94 0.02 260);
-  --popover: oklch(0.129 0.03 264.695);
+
+  --popover: oklch(0.14 0.03 264.695 / 0.95);
   --popover-foreground: oklch(0.94 0.02 260);
+
+  /* Primary en Dark Mode: Un tono un poco más eléctrico para legibilidad */
   --primary: oklch(0.627 0.265 303.9);
   --primary-foreground: oklch(0.129 0.03 264.695);
+
   --secondary: oklch(0.208 0.042 265.755);
   --secondary-foreground: oklch(0.94 0.02 260);
+
   --muted: oklch(0.208 0.042 265.755);
   --muted-foreground: oklch(0.708 0.02 260);
-  --accent: oklch(0.208 0.042 265.755);
+
+  --accent: oklch(0.25 0.04 265);
   --accent-foreground: oklch(0.94 0.02 260);
-  --border: oklch(0.27 0.03 260);
-  --input: oklch(0.27 0.03 260);
+
+  --border: oklch(0.27 0.03 260 / 0.6);
+  --input: oklch(0.27 0.03 260 / 0.6);
   --ring: oklch(0.627 0.265 303.9);
 }
 
@@ -90,6 +92,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -98,39 +101,48 @@
 
 @layer base {
   body {
-    @apply bg-background text-foreground antialiased;
+    /* Fondo con un sutil gradiente radial para dar profundidad */
+    @apply bg-background text-foreground antialiased bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-background to-background;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-height: 100vh;
   }
 }
 
-/* --- Custom Utilities para el Dashboard --- */
+/* --- Senior Utilities: Menos código, más impacto --- */
 
 .gradient-card {
-  @apply bg-white/60 backdrop-blur-md border border-white/20 shadow-sm transition-all duration-300;
+  @apply bg-card backdrop-blur-md border border-border/50 shadow-lg shadow-black/5 transition-all duration-300;
 }
 
 .gradient-button {
-  @apply bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-200
-  hover:shadow-lg hover:shadow-violet-300 hover:scale-[1.02] active:scale-[0.98] transition-all;
+  /* Ahora usa las variables del tema para que cambie en Dark Mode automáticamente */
+  @apply bg-primary text-primary-foreground shadow-lg shadow-primary/20
+  hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all;
 }
 
 .gradient-accent {
-  @apply bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10;
+  /* Efecto aurora sutil para fondos de sección */
+  @apply bg-gradient-to-br from-primary/5 via-transparent to-primary/5;
 }
 
-/* Mejora de legibilidad para placeholders */
+/* Input placeholders que respetan el modo oscuro */
 input::placeholder,
 textarea::placeholder {
-  @apply text-slate-400 font-normal !important;
+  @apply text-muted-foreground/50 font-normal !important;
 }
 
-/* Scrollbar minimalista (opcional para KISS) */
+/* Scrollbar minimalista (Senior Touch) */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   @apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+  @apply bg-muted-foreground/20 rounded-full hover:bg-primary/40 transition-colors;
+}
+
+/* Eliminar resaltado azul en móviles */
+* {
+  -webkit-tap-highlight-color: transparent;
 }

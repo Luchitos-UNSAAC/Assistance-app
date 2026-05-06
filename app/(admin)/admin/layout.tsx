@@ -5,6 +5,7 @@ import {AdminMobileTabs} from "@/features/admin/components/tabs-mobile-admin";
 import type React from "react";
 import {Toaster} from "@/components/ui/toaster";
 import {AdminNavbar} from "@/components/admin-navbar";
+import DeleteConfirmationModal from "@/components/delete-confirm-modal";
 
 export default async function AdminLayout({children}: { children: React.ReactNode }) {
   const userAdmin = await getCurrentAdminUser();
@@ -32,7 +33,7 @@ export default async function AdminLayout({children}: { children: React.ReactNod
       <div className="md:hidden fixed bottom-0 inset-x-0 z-50">
         <AdminMobileTabs/>
       </div>
-
+      <DeleteConfirmationModal/>
       <Toaster/>
     </div>
   );

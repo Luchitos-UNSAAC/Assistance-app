@@ -7,7 +7,7 @@ export default function Page() {
         Nueva configuración
       </h1>
 
-      <p className="text-sm text-gray-600 mb-6">
+      <p className="text-sm mb-6">
         Define una clave y su valor para la configuración del sistema.
       </p>
 

@@ -811,7 +811,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                 responsiveSettings.compactMode && "min-h-8 text-sm",
                 screenSize === "mobile" && "min-h-12 text-base",
                 disabled && "opacity-50 cursor-not-allowed",
-                "text-gray-500",
+                // "text-gray-500",
                 className
               )}
               style={{
@@ -913,7 +913,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                                 }
                               }}
                               aria-label={`Remove ${option.label} from selection`}
-                              className="ml-2 h-4 w-4 cursor-pointer hover:bg-black/20 rounded-sm p-0.5 -m-0.5 focus:outline-none focus:ring-1 focus:black/50">
+                              className="ml-2 h-4 w-4 cursor-pointer hover:bg-primary/20 rounded-sm p-0.5 -m-0.5 focus:outline-none focus:ring-1 focus:primary/50">
                               <XCircle
                                 className={cn(
                                   "h-3 w-3",

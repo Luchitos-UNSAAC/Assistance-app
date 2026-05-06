@@ -8,12 +8,12 @@ export default async function Page() {
     <div className="w-full">
       <div className="mb-3 mt-6">
         <h1 className='text-2xl font-bold'>Configuraciones</h1>
-        <p className="text-gray-800">
+        <p>
           Gestion de configuraciones
         </p>
       </div>
 
-      <SettingsTable data={settings} />
+      <SettingsTable data={settings}/>
     </div>
   )
 }

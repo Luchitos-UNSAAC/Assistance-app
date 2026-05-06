@@ -38,5 +38,3 @@ export default async function RootLayout({
     </ThemeProvider>
   )
 }
-
-// className="pt-20 pb-20"
