@@ -61,10 +61,10 @@ export const getAttendancesAndVolunteersByEmail = async (email: string): Promise
         email,
       }
     })
-    if (!user) {
+    if (!user || !user?.volunteerId) {
       return null
     }
-    return await getAttendancesAsManager(user.id)
+    return await getAttendancesAsManager(user.volunteerId)
   } catch (error) {
     console.error("[ERROR_GET_ATTENDANCES]", error);
     return null
@@ -162,7 +162,7 @@ async function getAttendancesAsAdmin(adminUserId: string) {
   const today = new Date();
   const todayWeekDay = DAY_MAP[today.getDay()];
 
-  // 1️⃣ Ver si el admin es líder
+  // 1️. Ver si el admin es líder
   const adminVolunteer = await prisma.volunteer.findFirst({
     where: {
       deletedAt: null,
