@@ -9,6 +9,9 @@ export const callFormSchema = z.object({
   birthDate: z.string().min(1, "La fecha de nacimiento es obligatoria"),
   answers: z.record(z.union([z.string().min(1, "Campo obligatorio"), z.array(z.string()).min(1, "Debes elegir al menos una opción")])),
   schedules: z.array(z.string()).min(1, "Debes seleccionar al menos un horario"),
+  privacyAccepted: z.boolean().refine((val) => val, {
+    message: "Debes aceptar la Política de Privacidad para continuar",
+  }),
 });
 
 export type CallFormSchema = z.infer<typeof callFormSchema>;

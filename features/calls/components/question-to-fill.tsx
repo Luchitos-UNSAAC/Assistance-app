@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,14 +48,16 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
       birthDate: "",
       answers: {},
       schedules: [],
+      privacyAccepted: false,
     },
   });
   const router = useRouter();
   const { toast } = useToast()
-  
+
   const answers = watch("answers");
   const selectedSchedules = watch("schedules");
-  
+  const privacyAccepted = watch("privacyAccepted");
+
   // Prisma -> Form mapping
   const mapFromPrisma = (q: CallQuestion): Question => ({
     id: q.id,
@@ -69,9 +72,9 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
             : "checkbox",
     options: Array.isArray(q.options) ? q.options.filter((opt): opt is string => typeof opt === "string") : [],
   });
-  
+
   const localQuestions: Question[] = questions.map(mapFromPrisma);
-  
+
   const onSubmit = async (data: CallFormSchema) => {
     try {
       const res = await fetch(`/api/calls/${callId}/participants`, {
@@ -79,7 +82,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      
+
       if (!res.ok) {
         toast({
           title: "Error",
@@ -97,14 +100,14 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
       console.error("❌ Error al enviar:", err);
     }
   };
-  
+
   const formatSchedule = (s: CallSchedule) => {
     if (s.onDate) {
       return `${new Date(s.onDate).toLocaleDateString()} - ${new Date(s.startTime!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} a ${new Date(s.endTime!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
     }
     return `${s.dayOfWeek} - ${new Date(s.startTime!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} a ${new Date(s.endTime!).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
   };
-  
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl mx-auto space-y-8 p-6">
       <h1 className="text-3xl font-bold mb-8 text-center">Formulario</h1>
@@ -118,7 +121,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
           {errors.fullName && <p className="mt-1 text-red-500 text-sm">{errors.fullName.message}</p>}
         </CardContent>
       </Card>
-      
+
       {/* Correo institucional */}
       <Card>
         <CardHeader>
@@ -129,7 +132,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
           {errors.email && <p className="mt-1 text-red-500 text-sm">{errors.email.message}</p>}
         </CardContent>
       </Card>
-      
+
       {/* DNI */}
       <Card>
         <CardHeader>
@@ -140,7 +143,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
           {errors.dni && <p className="mt-1 text-red-500 text-sm">{errors.dni.message}</p>}
         </CardContent>
       </Card>
-      
+
       {/* Celular */}
       <Card>
         <CardHeader>
@@ -151,7 +154,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
           {errors.phoneNumber && <p className="mt-1 text-red-500 text-sm">{errors.phoneNumber.message}</p>}
         </CardContent>
       </Card>
-      
+
       {/* DNI */}
       <Card>
         <CardHeader>
@@ -162,7 +165,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
           {errors.address && <p className="mt-1 text-red-500 text-sm">{errors.address.message}</p>}
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>5. Nacimiento</CardTitle>
@@ -172,7 +175,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
           {errors.birthDate && <p className="mt-1 text-red-500 text-sm">{errors.birthDate.message}</p>}
         </CardContent>
       </Card>
-      
+
       {/* Preguntas dinámicas */}
       {localQuestions.map((q, index) => (
         <Card key={q.id}>
@@ -187,7 +190,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
                 onChange={(e) => setValue(`answers.${q.id}`, e.target.value)}
               />
             )}
-            
+
             {q.type === "multiple" && (
               <RadioGroup
                 onValueChange={(val) => setValue(`answers.${q.id}`, val)}
@@ -201,7 +204,7 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
                 ))}
               </RadioGroup>
             )}
-            
+
             {q.type === "checkbox" &&
               q.options?.map((opt, i) => {
                 const current = (answers[q.id] as string[]) || [];
@@ -223,12 +226,12 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
                   </div>
                 );
               })}
-            
+
             {errors.answers?.[q.id] && <p className="mt-1 text-red-500 text-sm">{errors.answers[q.id]?.toString()}</p>}
           </CardContent>
         </Card>
       ))}
-      
+
       {/* Horarios */}
       {(schedules?.length ?? 0) > 0 && (
         <Card>
@@ -258,13 +261,60 @@ export default function QuestionsToFill({ questions, schedules, callId }: Questi
             {errors.schedules && <p className="mt-1 text-red-500 text-sm">{errors.schedules.message}</p>}
           </CardContent>
         </Card>
-      )}
-      
-      <Button type="submit"
-              className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded"
-              size="lg">
-        Guardar respuestas
-      </Button>
+       )}
+
+       {/* Privacy Policy Acceptance */}
+       <Card className="bg-blue-50 border-blue-200">
+         <CardHeader>
+           <CardTitle className="text-blue-900">🔒 Protección de Datos</CardTitle>
+         </CardHeader>
+         <CardContent className="space-y-3">
+           <p className="text-sm text-gray-700">
+             Tus datos personales se protegen bajo nuestra Política de Privacidad. Al enviar este formulario aceptas:
+           </p>
+           <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
+             <li>El almacenamiento seguro de tu información</li>
+             <li>El uso de tus datos solo para gestión de voluntariado</li>
+             <li>La comunicación sobre eventos y actividades</li>
+           </ul>
+           <div className="flex items-start space-x-2 pt-2">
+             <Checkbox
+               id="privacy-accept"
+               checked={privacyAccepted}
+               onCheckedChange={(val) => setValue("privacyAccepted", !!val)}
+             />
+             <div className="flex-1">
+               <Label htmlFor="privacy-accept" className="text-sm cursor-pointer">
+                 He leído y acepto la{" "}
+                 <Link
+                   href="/politica-privacidad"
+                   target="_blank"
+                   className="text-blue-600 hover:text-blue-700 underline font-semibold"
+                 >
+                   Política de Privacidad
+                 </Link>
+                 {" "}y los{" "}
+                 <Link
+                   href="/terminos-servicio"
+                   target="_blank"
+                   className="text-blue-600 hover:text-blue-700 underline font-semibold"
+                 >
+                   Términos de Servicio
+                 </Link>
+               </Label>
+             </div>
+           </div>
+           {errors.privacyAccepted && (
+             <p className="text-red-500 text-sm font-medium">{errors.privacyAccepted.message}</p>
+           )}
+         </CardContent>
+       </Card>
+
+       <Button type="submit"
+               className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded"
+               size="lg">
+         Guardar respuestas
+       </Button>
     </form>
   );
 }
