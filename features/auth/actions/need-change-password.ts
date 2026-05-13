@@ -26,7 +26,7 @@ export async function needChangePassword() {
     }
     return {
       success: true,
-      data: user.password === "TEMP_PASSWORD"
+      data: user.password === "TEMP_PASS"
     }
 
   } catch (error) {
