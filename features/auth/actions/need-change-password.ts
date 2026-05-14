@@ -16,17 +16,36 @@ export async function needChangePassword() {
     const user = await prisma.user.findUnique({
       where: {
         email: email
-      }
+      },
+      include: {
+        volunteer: {
+          select: {
+            birthday: true,
+          }
+        },
+      },
     })
-    if (!user || !user.volunteerId) {
+    if (!user) {
       return {
         success: false,
         error: "Usuario no encontrado"
       }
     }
+
+    if (!user.volunteerId) {
+      return {
+        success: false,
+        error: "No hay voluntario"
+      }
+    }
+
     return {
       success: true,
-      data: user.password === "TEMP_PASS"
+      data: user.password === "TEMP_PASS",
+      user: {
+        email,
+        birthday: user.volunteer?.birthday || undefined
+      }
     }
 
   } catch (error) {

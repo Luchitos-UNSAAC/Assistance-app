@@ -16,7 +16,7 @@ export async function changePassword(newPassword: string, birthday: Date){
     const user = await prisma.user.findUnique({
       where: {
         email: email,
-        password: "TEMP_PASSWORD"
+        password: "TEMP_PASS"
       }
     })
     if (!user || !user.volunteerId) {

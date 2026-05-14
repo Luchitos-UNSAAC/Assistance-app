@@ -1,6 +1,5 @@
 import type React from "react"
 import type {Metadata} from "next"
-import {Inter} from "next/font/google"
 import {ThemeProvider} from "@/components/theme-provider"
 import {Toaster} from "@/components/ui/toaster"
 import BottomNavigation from "@/components/bottom-navigation"
@@ -9,8 +8,6 @@ import DeleteConfirmationModal from "@/components/delete-confirm-modal";
 import {Navbar} from "@/components/navbar";
 import {needChangePassword} from "@/features/auth/actions/need-change-password";
 import {ChangePasswordModal} from "@/features/auth/components/change-password-modal";
-
-const inter = Inter({subsets: ["latin"]})
 
 export const metadata: Metadata = {
   title: "LUCHOS UNSAAC - Plataforma de Voluntarios Caninos",
@@ -31,7 +28,12 @@ export default async function RootLayout({
           <main>{children}</main>
           <BottomNavigation/>
           <DeleteConfirmationModal/>
-          {itNeedChangePassword.data && <ChangePasswordModal isOpen={itNeedChangePassword.data}/>}
+          {itNeedChangePassword.data && (
+            <ChangePasswordModal
+              isOpen={itNeedChangePassword.data}
+              user={itNeedChangePassword.user}
+            />
+          )}
         </ClientRenderSecure>
       </div>
       <Toaster/>

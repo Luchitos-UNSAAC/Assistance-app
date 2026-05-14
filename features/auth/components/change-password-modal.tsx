@@ -1,24 +1,29 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { useRouter } from "next/navigation"
-import { Loader2, Lock, Eye, EyeOff } from "lucide-react"
+import {useState, useTransition} from "react"
+import {useRouter} from "next/navigation"
+import {Loader2, Lock, Eye, EyeOff} from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
-import { changePassword } from "@/features/auth/actions/change-password";
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {useToast} from "@/hooks/use-toast"
+import {changePassword} from "@/features/auth/actions/change-password";
 
 interface ChangePasswordModalProps {
-  isOpen: boolean
+  isOpen: boolean;
+  user: {
+    email: string;
+    birthday?: Date;
+  }
 }
 
 export const ChangePasswordModal = ({
                                       isOpen,
+                                      user
                                     }: ChangePasswordModalProps) => {
   const router = useRouter()
-  const { toast } = useToast()
+  const {toast} = useToast()
 
   const [pending, startTransition] = useTransition()
   const [isLoading, setIsLoading] = useState(false)
@@ -26,7 +31,7 @@ export const ChangePasswordModal = ({
   // Estados del formulario
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [birthday, setBirthday] = useState("")
+  const [birthday, setBirthday] = useState(user.birthday ? user.birthday.toISOString().split("T")[0] : "")
 
   // Estado para visibilidad de contraseña
   const [showPassword, setShowPassword] = useState(false)
@@ -89,11 +94,12 @@ export const ChangePasswordModal = ({
         aria-hidden="true"
       />
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-md rounded-xl bg-white p-6 shadow-xl space-y-6 overflow-y-auto max-h-[90vh]">
+      <div
+        className="relative z-10 w-full max-w-md rounded-xl bg-white p-6 shadow-xl space-y-6 overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-full">
-            <Lock className="w-5 h-5 text-primary" />
+            <Lock className="w-5 h-5 text-primary"/>
           </div>
           <div className="space-y-1">
             <h2 className="text-xl font-bold text-gray-800">
@@ -140,7 +146,7 @@ export const ChangePasswordModal = ({
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
               </button>
             </div>
           </div>
@@ -170,7 +176,7 @@ export const ChangePasswordModal = ({
             className="w-full sm:min-w-[140px]"
           >
             {isLoading && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
             )}
             {isLoading ? "Actualizando..." : "Actualizar datos"}
           </Button>
