@@ -145,7 +145,7 @@ export default function AttendanceModal({ isOpen, onClose, volunteer }: Attendan
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-white border-2 border-purple-200 shadow-2xl">
+      <DialogContent className="sm:max-w-md border-2 shadow-2xl dark:bg-black bg-white">
         <DialogHeader>
           <DialogTitle>Registrar asistencia — {volunteer.name}</DialogTitle>
         </DialogHeader>

@@ -66,7 +66,7 @@ export function ChangeUserRoleModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={close}>
-      <DialogContent className="bg-white">
+      <DialogContent className="dark:bg-black bg-white">
         <DialogHeader>
           <DialogTitle>
             Cambiar rol de {user.name}
@@ -93,8 +93,8 @@ export function ChangeUserRoleModal() {
               }}
               className={`w-full px-4 py-2 rounded-md border text-left transition
                 ${role === r.value
-                ? "bg-black text-white"
-                : "hover:bg-gray-100"}
+                ? "border-green-600"
+                : "border-primary"}
               `}
             >
               {r.label}
@@ -115,8 +115,8 @@ export function ChangeUserRoleModal() {
                 onClick={() => setIsLeader(true)}
                 className={`px-4 py-2 rounded-md border text-sm transition
                   ${isLeader
-                  ? "bg-black text-white"
-                  : "hover:bg-gray-100"}
+                  ? "border-green-600"
+                  : "border-red-100"}
                 `}
               >
                 Sí
@@ -130,8 +130,8 @@ export function ChangeUserRoleModal() {
                 }}
                 className={`px-4 py-2 rounded-md border text-sm transition
                   ${!isLeader
-                  ? "bg-black text-white"
-                  : "hover:bg-gray-100"}
+                  ? "border-green-600"
+                  : "border-red-100"}
                 `}
               >
                 No
@@ -155,8 +155,8 @@ export function ChangeUserRoleModal() {
                   onClick={() => setLeaderDay(day)}
                   className={`px-3 py-2 rounded-md border text-sm transition
                     ${leaderDay === day
-                    ? "bg-black text-white"
-                    : "hover:bg-gray-100"}
+                    ? "border-green-600"
+                    : "border-red-100"}
                   `}
                 >
                   {day}

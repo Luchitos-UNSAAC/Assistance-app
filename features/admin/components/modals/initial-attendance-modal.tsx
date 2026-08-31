@@ -76,50 +76,50 @@ export const InitialAttendanceModal = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/90"
         onClick={() => !disabled && close()}
       />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl space-y-6">
+      <div className="relative z-10 w-full max-w-lg rounded-xl p-6 shadow-xl space-y-6 dark:bg-black bg-white">
         {/* Header */}
         <div className="space-y-1">
-          <h2 className="text-xl font-bold text-gray-800">
+          <h2 className="text-xl font-bold">
             Primeras asistencias 🐶
           </h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm">
             Registra el historial inicial del voluntario
           </p>
         </div>
 
         {/* Volunteer info */}
-        <div className="rounded-lg bg-gray-50 p-4 border">
-          <p className="font-semibold text-gray-800">
+        <div className="rounded-lg p-4 border">
+          <p className="font-semibold">
             {volunteer.name}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm">
             {volunteer.email}
           </p>
         </div>
 
         {/* Current summary */}
         <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="rounded-lg bg-green-50 p-3">
-            <p className="text-xs text-gray-500">Presentes</p>
+          <div className="rounded-lg p-3">
+            <p className="text-xs">Presentes</p>
             <p className="text-lg font-bold text-green-700">
               {volunteer.attendances.PRESENT}
             </p>
           </div>
 
-          <div className="rounded-lg bg-yellow-50 p-3">
-            <p className="text-xs text-gray-500">Tardanzas</p>
+          <div className="rounded-lg p-3">
+            <p className="text-xs">Tardanzas</p>
             <p className="text-lg font-bold text-yellow-700">
               {volunteer.attendances.LATE}
             </p>
           </div>
 
-          <div className="rounded-lg bg-red-50 p-3">
-            <p className="text-xs text-gray-500">Faltas</p>
+          <div className="rounded-lg p-3">
+            <p className="text-xs">Faltas</p>
             <p className="text-lg font-bold text-red-700">
               {volunteer.attendances.ABSENT}
             </p>
@@ -163,7 +163,7 @@ export const InitialAttendanceModal = () => {
             </div>
           </div>
 
-          <div className="rounded-lg bg-gray-50 border p-3 text-sm">
+          <div className="rounded-lg border p-3 text-sm">
             Total de registros:{" "}
             <span className="font-semibold">{total}</span>
           </div>

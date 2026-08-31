@@ -58,7 +58,7 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold">{volunteer.name}</h1>
-        <p className="text-sm text-gray-500">{volunteer.email}</p>
+        <p className="text-sm">{volunteer.email}</p>
       </div>
 
       {/* Score */}
@@ -66,9 +66,9 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
         {(Object.keys(scoreAttendances) as AttendanceScoreKey[]).map((key) => (
           <div
             key={key}
-            className="rounded-xl border bg-gray-50 p-2 text-center"
+            className="rounded-xl border p-2 text-center"
           >
-            <p className="text-xs text-gray-500">{STATUS_LABELS[key]}</p>
+            <p className="text-xs">{STATUS_LABELS[key]}</p>
             <p className="text-2xl font-bold">{scoreAttendances[key]}</p>
           </div>
         ))}
@@ -132,7 +132,7 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
       {/* TABLE */}
       <div className="w-full overflow-x-auto rounded-xl border">
         <table className="w-full table-auto border-collapse">
-          <thead className="bg-gray-100">
+          <thead className="">
           <tr>
             <th className="px-4 py-3 text-left text-sm font-medium">
               #
@@ -163,14 +163,14 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
             <tr>
               <td
                 colSpan={6}
-                className="px-4 py-6 text-center text-sm text-gray-500"
+                className="px-4 py-6 text-center text-sm"
               >
                 No hay asistencias para los filtros seleccionados
               </td>
             </tr>
           ) : (
             filteredAttendances.map((a, index) => (
-              <tr key={a.id} className="hover:bg-gray-50">
+              <tr key={a.id} className="hover:border-green-500">
                 <td className="px-4 py-3">
                   {index + 1}
                 </td>
@@ -196,7 +196,7 @@ export default function VolunteerAttendancesForAdmin({data}: Props) {
                   {a.source}
                 </td>
 
-                <td className="px-4 py-3 text-sm text-gray-500">
+                <td className="px-4 py-3 text-sm">
                   {format(new Date(a.createdAt), "yyyy-MM-dd HH:mm")}
                 </td>
               </tr>

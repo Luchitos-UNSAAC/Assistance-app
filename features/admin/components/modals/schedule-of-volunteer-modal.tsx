@@ -75,11 +75,11 @@ export const ScheduleVolunteerModal = ({ groups }: ScheduleVolunteerModalProps) 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/90"
         onClick={() => !pending && close()}
       />
 
-      <div className="relative z-10 w-full max-w-2xl rounded-xl bg-white p-6 space-y-6 shadow-xl">
+      <div className="relative z-10 w-full max-w-2xl rounded-xl p-6 space-y-6 shadow-xl bg-primary border-secondary dark:bg-black bg-white">
         {/* Header */}
         <div>
           <h2 className="text-xl font-bold">
@@ -91,7 +91,7 @@ export const ScheduleVolunteerModal = ({ groups }: ScheduleVolunteerModalProps) 
         </div>
 
         {/* Volunteer */}
-        <div className="rounded-lg border bg-gray-50 p-4">
+        <div className="rounded-lg border p-4">
           <p className="font-semibold">{volunteer.name}</p>
           <p className="text-sm text-muted-foreground">
             {volunteer.email}
@@ -117,8 +117,8 @@ export const ScheduleVolunteerModal = ({ groups }: ScheduleVolunteerModalProps) 
                       className={cn(
                         "cursor-pointer rounded-lg border p-3 flex items-center justify-between transition",
                         selected
-                          ? "bg-green-50 border-green-400"
-                          : "hover:bg-gray-50"
+                          ? "border-green-400"
+                          : ""
                       )}
                     >
                       <div>
