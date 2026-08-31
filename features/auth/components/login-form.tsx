@@ -106,7 +106,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br bg-primary">
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -133,14 +133,14 @@ export default function LoginForm() {
 
 
         {/* Login Form */}
-        <Card className="bg-white/90 backdrop-blur-sm border-2 border-white/20 shadow-2xl">
+        <Card className="bg-primary/90 backdrop-blur-sm border-2 border-white/20 shadow-2xl">
           <CardHeader>
-            <CardTitle className="text-center text-gray-900">Iniciar Sesión</CardTitle>
+            <CardTitle className="text-center text-primary">Iniciar Sesión</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="email" className="text-gray-700">
+                <Label htmlFor="email" className="text-primary">
                   Email
                 </Label>
                 <Input
@@ -149,13 +149,13 @@ export default function LoginForm() {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   placeholder="tu-email@unsaac.edu"
-                  className={`bg-white/80 border-2 ${errors.email ? "border-red-500" : "border-gray-200"} focus:border-purple-500`}
+                  className={`bg-primary/80 border-2 ${errors.email ? "border-red-500" : "border-primary"} focus:border-purple-500`}
                 />
                 {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
               </div>
 
               <div>
-                <Label htmlFor="password" className="text-gray-700">
+                <Label htmlFor="password" className="text-primary">
                   Contraseña
                 </Label>
                 <div className="relative">
@@ -165,7 +165,7 @@ export default function LoginForm() {
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     placeholder="Tu contraseña"
-                    className={`bg-white/80 border-2 pr-10 ${errors.password ? "border-red-500" : "border-gray-200"} focus:border-purple-500`}
+                    className={`bg-primary/80 border-2 pr-10 ${errors.password ? "border-red-500" : "border-gray-200"} focus:border-purple-500`}
                   />
                   <Button
                     type="button"

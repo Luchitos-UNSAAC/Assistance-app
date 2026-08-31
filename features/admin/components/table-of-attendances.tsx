@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {VolunteerWithAttendancesByStatus} from "@/features/admin/actions/get-volunteers-with-attendances-for-admin";
 import {ArrowDown, ArrowUp, ArrowUpDown, Edit} from "lucide-react";
 import AuthGuard from "@/components/auth-guard";
@@ -8,6 +8,8 @@ import {MultiSelect} from "@/components/ui/multi-select";
 import {ButtonActions} from "@/features/admin/components/button-actions";
 import {formatDate, formatRoleLabel, getVolunteerSchedule, ROLE_LABELS, WEEK_DAY_LABELS} from "@/features/admin/utils";
 import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import AddVolunteerModal from "@/features/volunteers/components/add-volunteer-modal";
 
 type SortDirection = 'asc' | 'desc';
 
@@ -18,11 +20,13 @@ type SortKey =
   | 'birthday';
 
 export default function TableOfAttendances({data}: { data: VolunteerWithAttendancesByStatus[] }) {
-  const [sortKey, setSortKey] = React.useState<SortKey>('name');
-  const [sortDirection, setSortDirection] = React.useState<SortDirection>('asc');
-  const [search, setSearch] = React.useState('');
-  const [selectedDays, setSelectedDays] = React.useState<string[]>([]);
-  const [selectedRoles, setSelectedRoles] = React.useState<string[]>([]);
+  const [sortKey, setSortKey] = useState<SortKey>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [search, setSearch] = useState('');
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [isAddOpen, setIsAddOpen] = useState(false)
+
 
   // Opciones de Selectores (Memorizadas)
   const roleOptions = useMemo(() => Object.entries(ROLE_LABELS).map(([value, label]) => ({value, label})), []);
@@ -67,11 +71,21 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
     <AuthGuard requiredRole="ADMIN">
       <div className="mt-6 w-full space-y-6">
         {/* Header Section */}
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Voluntarios</h1>
-          <p className="text-muted-foreground text-sm">Gestión centralizada de miembros y asistencias.</p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+          <div>
+            <h1 className="text-2xl font-extrabold tracking-tight">Voluntarios</h1>
+            <p className="text-muted-foreground text-sm">Gestión centralizada de miembros y asistencias.</p>
+          </div>
+          <div>
+            {/*  Add button to add volunteers*/}
+            <Button variant="outline" className="flex items-center gap-2"
+                    onClick={() => setIsAddOpen(true)}
+            >
+              <Edit className="h-4 w-4"/>
+              Agregar Voluntario
+            </Button>
+          </div>
         </div>
-
         {/* Filters Bar */}
         <div className="flex flex-col md:flex-row gap-3">
           <input
@@ -166,6 +180,7 @@ export default function TableOfAttendances({data}: { data: VolunteerWithAttendan
           ))}
         </div>
       </div>
+      <AddVolunteerModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />
     </AuthGuard>
   );
 }

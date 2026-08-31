@@ -21,6 +21,8 @@ import { useRouter } from "next/navigation"
 import { useVolunteerGroupModal } from "@/features/admin/stores/use-volunteer-group-modal"
 import { useChangeUserRoleModal } from "@/features/admin/stores/use-change-user-role-modal"
 import { cn } from "@/lib/utils"
+import {useState} from "react";
+import AttendanceModal from "@/features/attendances/components/attendance-modal";
 
 interface ButtonActionsProps {
   volunteer: VolunteerWithAttendancesByStatus
@@ -35,65 +37,95 @@ export const ButtonActions = ({ volunteer }: ButtonActionsProps) => {
   // Estilo común para los iconos de los items
   const iconStyles = "mr-2 h-4 w-4 text-muted-foreground/80"
 
+  const [isAttendanceOpen, setIsAttendanceOpen] = useState(false)
+  const [selectedVolunteer, setSelectedVolunteer] = useState<VolunteerWithAttendancesByStatus | null>(null)
+
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 hover:bg-accent hover:text-accent-foreground rounded-full"
-          aria-label="Abrir opciones de voluntario"
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 hover:bg-accent hover:text-accent-foreground rounded-full"
+            aria-label="Abrir opciones de voluntario"
+          >
+            <MoreHorizontalIcon className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          align="end"
+          className="w-52 border-border/50 bg-popover/95 backdrop-blur-md shadow-lg"
         >
-          <MoreHorizontalIcon className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        align="end"
-        className="w-52 border-border/50 bg-popover/95 backdrop-blur-md shadow-lg"
-      >
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={() => openScheduleVolunteerModal(volunteer)}
-            className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
-          >
-            <Calendar className={iconStyles} />
-            <span className="font-medium">Horarios</span>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() => openInitialAttendanceModal(volunteer)}
-            className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
-          >
-            <MailCheckIcon className={iconStyles} />
-            <span className="font-medium">Primeras asistencias</span>
-          </DropdownMenuItem>
-
-          {volunteer.user && (
+          <DropdownMenuGroup>
             <DropdownMenuItem
-              onClick={() =>
-                openChangeUserRoleModal({
-                  id: volunteer.user!.id,
-                  role: volunteer.user!.role,
-                  name: volunteer.user!.name,
-                })
-              }
-              className="cursor-pointer focus:bg-primary/10 focus:text-primary"
+              onClick={() => { setSelectedVolunteer(volunteer); setIsAttendanceOpen(true) }}
+              className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
             >
-              <UserIcon className={cn(iconStyles, "text-primary/70")} />
-              <span className="font-semibold">Cambiar rol</span>
+              <Calendar className={iconStyles} />
+              <span className="font-medium">Marcar Asistencia</span>
             </DropdownMenuItem>
-          )}
+            <DropdownMenuItem
+              onClick={() => openScheduleVolunteerModal(volunteer)}
+              className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
+            >
+              <Calendar className={iconStyles} />
+              <span className="font-medium">Horarios</span>
+            </DropdownMenuItem>
 
-          <DropdownMenuItem
-            onClick={() => router.push(`/admin/volunteers/${volunteer.id}/attendances`)}
-            className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
-          >
-            <ArchiveIcon className={iconStyles} />
-            <span className="font-medium">Ver fechas</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <DropdownMenuItem
+              onClick={() => openInitialAttendanceModal(volunteer)}
+              className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
+            >
+              <MailCheckIcon className={iconStyles} />
+              <span className="font-medium">Primeras asistencias</span>
+            </DropdownMenuItem>
+
+            {volunteer.user && (
+              <DropdownMenuItem
+                onClick={() =>
+                  openChangeUserRoleModal({
+                    id: volunteer.user!.id,
+                    role: volunteer.user!.role,
+                    name: volunteer.user!.name,
+                  })
+                }
+                className="cursor-pointer focus:bg-primary/10 focus:text-primary"
+              >
+                <UserIcon className={cn(iconStyles, "text-primary/70")} />
+                <span className="font-semibold">Cambiar rol</span>
+              </DropdownMenuItem>
+            )}
+
+            <DropdownMenuItem
+              onClick={() => router.push(`/admin/volunteers/${volunteer.id}/attendances`)}
+              className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
+            >
+              <ArchiveIcon className={iconStyles} />
+              <span className="font-medium">Ver fechas</span>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {selectedVolunteer && (
+        <AttendanceModal
+          isOpen={isAttendanceOpen}
+          onClose={() => setIsAttendanceOpen(false)}
+          volunteer={{
+            id: selectedVolunteer.id,
+            name: selectedVolunteer.name,
+            email: selectedVolunteer.email,
+            birthday: selectedVolunteer.birthday ? new Date(selectedVolunteer.birthday).toISOString() : undefined,
+            attendances: [],
+            address: selectedVolunteer.address,
+            phone: selectedVolunteer.phone,
+            status: selectedVolunteer.status,
+          }}
+        />
+      )}
+    </>
   )
 }

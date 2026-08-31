@@ -195,7 +195,7 @@ export default function VolunteerModal({isOpen, onClose, volunteer}: VolunteerMo
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange("email", e.target.value)}
-              placeholder="ejemplo@unsaac.edu"
+              placeholder="ejemplo@unsaac.edu.pe"
               className={errors.email ? "border-red-500" : ""}
               disabled={!!volunteer}
             />

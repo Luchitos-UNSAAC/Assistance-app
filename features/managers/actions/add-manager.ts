@@ -28,8 +28,10 @@ const dayOfWeekMapper = (day: string) => {
       return WeekDay.JUEVES;
     case "VIERNES":
       return WeekDay.VIERNES;
-    case "SABADO":
-      return WeekDay.SABADO;
+    case "SABADO_MANIANA":
+      return WeekDay.SABADO_MANIANA;
+    case "SABADO_TARDE":
+      return WeekDay.SABADO_TARDE;
     case "DOMINGO":
       return WeekDay.DOMINGO;
     default:
@@ -53,7 +55,7 @@ export const addManager = async (body: AddManagerBody) => {
         message: `No existe el encargado`
       };
     }
-    
+
     const existingVolunteer = await prisma.volunteer.findUnique({
       where: {
         email: body.email,
@@ -65,9 +67,9 @@ export const addManager = async (body: AddManagerBody) => {
         message: `Ya existe un encargado con este email`,
       }
     }
-    
+
     const statusFormatted = body.status === "Active" ? VolunteerStatus.ACTIVE : VolunteerStatus.INACTIVE;
-    
+
     const newVolunteer = await prisma.volunteer.create({
       data: {
         name: body.name,
@@ -95,7 +97,7 @@ export const addManager = async (body: AddManagerBody) => {
         message: `Error al agregar el encargado`,
       }
     }
-    
+
     const dayOfWeekMapped = dayOfWeekMapper(body.dayOfWeek);
     // Verify existing group for the day
     const existingGroup = await prisma.group.findFirst({
@@ -111,19 +113,19 @@ export const addManager = async (body: AddManagerBody) => {
           groupId: existingGroup.id,
         }
       })
-      
+
       if (!newMemberGroup) {
         return {
           success: false,
           message: `Error al agregar el encargado al grupo existente`,
         }
       }
-      
+
       return {
         success: true,
       }
     }
-    
+
     const group = await prisma.group.create({
       data: {
         name: `Grupo de ` + dayOfWeekMapped,
@@ -137,14 +139,14 @@ export const addManager = async (body: AddManagerBody) => {
         }
       }
     })
-    
+
     if (!group) {
       return {
         success: false,
         message: `Error al crear el grupo del encargado`,
       }
     }
-    
+
     return {
       success: true,
     }
