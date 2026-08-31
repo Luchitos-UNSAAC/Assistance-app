@@ -129,13 +129,13 @@ export default function AddVolunteerModal({ isOpen, onClose }: AddVolunteerModal
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md  border-2 shadow-2xl">
+      <DialogContent className="sm:max-w-md  border-2 shadow-2xl dark:bg-black bg-white">
         <DialogHeader>
           <DialogTitle>Agregar Voluntario</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 p-1">
-          <div className="space-y-4 h-[80vh] overflow-y-auto">
+          <div className="space-y-4 h-[70vh] overflow-y-auto">
             <div>
               <Label htmlFor="name">Nombre completo</Label>
               <Input
