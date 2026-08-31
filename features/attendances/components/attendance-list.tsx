@@ -119,7 +119,7 @@ export default function AttendanceList({
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <h1 className="text-md font-semibold text-gray-900">
+              <h1 className="text-md font-semibold text-primary">
                 {isPossibleToMarkAttendances ? 'Asistencias de hoy' : 'Dia de asistencias:'}
               </h1>
 
@@ -135,7 +135,7 @@ export default function AttendanceList({
                 <Button
                   onClick={handleCreateAttendances}
                   disabled={isPending}
-                  className="bg-purple-600 text-white hover:bg-purple-700 animate-pulse"
+                  className="bg-purple-600 text-primary hover:bg-purple-700 animate-pulse"
                 >
                   Abrir
                 </Button>
@@ -175,12 +175,12 @@ export default function AttendanceList({
 
               const badgeClass =
                 attendanceStatus === "Present"
-                  ? "bg-green-500 text-white"
+                  ? "bg-green-500 text-primary"
                   : attendanceStatus === "Justified"
-                    ? "bg-yellow-500 text-white"
+                    ? "bg-yellow-500 text-primary"
                     : attendanceStatus === "Late"
-                      ? "bg-orange-500 text-white"
-                      : "bg-red-500 text-white"
+                      ? "bg-orange-500 text-primary"
+                      : "bg-red-500 text-primary"
 
               return (
                 <Card key={vol.id} className="gradient-card">
@@ -189,13 +189,13 @@ export default function AttendanceList({
                       {/* Left: Volunteer info */}
                       <div className="flex items-start gap-3">
                         {/*<div className="p-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-md shrink-0">*/}
-                        {/*  /!*<Calendar className="h-4 w-4 text-white"/>*!/*/}
+                        {/*  /!*<Calendar className="h-4 w-4 text-primary"/>*!/*/}
                         {/*</div>*/}
                         <AvatarDog
                           avatarUrl={vol?.user?.avatar || undefined}
                           name={vol.name}/>
                         <div className="text-sm leading-snug">
-                          <h3 className={cn('font-semibold text-gray-900 truncate max-w-[240px]',
+                          <h3 className={cn('font-semibold text-primary truncate max-w-[240px]',
                             !attendancesForTodayIsAlreadyCreated && 'truncate max-w-[160px]')}>{vol.name}</h3>
                           <p className="text-xs text-gray-600">{vol.email}</p>
                           {attendance?.date && (
@@ -272,7 +272,7 @@ export default function AttendanceList({
 
           {volunteers.length === 0 && (
             <div className="text-center py-12">
-              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4"/>
+              <Calendar className="h-12 w-12 text-primary mx-auto mb-4"/>
               <p className="text-gray-500">No hay voluntarios en este grupo</p>
             </div>
           )}

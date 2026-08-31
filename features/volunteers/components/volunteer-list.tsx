@@ -97,7 +97,7 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
         <div className="px-4 space-y-1">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900">Voluntarios</h1>
+            <h1 className="text-xl font-bold text-primary">Voluntarios</h1>
             {canManageVolunteers && (
               <div className="flex items-center gap-2">
                 {
@@ -116,7 +116,7 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
                     setSelectedVolunteer(null)
                     setIsModalOpen(true)
                   }}
-                  className="gradient-button text-white"
+                  className="gradient-button text-primary"
                 >
                   <Plus className="h-2 w-2"/>
                 </Button>
@@ -146,10 +146,10 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
                       <div className="flex items-center gap-2">
                         <div
                           className="hidden md:block p-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
-                          <User className="h-4 w-4 text-white"/>
+                          <User className="h-4 w-4 text-primary"/>
                         </div>
                         <div className="text-sm">
-                          <h3 className="font-semibold text-gray-900 leading-tight">
+                          <h3 className="font-semibold text-primary leading-tight">
                           <span className="block max-w-[200px] truncate">
                             {volunteer.name}
                           </span>
@@ -183,11 +183,11 @@ export default function VolunteerList({volunteers, attendances, newVolunteers}: 
                       <div className="flex gap-1 flex-col items-end justify-end text-[11px]">
                         <div className="w-full flex gap-1 flex-col items-end justify-end">
                         <span
-                          className="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 font-medium text-green-700 ring-1 ring-green-600/20">
+                          className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 font-medium text-green-700 ring-1 ring-green-600/20">
                           {stats.present} Presente{stats.present !== 1 ? "s" : ""}
                         </span>
                           <span
-                            className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 font-medium text-red-700 ring-1 ring-red-600/20">
+                            className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 font-medium text-red-700 ring-1 ring-red-600/20">
                           {stats.absent} Inasistencia{stats.absent !== 1 ? "s" : ""}
                         </span>
                         </div>

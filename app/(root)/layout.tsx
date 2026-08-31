@@ -22,7 +22,7 @@ export default async function RootLayout({
   const itNeedChangePassword = await needChangePassword()
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="min-h-screen bg-gradient-to-br bg-primary">
         <ClientRenderSecure>
           <Navbar/>
           <main>{children}</main>

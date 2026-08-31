@@ -39,11 +39,11 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
                 <CardContent className="p-3">
                   <div className="flex items-center space-x-2">
                     <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
-                      <Users className="h-4 w-4 text-gray-100"/>
+                      <Users className="h-4 w-4 text-primary"/>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600">Voluntarios Activos</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-xs text-primary">Voluntarios Activos</p>
+                      <p className="text-2xl font-bold text-primary">
                         {reviewDashboard.activeVolunteers}
                       </p>
                     </div>
@@ -56,13 +56,13 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
                   <div className="p-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg">
-                    <TrendingUp className="h-4 w-4 text-gray-100"/>
+                    <TrendingUp className="h-4 w-4 text-primary"/>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-primary">
                       {isVolunteerView ? "Mi Asistencia Hoy" : "Presentes Hoy"}
                     </p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-primary">
                       {isVolunteerView
                         ? reviewDashboard.myPresentToday
                         : reviewDashboard.presentToday}
@@ -77,11 +77,11 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-2">
                     <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg">
-                      <User className="h-4 w-4 text-white"/>
+                      <User className="h-4 w-4 text-primary"/>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">Total Asistencias</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-2xl font-bold text-primary">
                         {reviewDashboard.myAttendances}
                       </p>
                     </div>
@@ -103,12 +103,12 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
                   {reviewDashboard.upcomingBirthdays.map((volunteer) => (
                     <div key={volunteer.id} className="flex items-center justify-between px-2 py-2 bg-white/50 rounded-lg">
                       <div>
-                        <p className="font-medium text-gray-900 truncate max-w-[180px] sm:max-w-[230px]">
+                        <p className="font-medium text-primary truncate max-w-[180px] sm:max-w-[230px]">
                           {volunteer?.isToday && <span className="mr-1">🎂</span>}
                           {volunteer.name}
                         </p>
                         {
-                          volunteer?.birthday &&  <p className="text-sm text-gray-600">
+                          volunteer?.birthday &&  <p className="text-sm text-primary">
                             {format(parseISO(volunteer.birthday), "dd 'de' MMMM", { locale: es })}
                           </p>
                         }
@@ -130,7 +130,7 @@ export default function Dashboard({ reviewDashboard }: DashboardProps) {
                         </div>
                       }
                       {volunteer?.isToday && (
-                        <span className="inline-flex items-center bg-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                        <span className="inline-flex items-center bg-pink-500 text-primary text-xs font-semibold px-3 py-1 rounded-full">
                           Hoy
                           </span>
                       )}
